@@ -1,0 +1,72 @@
+{
+  "subject": {
+    "code": "ENGL",
+    "name": "English",
+    "description": "Courses focused on composition, literature, and critical thinking in English."
+  },
+  "courses": [
+    {
+      "courseId": "ENGL-101",
+      "shortName": "ENGL 101",
+      "fullName": "Introduction to Composition",
+      "units": 3,
+      "attributes": ["1A", "A2", "LD"],
+      "description": "Development of fundamental writing skills with emphasis on structure, clarity, and academic argumentation.",
+      "sections": [
+        {
+          "sectionId": "ENGL-101-01",
+          "professor": "Dr. Smith",
+          "schedule": "MWF 10:00-11:00 AM",
+          "location": "MI 201"
+        },
+        {
+          "sectionId": "ENGL-101-02",
+          "professor": "Dr. Johnson",
+          "schedule": "TuTh 1:00-2:15 PM",
+          "location": "MI 305"
+        }
+      ]
+    },
+    {
+      "courseId": "ENGL-200",
+      "shortName": "ENGL 200",
+      "fullName": "Literature and Culture",
+      "units": 4,
+      "attributes": ["C2", "DIV", "LD"],
+      "description": "Explores literature across diverse cultures, focusing on themes of identity, society, and representation.",
+      "sections": [
+        {
+          "sectionId": "ENGL-200-01",
+          "professor": "Dr. Martinez",
+          "schedule": "TuTh 9:30-10:45 AM",
+          "location": "AE 102"
+        }
+      ]
+    },
+    {
+      "courseId": "ENGL-310",
+      "shortName": "ENGL 310",
+      "fullName": "Advanced Composition and Rhetoric",
+      "units": 3,
+      "attributes": ["1B2COMP", "UD-3", "UD"],
+      "description": "Upper-division study of rhetoric, research-based writing, and argumentative discourse.",
+      "sections": []
+    },
+    {
+      "courseId": "ENGL-450",
+      "shortName": "ENGL 450",
+      "fullName": "Shakespeare in Context",
+      "units": 3,
+      "attributes": ["C4SJ", "UD"],
+      "description": "An in-depth analysis of Shakespeare’s works with emphasis on social justice, history, and performance.",
+      "sections": [
+        {
+          "sectionId": "ENGL-450-01",
+          "professor": "Dr. Lee",
+          "schedule": "MW 2:30-3:45 PM",
+          "location": "LI 220"
+        }
+      ]
+    }
+  ]
+}

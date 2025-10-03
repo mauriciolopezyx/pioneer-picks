@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.trackit</groupId>
-	<artifactId>trackit</artifactId>
+	<artifactId>pioneerpicks</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>trackit</name>
 	<description>TrackIt concept project</description>

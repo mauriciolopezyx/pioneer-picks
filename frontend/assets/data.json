@@ -1,0 +1,30 @@
+{
+    "subjects": [
+        {
+            "name": "English",
+            "id": 1
+        },
+        {
+            "name": "History",
+            "id": 2
+        },
+        {
+            "name": "Math",
+            "id": 3
+        },
+        {
+            "name": "Physics",
+            "id": 4
+        }
+    ],
+    "courses": {
+        "English": [
+            {
+                "name": "ENGL 308W"
+            },
+            {
+                "name": "ENGL 377W"
+            }
+        ]
+    }
+}
