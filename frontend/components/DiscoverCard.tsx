@@ -42,7 +42,7 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
         {/* Title top-left */}
         <Text
           numberOfLines={2}
-          className="text-xl font-medium text-white w-3/4"
+          className="text-xl text-white w-3/4"
         >
           {item.name}
         </Text>

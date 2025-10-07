@@ -16,8 +16,8 @@ const Courses = () => {
           minHeight: "100%", paddingBottom: 10
         }}
       >
-        <Text className="font-bold text-4xl mb-2">{name}</Text>
-        <Text className="font-medium mb-8">{data.subject.description}</Text>
+        <Text className="font-extrabold text-4xl mb-2">{name}</Text>
+        <Text className=" mb-8">{data.subject.description}</Text>
         <Text className="font-bold text-2xl mb-2">Courses</Text>
         <FlatList
             data={data.courses}

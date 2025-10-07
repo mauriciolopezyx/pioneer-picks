@@ -35,13 +35,13 @@ const Course = () => {
                 minHeight: "100%", paddingBottom: 10
                 }}
             >
-                <Text className="font-bold text-4xl mb-2">{courseId} ({course.units} Units)</Text>
+                <Text className="font-extrabold text-4xl mb-2">{courseId} ({course.units} Units)</Text>
 
                 <Text className="font-bold text-2xl">Description</Text>
-                <Text className="font-medium mb-4">{course?.description}</Text>
+                <Text className="mb-4">{course?.description}</Text>
 
                 <Text className="font-bold text-2xl">Areas</Text>
-                <Text className="font-medium mb-4">{course?.attributes.join(", ")}</Text>
+                <Text className="mb-4">{course?.attributes.join(", ")}</Text>
 
                 <Text className="font-bold text-2xl mb-2">Sections</Text>
                 <FlatList
