@@ -1,7 +1,16 @@
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, TouchableOpacity, View, useColorScheme } from "react-native";
+import { courseColorPalette } from "@/services/utils";
+
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
   English: "book-outline",
@@ -10,44 +19,59 @@ const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
   Physics: "flask-outline"
 };
 
-const colorPalette = [
-  "#E74C3C", // red
-  "#9B59B6", // purple
-  "#3498DB", // blue
-  "#1ABC9C", // teal
-  "#F39C12", // orange
-  "#2ECC71", // green
-];
-
 type Subject = {
     name: string,
     id: number
 }
 
 const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
+  const router = useRouter()
   const colorScheme = useColorScheme();
-  const bgColor = colorPalette[index % colorPalette.length];
+  const bgColor = courseColorPalette[item.name.toLowerCase()]?.primary ?? "#fff";
   const iconName = iconMap[item.name] ?? "ellipse-outline";
 
-  return (
-    <Link href={{
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
+
+  const handleSubmit = () => {
+    router.navigate({
         pathname: "/(tabs)/discover/[name]",
         params: { name: item.name },
-    }} asChild>
-      <TouchableOpacity
-        className="flex-1 m-1 h-32 rounded-lg p-3 overflow-hidden"
-        style={{ backgroundColor: bgColor }}
-        activeOpacity={0.8}
+    })
+  };
+
+  const tap = Gesture.Tap()
+    .onBegin(() => {
+        scale.value = withTiming(0.97, { duration: 80 });
+        opacity.value = withTiming(0.7, { duration: 80 });
+    })
+    .onFinalize(() => {
+        scale.value = withTiming(1, { duration: 150 });
+        opacity.value = withTiming(1, { duration: 150 });
+    })
+    .onEnd(() => {
+        scheduleOnRN(handleSubmit);
+    });
+  
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+    backgroundColor: bgColor
+  }));
+
+  return (
+    <GestureDetector gesture={tap}>
+      <Animated.View
+          className="flex-1 m-1 h-32 rounded-lg p-3 overflow-hidden"
+          style={animatedStyle}
       >
-        {/* Title top-left */}
         <Text
           numberOfLines={2}
-          className="text-xl text-white w-3/4"
+          className="font-montserrat-medium text-xl text-white w-3/4"
         >
           {item.name}
         </Text>
-
-        {/* Icon bottom-right, oversized & clipped */}
+        
         <Ionicons
           name={iconName}
           size={100} // big enough to overflow
@@ -58,8 +82,8 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
             right: -15,
           }}
         />
-      </TouchableOpacity>
-    </Link>
+      </Animated.View>
+    </GestureDetector>
   );
 };
 

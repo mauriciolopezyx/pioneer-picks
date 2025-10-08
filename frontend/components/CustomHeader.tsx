@@ -17,23 +17,12 @@ export default function CustomHeader({ value, onChangeText, placeholder="Search 
 
   const currentTitle = titles[route.name] ?? route.name;
 
-  // Animated opacity for smooth show/hide
-  const inputOpacity = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(inputOpacity, {
-      toValue: isFocused ? 1 : 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  }, [isFocused]);
-
   return (
     <View className={`flex-row justify-between items-center py-2 w-full ${route.name != "all" && "px-[8px]"}`}>
       {/* Title */}
       {true && (
         <Text
-          className={`text-3xl font-bold ${colorScheme === 'dark' ? 'text-white' : 'text-black'}`}
+          className={`text-3xl font-montserrat-bold ${colorScheme === 'dark' ? 'text-white' : 'text-black'}`}
         >
           {!isFocused ? currentTitle : ""}
         </Text>
@@ -54,11 +43,7 @@ export default function CustomHeader({ value, onChangeText, placeholder="Search 
       {/* Animated search input */}
       {isFocused && (
         <Animated.View
-          style={{
-            flex: 1,
-            opacity: inputOpacity,
-          }}
-          className="flex-row items-center justify-between gap-4"
+          className="flex-1 flex-row items-center justify-between gap-4"
         >
           <TextInput
             ref={inputRef}
@@ -67,7 +52,7 @@ export default function CustomHeader({ value, onChangeText, placeholder="Search 
             placeholder={placeholder}
             placeholderTextColor={colorScheme === 'dark' ? '#fff' : '#fff'}
             onBlur={() => setIsFocused(false)}
-            className={`text-white bg-light-200 flex-1 px-4 py-2 rounded-lg text-lg align-middle font-light`}
+            className={`text-white bg-light-200 flex-1 px-4 py-2 rounded-full text-lg align-middle font-montserrat-medium`}
             returnKeyType="search"
             autoCorrect={false}
             style={{

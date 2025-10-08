@@ -1,20 +1,24 @@
-import { SafeAreaView, Text, ScrollView, FlatList, View } from 'react-native'
+import { Text, ScrollView, FlatList, View } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import data from "@/assets/english.json"
 import SectionCard from '@/components/SectionCard';
 
+import {
+    SafeAreaView
+} from 'react-native-safe-area-context';
+
 const Course = () => {
 
-    const { id:courseId, subject } = useLocalSearchParams();
+    const { id:courseId, subject }: {id: string, subject: string} = useLocalSearchParams();
     const navigation = useNavigation();
 
     useEffect(() => {
         if (subject) {
-        navigation.setOptions({
-            headerBackTitle: subject,
-        });
+            navigation.setOptions({
+                headerBackTitle: subject,
+            });
         }
     }, [subject]);
 
@@ -27,7 +31,7 @@ const Course = () => {
     }
 
     return (
-        <SafeAreaView className="flex-1">
+        <SafeAreaView className="flex-1 pt-[40px]">
             <ScrollView
                 className="flex-1 px-5"
                 showsVerticalScrollIndicator={false}
@@ -35,19 +39,19 @@ const Course = () => {
                 minHeight: "100%", paddingBottom: 10
                 }}
             >
-                <Text className="font-extrabold text-4xl mb-2">{courseId} ({course.units} Units)</Text>
+                <Text className="font-montserrat-extrabold text-4xl mb-2">{courseId} ({course.units} Units)</Text>
 
-                <Text className="font-bold text-2xl">Description</Text>
-                <Text className="mb-4">{course?.description}</Text>
+                <Text className="font-montserrat-bold text-2xl">Description</Text>
+                <Text className="font-montserrat mb-4">{course?.description}</Text>
 
-                <Text className="font-bold text-2xl">Areas</Text>
-                <Text className="mb-4">{course?.attributes.join(", ")}</Text>
+                <Text className="font-montserrat-bold text-2xl">Areas</Text>
+                <Text className="font-montserrat mb-4">{course?.attributes.join(", ")}</Text>
 
-                <Text className="font-bold text-2xl mb-2">Sections</Text>
+                <Text className="font-montserrat-bold text-2xl mb-2">Sections</Text>
                 <FlatList
                     data={course.sections}
                     renderItem={(item) => (
-                        <SectionCard {...item} course={course?.courseId} />
+                        <SectionCard {...item} course={course?.courseId} subject={subject} />
                     )}
                     keyExtractor={(item) => item.sectionId.toString() ?? crypto.randomUUID()}
                     numColumns={1}

@@ -5,6 +5,7 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+
       colors: {
         primary: "#d50032",
         secondary: "#000000",
@@ -18,7 +19,17 @@ module.exports = {
         },
         tab: "#aaa",
         accent: "#AB8BFF"
-      }
+      },
+
+      fontFamily: {
+        montserrat: ["Montserrat_400Regular"],
+        "montserrat-medium": ["Montserrat_500Medium"],
+        "montserrat-semibold": ["Montserrat_600SemiBold"],
+        "montserrat-bold": ["Montserrat_700Bold"],
+        "montserrat-extrabold": ["Montserrat_800ExtraBold"],
+        "montserrat-black": ["Montserrat_900Black"]
+      },
+
     },
   },
   plugins: [],

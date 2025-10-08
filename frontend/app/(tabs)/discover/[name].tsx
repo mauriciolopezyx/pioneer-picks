@@ -1,14 +1,18 @@
-import { StyleSheet, Text, SafeAreaView, ScrollView, FlatList, View } from 'react-native'
+import { StyleSheet, Text, ScrollView, FlatList, View } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 import React from 'react'
 import data from "@/assets/english.json"
 import CourseCard from '@/components/CourseCard'
 
+import {
+    SafeAreaView
+} from 'react-native-safe-area-context';
+
 const Courses = () => {
     const {name} = useLocalSearchParams()
 
     return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 pt-[40px]">
         <ScrollView
         className="flex-1 px-5"
         showsVerticalScrollIndicator={false}
@@ -16,9 +20,9 @@ const Courses = () => {
           minHeight: "100%", paddingBottom: 10
         }}
       >
-        <Text className="font-extrabold text-4xl mb-2">{name}</Text>
-        <Text className=" mb-8">{data.subject.description}</Text>
-        <Text className="font-bold text-2xl mb-2">Courses</Text>
+        <Text className="font-montserrat-extrabold text-4xl mb-2">{name}</Text>
+        <Text className="font-montserrat mb-8">{data.subject.description}</Text>
+        <Text className="font-montserrat-bold text-2xl mb-2">Courses</Text>
         <FlatList
             data={data.courses}
             renderItem={(item) => (

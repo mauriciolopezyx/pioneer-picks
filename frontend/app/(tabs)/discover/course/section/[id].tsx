@@ -1,14 +1,27 @@
-import { SafeAreaView, Text, View, Pressable } from 'react-native'
-import { useLocalSearchParams, Link } from 'expo-router'
+import { Text, View, Pressable } from 'react-native'
+import { useLocalSearchParams, Link, useRouter } from 'expo-router'
 import { useState, useEffect, useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
 import data from "@/assets/english.json"
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation } from "@tanstack/react-query"
 
+import {
+    SafeAreaView
+} from 'react-native-safe-area-context';
+
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+
 const Course = () => {
 
-    const { id:sectionId, course } = useLocalSearchParams();
+    const router = useRouter()
+    const { id:sectionId, course }: {id: string, course: string} = useLocalSearchParams();
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -54,42 +67,67 @@ const Course = () => {
 
 
     return (
-        <SafeAreaView className="flex-1">
+        <SafeAreaView className="flex-1 pt-[40px]" edges={["top"]}>
             <View
                 className="flex-1 px-5"
             >
-                <Text className="font-extrabold text-4xl mb-2">{sectionId}</Text>
-                <Text className="font-bold text-2xl">{section?.professor}</Text>
-                <Text className="text-2xl mb-8">{section?.schedule}</Text>
+                <Text className="font-montserrat-extrabold text-4xl mb-2">{sectionId}</Text>
+                <Text className="font-montserrat-bold text-2xl">{section?.professor}</Text>
+                <Text className="font-montserrat text-2xl mb-8">{section?.schedule}</Text>
 
                 {/* <View className="border-t-[1px] mb-8"></View> */}
 
-                <Pressable className="flex flex-row justify-between items-center border-y-[1px] py-4">
-                    <Text className="text-2xl">Syllabus</Text>
-                    <Ionicons name="chevron-forward-outline" size={30} color="black" />
-                </Pressable>
+                <View className="border-t-[1px]"></View>
+                <Options title="General Information" onPress={ () => {} } />
+                <View className="border-t-[1px]"></View>
+                <Options title="Reviews" onPress={ () => {} } />
+                <View className="border-t-[1px]"></View>
 
-                <Pressable className="flex flex-row justify-between items-center border-b-[1px] py-4">
-                    <Text className="text-2xl">Books</Text>
-                    <Ionicons name="chevron-forward-outline" size={30} color="black" />
-                </Pressable>
-
-                <Pressable className="flex flex-row justify-between items-center border-b-[1px] py-4">
-                    <Text className=" text-2xl">Student Contributions</Text>
-                    <Ionicons name="chevron-forward-outline" size={30} color="black" />
-                </Pressable>
-
-                <Link href={`/section/${sectionId}`} asChild>
-                    <Pressable className="flex flex-row justify-between items-center border-b-[1px] py-4">
-                        <Text className="text-2xl">Reviews</Text>
-                        <Ionicons name="chevron-forward-outline" size={30} color="black" />
-                    </Pressable>
-                </Link>
+                <Options title="Comments" onPress={ () => { router.navigate({pathname: "/(modals)/section/[commentsId]", params: {commentsId: sectionId}}) } } />
+                <View className="border-t-[1px]"></View>
                 
             </View>
         </SafeAreaView>
     )
 }
 
+const Options = ({title, onPress}: {title: string, onPress: () => void}) => {
+    const scale = useSharedValue(1);
+    const opacity = useSharedValue(1);
+
+    const handleSubmit = () => {
+        onPress()
+    };
+
+    const tap = Gesture.Tap()
+        .onBegin(() => {
+            scale.value = withTiming(0.97, { duration: 80 });
+            opacity.value = withTiming(0.7, { duration: 80 });
+        })
+        .onFinalize(() => {
+            scale.value = withTiming(1, { duration: 150 });
+            opacity.value = withTiming(1, { duration: 150 });
+        })
+        .onEnd(() => {
+            scheduleOnRN(handleSubmit);
+        });
+    
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+        opacity: opacity.value,
+    }));
+
+    return (
+        <GestureDetector gesture={tap}>
+            <Animated.View
+                className="flex flex-row justify-between items-center py-4"
+                style={animatedStyle}
+            >
+                <Text className="font-montserrat-medium text-2xl">{title}</Text>
+                <Ionicons name="chevron-forward-outline" size={30} color="black" />
+            </Animated.View>
+        </GestureDetector>
+    )
+}
 
 export default Course

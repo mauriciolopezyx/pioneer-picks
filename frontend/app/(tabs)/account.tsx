@@ -1,5 +1,6 @@
 import { View, Text, Button, Pressable } from 'react-native'
 import { useState, useEffect } from "react"
+import { useRouter } from 'expo-router';
 
 import { useMutation } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
@@ -10,10 +11,12 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 const Account = () => {
 
+  const router = useRouter()
   const [authenticated, setAuthenticated] = useState<boolean>(false)
 
   const {mutate:heartbeat} = useMutation({
@@ -42,46 +45,6 @@ const Account = () => {
     heartbeat()
   }, [])
 
-  const scale1 = useSharedValue(1);
-  const opacity1 = useSharedValue(1);
-  const scale2 = useSharedValue(1);
-  const opacity2 = useSharedValue(1);
-
-  const tap1 = Gesture.Tap()
-    .onBegin(() => {
-      scale1.value = withTiming(0.97, { duration: 80 });
-      opacity1.value = withTiming(0.7, { duration: 80 });
-    })
-    .onFinalize(() => {
-      scale1.value = withTiming(1, { duration: 150 });
-      opacity1.value = withTiming(1, { duration: 150 });
-    })
-    .onEnd(() => {
-      console.log("Button pressed 1!");
-    });
-
-  const tap2 = Gesture.Tap()
-    .onBegin(() => {
-      scale2.value = withTiming(0.97, { duration: 80 });
-      opacity2.value = withTiming(0.7, { duration: 80 });
-    })
-    .onFinalize(() => {
-      scale2.value = withTiming(1, { duration: 150 });
-      opacity2.value = withTiming(1, { duration: 150 });
-    })
-    .onEnd(() => {
-      console.log("Button pressed 2!");
-    });
-
-  const animatedStyle1 = useAnimatedStyle(() => ({
-    transform: [{ scale: scale1.value }],
-    opacity: opacity1.value,
-  }));
-  const animatedStyle2 = useAnimatedStyle(() => ({
-    transform: [{ scale: scale2.value }],
-    opacity: opacity2.value,
-  }));
-
   return (
     <View className="flex-1 justify-center items-center gap-4">
       {authenticated ? (
@@ -89,28 +52,51 @@ const Account = () => {
         </>
       ) : (
         <>
-          <Text className="text-lg  mb-8">Sign in or register to unlock all features</Text>
-          <GestureDetector gesture={tap1}>
-            <Animated.View
-              className="w-72 py-3 px-4 flex items-center justify-center rounded-full bg-[#767576]"
-              style={animatedStyle1}
-            >
-              <Text className="text-white text-xl font-bold">Login</Text>
-            </Animated.View>
-          </GestureDetector>
-
-          <GestureDetector gesture={tap2}>
-            <Animated.View
-              className="w-72 py-3 px-4 flex items-center justify-center rounded-full bg-[#767576]"
-              style={animatedStyle2}
-            >
-              <Text className="text-white text-xl font-bold">Register</Text>
-            </Animated.View>
-          </GestureDetector>
+          <Text style={{textAlign: "center"}} className="font-montserrat w-3/4 text-lg mb-8" numberOfLines={2}>Sign in or register to comment and bookmark</Text>
+          <ControlButton title="Login" onPress={() => { router.navigate({pathname: "/login"})}} />
+          <ControlButton title="Register" onPress={() => { router.navigate({pathname: "/login"})}} />
         </>
       )}
     </View>
   )
+}
+
+const ControlButton = ({title, onPress}: {title: string, onPress: () => void}) => {
+    const scale = useSharedValue(1);
+    const opacity = useSharedValue(1);
+
+    const handleSubmit = () => {
+        onPress()
+    };
+
+    const tap = Gesture.Tap()
+        .onBegin(() => {
+            scale.value = withTiming(0.97, { duration: 80 });
+            opacity.value = withTiming(0.7, { duration: 80 });
+        })
+        .onFinalize(() => {
+            scale.value = withTiming(1, { duration: 150 });
+            opacity.value = withTiming(1, { duration: 150 });
+        })
+        .onEnd(() => {
+            scheduleOnRN(handleSubmit);
+        });
+    
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+        opacity: opacity.value,
+    }));
+    
+    return (
+        <GestureDetector gesture={tap}>
+          <Animated.View
+            className="w-72 py-3 px-4 flex items-center justify-center rounded-full bg-[#767576]"
+            style={animatedStyle}
+          >
+            <Text className="text-white text-xl font-montserrat-bold">{title}</Text>
+          </Animated.View>
+        </GestureDetector>
+    )
 }
 
 export default Account
