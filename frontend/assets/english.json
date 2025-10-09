@@ -12,6 +12,52 @@
       "units": 3,
       "attributes": ["1A", "A2", "LD"],
       "description": "Development of fundamental writing skills with emphasis on structure, clarity, and academic argumentation.",
+
+      "professors": [
+        {
+          "name": "Xiaojun Ruan",
+          "id": "p-1231",
+          "reviews": [
+            {
+              "name": "Anonymous",
+              "semester": "Fall 2025",
+              "location": 1,
+              "id": 3242,
+              "workload": 1,
+              "leniency": 1,
+              "assessment": 1,
+              "communication": 1,
+              "curve": false,
+              "attendance": true,
+              "late": false,
+              "textbook": "Liam Holmes 2025 Edition"
+            }
+          ],
+          "comments": [
+            {
+              "name": "User 1",
+              "date": "10/2/2025",
+              "semester": "Fall 2025",
+              "body": "This is comment 1",
+              "id": 1213
+            },
+            {
+              "name": "User 2",
+              "date": "10/2/2025",
+              "semester": "Fall 2025",
+              "body": "This is comment 2",
+              "id": 21214
+            },
+            {
+              "name": "User 3",
+              "date": "10/2/2025",
+              "semester": "Fall 2025",
+              "body": "He's an okay professor, harsh at grading, attendance is mandatory. Do yourself a favor though and avoid her morning classes, it's so exhausting",
+              "id": 12123
+            }
+          ]
+        }
+      ],
       "sections": [
         {
           "sectionId": "ENGL-101-01",
@@ -26,6 +72,7 @@
           "location": "MI 305"
         }
       ]
+
     },
     {
       "courseId": "ENGL-200",

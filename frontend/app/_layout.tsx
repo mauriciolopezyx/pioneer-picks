@@ -24,7 +24,7 @@ export default function RootLayout() {
             name="(tabs)"
           />
           <Stack.Screen 
-            name="(modals)/section/[commentsId]" 
+            name="(modals)/professors/[commentsId]" 
             options={{ presentation: "modal" }} 
           />
         </Stack>

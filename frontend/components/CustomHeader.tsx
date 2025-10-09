@@ -22,7 +22,7 @@ export default function CustomHeader({ value, onChangeText, placeholder="Search 
       {/* Title */}
       {true && (
         <Text
-          className={`text-3xl font-montserrat-bold ${colorScheme === 'dark' ? 'text-white' : 'text-black'}`}
+          className={`text-3xl w-1/2 font-montserrat-bold ${colorScheme === 'dark' ? 'text-white' : 'text-black'}`}
         >
           {!isFocused ? currentTitle : ""}
         </Text>

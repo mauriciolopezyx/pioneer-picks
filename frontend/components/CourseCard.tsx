@@ -62,7 +62,7 @@ const CourseCard = ({ item, index, subject }: {item: Course, index: number, subj
 
   const handleSubmit = () => {
     router.navigate({
-        pathname: "/(tabs)/discover/course/[id]",
+        pathname: "/(tabs)/discover/courses/[id]",
         params: { id: item.courseId, subject: subject },
     })
   };

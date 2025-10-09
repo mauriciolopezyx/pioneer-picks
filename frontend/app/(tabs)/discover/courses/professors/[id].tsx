@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import data from "@/assets/english.json"
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation } from "@tanstack/react-query"
+import { courseColorPalette } from "@/services/utils"
 
 import {
     SafeAreaView
@@ -21,7 +22,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 const Course = () => {
 
     const router = useRouter()
-    const { id:sectionId, course }: {id: string, course: string} = useLocalSearchParams();
+    const { id:professorId, course, subject }: {id: string, course: string, subject: string} = useLocalSearchParams();
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -33,15 +34,18 @@ const Course = () => {
     }, [course]);
 
     const info = data.courses.find(c =>
-        c.sections.some(section => section.sectionId === sectionId)
+        c.professors?.some(section => section.id === professorId)
     )
-    const section = info?.sections.find(s => s.sectionId === sectionId)
+    const professor = info?.professors?.find(s => s.id === professorId)
 
-    if (!section) {
+    if (!professor) {
         return (
             <View></View>
         )
     }
+
+    const bgColor = courseColorPalette[subject.toLowerCase()]?.primary ?? "#000";
+    const textColor = courseColorPalette[subject.toLowerCase()]?.secondary ?? "text-white"
 
     // const {isPending:loading, isError, error, mutate} = useMutation({
     //     mutationFn: async () => {
@@ -69,21 +73,26 @@ const Course = () => {
     return (
         <SafeAreaView className="flex-1 pt-[40px]" edges={["top"]}>
             <View
-                className="flex-1 px-5"
+                className="px-5"
             >
-                <Text className="font-montserrat-extrabold text-4xl mb-2">{sectionId}</Text>
-                <Text className="font-montserrat-bold text-2xl">{section?.professor}</Text>
-                <Text className="font-montserrat text-2xl mb-8">{section?.schedule}</Text>
+                <Text className="font-montserrat-bold text-lg">Professor</Text>
+                <Text className="font-montserrat-bold text-4xl">{professor.name}</Text>
+                <Text className="font-montserrat-medium text-lg mb-4">has taught {course} for {3} semesters</Text>
+
+                <Text className="font-montserrat-bold text-2xl mb-2">Courses</Text>
+                <View className="flex flex-row gap-5 w-full mb-8">
+                    <View className={`flex justify-center items-center py-2 px-4 rounded-full`} style={{ backgroundColor: bgColor }}>
+                        <Text className={`font-montserrat-bold text-sm ${textColor}`}>{course}</Text>
+                    </View>
+                </View>
 
                 {/* <View className="border-t-[1px] mb-8"></View> */}
 
                 <View className="border-t-[1px]"></View>
-                <Options title="General Information" onPress={ () => {} } />
-                <View className="border-t-[1px]"></View>
-                <Options title="Reviews" onPress={ () => {} } />
+                <Options title={`Reviews (${professor.reviews.length})`} onPress={ () => {} } />
                 <View className="border-t-[1px]"></View>
 
-                <Options title="Comments" onPress={ () => { router.navigate({pathname: "/(modals)/section/[commentsId]", params: {commentsId: sectionId}}) } } />
+                <Options title={`Comments (${professor.comments.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/[commentsId]", params: {commentsId: professor.id}}) } } />
                 <View className="border-t-[1px]"></View>
                 
             </View>

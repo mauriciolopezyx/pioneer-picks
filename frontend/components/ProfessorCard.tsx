@@ -12,14 +12,42 @@ import Animated, {
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
-type Section = {
-    sectionId: string,
-    professor: string,
-    schedule: string,
-    location: string
+// type Section = {
+//     sectionId: string,
+//     professor: string,
+//     schedule: string,
+//     location: string
+// }
+
+type Review = {
+  name: string
+  semester: string,
+  location: number,
+  id: number,
+  workload: number,
+  leniency: number,
+  assessment: number,
+  communication: number,
+  curve: boolean,
+  attendance: boolean,
+  late: boolean,
+  textbook?: string
+}
+type Comment = {
+  name: string,
+  date: string,
+  semester: string,
+  body: string,
+  id: number
+}
+type Professor = {
+  name: string,
+  id: string,
+  reviews: Review[],
+  comments: Comment[]
 }
 
-const SectionCard = ({ item, index, course, subject }: {item: Section, index: number, course: string, subject: string}) => {
+const ProfessorCard = ({ item:professor, index, course, subject }: {item: Professor, index: number, course: string, subject: string}) => {
   const router = useRouter()
   const colorScheme = useColorScheme();
   const bgColor = courseColorPalette[subject.toLowerCase()]?.primary ?? "#000";
@@ -30,8 +58,8 @@ const SectionCard = ({ item, index, course, subject }: {item: Section, index: nu
 
   const handleSubmit = () => {
     router.navigate({
-      pathname: "/(tabs)/discover/course/section/[id]",
-      params: { id: item.sectionId, course },
+      pathname: "/(tabs)/discover/courses/professors/[id]",
+      params: { id: professor.id, course, subject },
     })
   };
 
@@ -62,19 +90,14 @@ const SectionCard = ({ item, index, course, subject }: {item: Section, index: nu
       >
         <View>
             <Text numberOfLines={1} className={`text-xl font-montserrat-bold ${textColor}`}>
-                {item.sectionId}
+                {professor.name}
             </Text>
             <Text className={`font-montserrat-semibold ${textColor}`}>
-                {item.professor}
-            </Text>
-            <Text className={`font-montserrat ${textColor}`}>
-                {item.schedule}
+                {`${professor.reviews.length} Review${professor.reviews.length == 1 ? "" : "s"}`}, {"4 Semesters"}
             </Text>
         </View>
         <View>
-            <Text className={`font-montserrat-bold text-2xl ${textColor}`}>
-                {item.location}
-            </Text>
+            <Ionicons name="chevron-forward-outline" size={30} color="white" />
         </View>
 
 
@@ -93,4 +116,4 @@ const SectionCard = ({ item, index, course, subject }: {item: Section, index: nu
   );
 };
 
-export default SectionCard
+export default ProfessorCard

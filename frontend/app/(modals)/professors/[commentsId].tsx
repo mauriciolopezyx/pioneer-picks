@@ -1,6 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform  } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams } from "expo-router"
+import data from "@/assets/english.json"
 
 import Animated, {
   useSharedValue,
@@ -11,34 +13,30 @@ import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 type Comment = {
-    body: string,
-    id: number
-    comments: Comment[]
+  name: string,
+  date: string,
+  semester: string,
+  body: string,
+  id: number
 }
 
-const dummyComments: Comment[] = [
-    {
-        body: "This is comment 1",
-        id: 1,
-        comments: []
-    },
-    {
-        body: "This is comment 2",
-        id: 2,
-        comments: []
-    },
-    {
-        body: "She's an okay professor, harsh at grading, attendance is mandatory. Do yourself a favor though and avoid her morning classes, it's so exhausting",
-        id: 3,
-        comments: []
-    },
-]
-
 export default function SectionScreen() {
-    const [comments, setComments] = useState(dummyComments)
+
+    const { commentsId:professorId }: {commentsId: string} = useLocalSearchParams()
+    const [comments, setComments] = useState<Comment[]>([])
     const onComment = (newComment: Comment) => {
         setComments(prev => [newComment, ...prev])
     }
+
+    useEffect(() => {
+        const info = data.courses.find(c =>
+            c.professors?.some(section => section.id === professorId)
+        )
+        const professor = info?.professors?.find(s => s.id === professorId)
+        if (professor) {
+            setComments(professor.comments)
+        }
+    }, [])
 
     return (
         <KeyboardAvoidingView
@@ -126,8 +124,8 @@ const CommentItem = ({comment}: CommentItemProps) => {
     return (
         <View className="flex flex-col border-l-[1px] border-dark-100 p-3 gap-4">
             <View>
-                <Text className="font-montserrat-semibold text-md">Ulysses Johnson</Text>
-                <Text className="font-montserrat-medium text-sm text-light-200">Oct 10, 2025; Spring 2025</Text>
+                <Text className="font-montserrat-semibold text-md">{comment.name}</Text>
+                <Text className="font-montserrat-medium text-sm text-light-200">{`${comment.date}; ${comment.semester}`}</Text>
             </View>
             <Text className="font-montserrat text-md">{comment.body}</Text>
             {/* {replying ? (
@@ -159,8 +157,10 @@ const CommentInput = ({ onComment }: CommentInputProps) => {
     const handleSubmit = () => {
         if (!commentBody.trim()) return;
         onComment({
+            name: "dr johnson",
+            date: "10/8/2025",
             body: commentBody,
-            comments: [],
+            semester: "random semester",
             id: Math.floor(Math.random() * 10000) + 100,
         })
         setCommentBody("")
