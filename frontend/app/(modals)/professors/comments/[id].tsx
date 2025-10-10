@@ -3,6 +3,7 @@ import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platf
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from "expo-router"
 import data from "@/assets/english.json"
+import { useAuth } from "@/components/AuthProvider";
 
 import Animated, {
   useSharedValue,
@@ -22,7 +23,8 @@ type Comment = {
 
 export default function SectionScreen() {
 
-    const { commentsId:professorId }: {commentsId: string} = useLocalSearchParams()
+    const { id:professorId }: {id: string} = useLocalSearchParams()
+    const { user, loading } = useAuth()
     const [comments, setComments] = useState<Comment[]>([])
     const onComment = (newComment: Comment) => {
         setComments(prev => [newComment, ...prev])
@@ -64,7 +66,7 @@ export default function SectionScreen() {
             </View>
             <View className="border-t-[1px] border-gray-200 pb-[25px] pt-[10px] bg-black flex items-center justify-center">
                 <View className="w-[90%]">
-                    <CommentInput onComment={onComment} />
+                    <CommentInput onComment={onComment} user={user} />
                 </View>
             </View>
         </KeyboardAvoidingView>
@@ -144,10 +146,11 @@ const CommentItem = ({comment}: CommentItemProps) => {
 }
 
 type CommentInputProps = {
-    onComment: (newComment: Comment) => void
+    onComment: (newComment: Comment) => void,
+    user: any
 }
 
-const CommentInput = ({ onComment }: CommentInputProps) => {
+const CommentInput = ({ onComment, user }: CommentInputProps) => {
     const [commentBody, setCommentBody] = useState("");
     const inputRef = useRef<TextInput>(null);
 
@@ -181,7 +184,7 @@ const CommentInput = ({ onComment }: CommentInputProps) => {
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ scale: scale.value }],
-        opacity: opacity.value,
+        opacity: user != null ? opacity.value : 0.5,
     }));
 
     return (
@@ -190,11 +193,12 @@ const CommentInput = ({ onComment }: CommentInputProps) => {
                 ref={inputRef}
                 value={commentBody}
                 onChangeText={setCommentBody}
-                placeholder="What are your thoughts?"
-                placeholderTextColor={"#555"}
+                placeholder={user ? "What are your thoughts?" : "Sign in to comment"}
+                placeholderTextColor={user != null ? "#555" : "#999"}
                 multiline
-                className="font-montserrat-medium flex-1 bg-white border-[1px] p-3 border-dark-100 text-black rounded-full min-h-[40px] text-md"
+                className={`font-montserrat-medium flex-1 border-[1px] p-3 border-dark-100 text-black rounded-full min-h-[40px] text-md ${user != null ? "bg-white" : "bg-light-100"}`}
                 textAlign="left"
+                editable={user != null}
             />
             <GestureDetector gesture={tap}>
                 <Animated.View

@@ -78,7 +78,6 @@ const Course = () => {
                 <Text className="font-montserrat-bold text-lg">Professor</Text>
                 <Text className="font-montserrat-bold text-4xl">{professor.name}</Text>
                 <Text className="font-montserrat-medium text-lg mb-4">has taught {course} for {3} semesters</Text>
-
                 <Text className="font-montserrat-bold text-2xl mb-2">Courses</Text>
                 <View className="flex flex-row gap-5 w-full mb-8">
                     <View className={`flex justify-center items-center py-2 px-4 rounded-full`} style={{ backgroundColor: bgColor }}>
@@ -89,10 +88,10 @@ const Course = () => {
                 {/* <View className="border-t-[1px] mb-8"></View> */}
 
                 <View className="border-t-[1px]"></View>
-                <Options title={`Reviews (${professor.reviews.length})`} onPress={ () => {} } />
+                <Options title={`Reviews (${professor.reviews.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id}}) } } />
                 <View className="border-t-[1px]"></View>
 
-                <Options title={`Comments (${professor.comments.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/[commentsId]", params: {commentsId: professor.id}}) } } />
+                <Options title={`Comments (${professor.comments.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id}}) } } />
                 <View className="border-t-[1px]"></View>
                 
             </View>

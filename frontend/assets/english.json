@@ -10,7 +10,7 @@
       "shortName": "ENGL 101",
       "fullName": "Introduction to Composition",
       "units": 3,
-      "attributes": ["1A", "A2", "LD"],
+      "areas": ["1A", "A2", "LD"],
       "description": "Development of fundamental writing skills with emphasis on structure, clarity, and academic argumentation.",
 
       "professors": [
@@ -20,6 +20,7 @@
           "reviews": [
             {
               "name": "Anonymous",
+              "date": "10/2/2025",
               "semester": "Fall 2025",
               "location": 1,
               "id": 3242,
@@ -29,8 +30,10 @@
               "communication": 1,
               "curve": false,
               "attendance": true,
-              "late": false,
-              "textbook": "Liam Holmes 2025 Edition"
+              "late": true,
+              "textbook": "Liam Holmes 2025 Edition",
+              "positive": "this is what worked, blah blah blah",
+              "negative": "Watch out for his crash outs"
             }
           ],
           "comments": [
@@ -79,7 +82,7 @@
       "shortName": "ENGL 200",
       "fullName": "Literature and Culture",
       "units": 4,
-      "attributes": ["C2", "DIV", "LD"],
+      "areas": ["C2", "DIV", "LD"],
       "description": "Explores literature across diverse cultures, focusing on themes of identity, society, and representation.",
       "sections": [
         {
@@ -95,7 +98,7 @@
       "shortName": "ENGL 310",
       "fullName": "Advanced Composition and Rhetoric",
       "units": 3,
-      "attributes": ["1B2COMP", "UD-3", "UD"],
+      "areas": ["1B2COMP", "UD-3", "UD"],
       "description": "Upper-division study of rhetoric, research-based writing, and argumentative discourse.",
       "sections": []
     },
@@ -104,7 +107,7 @@
       "shortName": "ENGL 450",
       "fullName": "Shakespeare in Context",
       "units": 3,
-      "attributes": ["C4SJ", "UD"],
+      "areas": ["C4SJ", "UD"],
       "description": "An in-depth analysis of Shakespeare’s works with emphasis on social justice, history, and performance.",
       "sections": [
         {

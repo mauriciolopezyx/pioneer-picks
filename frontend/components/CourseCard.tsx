@@ -46,7 +46,7 @@ type Course = {
     shortName: string,
     fullName: string,
     units: number,
-    attributes: string[],
+    areas: string[],
     description: string,
     sections: Section[]
 }
@@ -100,7 +100,7 @@ const CourseCard = ({ item, index, subject }: {item: Course, index: number, subj
               {item.fullName}
           </Text>
           <Text className={`font-montserrat ${textColor}`}>
-              {item.attributes.join(", ")}
+              {item.areas.join(", ")}
           </Text>
         </View>
         <View>

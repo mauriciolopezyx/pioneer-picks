@@ -21,6 +21,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 type Review = {
   name: string
+  date: string,
   semester: string,
   location: number,
   id: number,
@@ -31,7 +32,9 @@ type Review = {
   curve: boolean,
   attendance: boolean,
   late: boolean,
-  textbook?: string
+  textbook?: string,
+  positive: string,
+  negative: string
 }
 type Comment = {
   name: string,

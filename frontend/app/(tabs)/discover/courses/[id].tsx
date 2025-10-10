@@ -51,7 +51,7 @@ const Course = () => {
 
                 <Text className="font-montserrat-bold text-2xl mb-2">Areas</Text>
                 <View className="flex flex-row gap-5 w-full mb-4">
-                    {course?.attributes.map(attribute => {
+                    {course?.areas.map(attribute => {
                         return (
                             <View key={attribute} className="flex justify-center items-center px-3 border-[1px] border-black rounded-full">
                                 <Text className="font-montserrat-bold">{attribute}</Text>
