@@ -25,15 +25,15 @@
               "location": 1,
               "id": 3242,
               "workload": 1,
-              "leniency": 1,
+              "leniency": 3,
               "assessment": 1,
-              "communication": 1,
-              "curve": false,
-              "attendance": true,
+              "communication": 2,
+              "curve": true,
+              "attendance": false,
               "late": true,
               "textbook": "Liam Holmes 2025 Edition",
-              "positive": "this is what worked, blah blah blah",
-              "negative": "Watch out for his crash outs"
+              "positive": "As long as you study properly this class should be easy A.",
+              "negative": "just make sure to attend class early he takes attendance and will dock points at the end of the semester, otherwise you should be good , easy A class."
             }
           ],
           "comments": [
