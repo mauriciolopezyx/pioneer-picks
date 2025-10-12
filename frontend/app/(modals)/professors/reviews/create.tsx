@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform  } from "react-native";
+import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform, ScrollView, ActionSheetIOS, Button  } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from "expo-router"
+import { useLocalSearchParams } from "expo-router"
+import { useActionSheet } from '@expo/react-native-action-sheet';
 import data from "@/assets/english.json"
 import { useAuth } from "@/components/AuthProvider";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,6 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { set } from "react-hook-form";
 
 type Review = {
   name: string,
@@ -32,25 +34,26 @@ type Review = {
   negative: string
 }
 
+type Form = {
+    season: string
+    year: string
+}
+
 export default function SectionScreen() {
 
-    const { id:professorId }: {id: string} = useLocalSearchParams()
-    const router = useRouter()
     const { user } = useAuth()
-    const [reviews, setReviews] = useState<Review[]>([])
-    const onComment = (newComment: Review) => {
-        setReviews(prev => [newComment, ...prev])
+
+    //use zod only for the inputs
+
+    const [form, setForm] = useState<Form>({
+        season: "Fall",
+        year: "2025"
+    })
+    const onFormUpdate = (key: string, value: any) => {
+        setForm((prev) => ({...prev, [key]: value}))
     }
 
-    useEffect(() => {
-        const info = data.courses.find(c =>
-            c.professors?.some(section => section.id === professorId)
-        )
-        const professor = info?.professors?.find(s => s.id === professorId)
-        if (professor) {
-            setReviews(professor.reviews)
-        }
-    }, [])
+    const { showActionSheetWithOptions } = useActionSheet();
 
     return (
         <KeyboardAvoidingView
@@ -58,66 +61,45 @@ export default function SectionScreen() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={55}
         >
-            <View className="flex-1 px-5 pt-5">
+            <ScrollView className="flex-1 px-5 pt-5">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto">Reviews</Text>
                 <View className="border-t-[1px] mb-8"></View>
-                <View className="flex-1">
-                    <FlatList
-                        data={reviews}
-                        renderItem={(item) => (
-                            <Review key={item.item.id} review={item.item} />
-                        )}
-                        keyExtractor={(item) => item.id.toString() ?? crypto.randomUUID()}
-                        numColumns={1}
-                        ItemSeparatorComponent={() => <View style={{ height: 30 }} />}
-                        contentContainerStyle={{ paddingBottom: 20 }}
-                        scrollEnabled={true}
-                        indicatorStyle="black"
-                    />
+                <View className="flex flex-row justify-between items-center mb-4">
+                    <Text className="font-montserrat-bold font-bold text-2xl">Semester</Text>
+                    <FormButton field={"season"} title={form.season} showActionSheetWithOptions={showActionSheetWithOptions} options={["Spring", "Summer", "Fall", "Winter", "Cancel"]} onFormUpdate={onFormUpdate} />
                 </View>
-            </View>
-            <View className="absolute bottom-[30px] right-[30px]">
-                <ControlButton user={true} onPress={() => { router.navigate({pathname: "/(modals)/professors/reviews/create"}) }} />
-            </View>
+            </ScrollView>
         </KeyboardAvoidingView>
     );
 }
 
-const ControlButton = ({user, onPress}: {user: any, onPress: () => void}) => {
-    const scale = useSharedValue(1);
-    const opacity = useSharedValue(1);
+type FormButtonProps = {
+    field: string,
+    title: string,
+    showActionSheetWithOptions: any,
+    options: string[],
+    onFormUpdate: (key: string, value: string) => void
+}
 
-    const handleSubmit = () => {
-        onPress()
-    };
+const FormButton = ({ field, title, showActionSheetWithOptions, options, onFormUpdate }: FormButtonProps) => {
+    const onPress = () => {
+        const destructiveButtonIndex = -1
+        const cancelButtonIndex = options.length - 1
 
-    const tap = Gesture.Tap()
-        .onBegin(() => {
-            scale.value = withTiming(0.97, { duration: 80 });
-            opacity.value = withTiming(0.7, { duration: 80 });
-        })
-        .onFinalize(() => {
-            scale.value = withTiming(1, { duration: 150 });
-            opacity.value = withTiming(1, { duration: 150 });
-        })
-        .onEnd(() => {
-            scheduleOnRN(handleSubmit);
-        });
-    
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-        opacity: user ? opacity.value : 0.25,
-    }));
-    
+        showActionSheetWithOptions({ options, cancelButtonIndex, destructiveButtonIndex }, (i: any) => {
+            switch (i) {
+                case destructiveButtonIndex:
+                    break
+                case cancelButtonIndex:
+                    break
+                default:
+                    onFormUpdate(field, options[i])
+                    break
+            }}
+        )
+    }
     return (
-        <GestureDetector gesture={tap}>
-            <Animated.View
-                className="border-[1px] border-dark-100 w-[75px] h-[75px] px-1 flex items-center justify-center bg-black rounded-full"
-                style={animatedStyle}
-            >
-                <Ionicons name={user ? "add-outline" : "information-outline"} size={35} color="white" />
-            </Animated.View>
-        </GestureDetector>
+        <Button title={title} onPress={onPress} />
     )
 }
 

@@ -12,24 +12,20 @@ export default function CustomHeader({ value, onChangeText, placeholder="Search 
   const titles: Record<string, string> = {
     index: "Home",
     account: "Account",
-    all: "Discover"
+    discover: "Discover"
   };
 
   const currentTitle = titles[route.name] ?? route.name;
 
   return (
-    <View className={`flex-row justify-between items-center py-2 w-full ${route.name != "all" && "px-[8px]"}`}>
-      {/* Title */}
+    <View className={`flex flex-row justify-between items-center py-2 w-full px-[5px]`}>
       {true && (
-        <Text
-          className={`text-3xl w-1/2 font-montserrat-bold ${colorScheme === 'dark' ? 'text-white' : 'text-black'}`}
-        >
+        <Text className={`text-3xl font-montserrat-bold ${colorScheme === 'dark' ? 'text-white' : 'text-black'}`}>
           {!isFocused ? currentTitle : ""}
         </Text>
       )}
 
-      {/* Pressable icon to focus the search */}
-      {!isFocused && (
+      {!isFocused ? (
         <Pressable
           onPress={() => {
             setIsFocused(true);
@@ -38,11 +34,9 @@ export default function CustomHeader({ value, onChangeText, placeholder="Search 
         >
           <Ionicons name="search" size={22} color={colorScheme === 'dark' ? '#d50032' : '#d50032'} />
         </Pressable>
-      )}
-
-      {/* Animated search input */}
-      {isFocused && (
-        <Animated.View
+      ) : null}
+      {isFocused ? (
+        <View
           className="flex-1 flex-row items-center justify-between gap-4"
         >
           <TextInput
@@ -70,8 +64,8 @@ export default function CustomHeader({ value, onChangeText, placeholder="Search 
           >
             <Ionicons name="close" size={32} color={colorScheme === 'dark' ? '#d50032' : '#d50032'} />
           </Pressable>
-        </Animated.View>
-      )}
+        </View>
+      ) : null}
     </View>
   );
 }

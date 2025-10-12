@@ -13,10 +13,12 @@ import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
+  All: "globe-outline",
   English: "book-outline",
   History: "time-outline",
   Math: "calculator-outline",
-  Physics: "flask-outline"
+  Physics: "flask-outline",
+  "Computer Science": "laptop-outline"
 };
 
 type Subject = {

@@ -12,17 +12,18 @@ export default function DiscoverLayout() {
       <Stack.Screen
         name="all"
         options={{
-            headerTitle: () => <CustomHeader />,
-            headerStyle: {
-                backgroundColor: "#000",
-            },
-            headerTransparent: false
+            // headerTitle: () => <CustomHeader />,
+            // headerStyle: {
+            //     backgroundColor: "#000",
+            // },
+            // headerTransparent: false,
+            headerShown: false
         }}
       />
       <Stack.Screen
         name="[name]"
         options={{
-            headerBackTitle: "Discover",
+            headerBackTitle: "Subjects",
             headerTitle: ""
         }}
       />

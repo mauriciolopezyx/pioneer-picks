@@ -34,6 +34,23 @@
               "textbook": "Liam Holmes 2025 Edition",
               "positive": "As long as you study properly this class should be easy A.",
               "negative": "just make sure to attend class early he takes attendance and will dock points at the end of the semester, otherwise you should be good , easy A class."
+            },
+            {
+              "name": "Anonymous",
+              "date": "10/2/2025",
+              "semester": "Fall 2025",
+              "location": 1,
+              "id": 3243,
+              "workload": 1,
+              "leniency": 3,
+              "assessment": 1,
+              "communication": 2,
+              "curve": true,
+              "attendance": false,
+              "late": true,
+              "textbook": "Liam Holmes 2025 Edition",
+              "positive": "As long as you study properly this class should be easy A.",
+              "negative": "just make sure to attend class early he takes attendance and will dock points at the end of the semester, otherwise you should be good , easy A class."
             }
           ],
           "comments": [

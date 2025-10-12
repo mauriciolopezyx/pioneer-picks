@@ -71,7 +71,7 @@ const Course = () => {
 
 
     return (
-        <SafeAreaView className="flex-1 pt-[40px]" edges={["top"]}>
+        <SafeAreaView className="flex-1" edges={["top"]}>
             <View
                 className="px-5"
             >

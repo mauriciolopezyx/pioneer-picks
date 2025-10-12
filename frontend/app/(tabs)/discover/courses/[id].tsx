@@ -31,7 +31,7 @@ const Course = () => {
     }
 
     return (
-        <SafeAreaView className="flex-1 pt-[40px]">
+        <SafeAreaView className="flex-1">
             <ScrollView
                 className="flex-1 px-5"
                 showsVerticalScrollIndicator={false}

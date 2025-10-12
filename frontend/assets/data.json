@@ -1,6 +1,10 @@
 {
     "subjects": [
         {
+            "name": "All",
+            "id": 0
+        },
+        {
             "name": "English",
             "id": 1
         },
@@ -15,6 +19,10 @@
         {
             "name": "Physics",
             "id": 4
+        },
+        {
+            "name": "Computer Science",
+            "id": 5
         }
     ],
     "courses": {

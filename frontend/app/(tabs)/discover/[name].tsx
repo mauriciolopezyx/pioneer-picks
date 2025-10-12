@@ -11,8 +11,10 @@ import {
 const Courses = () => {
     const {name} = useLocalSearchParams()
 
+    const chosenData = name === "All" ? data.courses : data.courses
+
     return (
-    <SafeAreaView className="flex-1 pt-[40px]">
+    <SafeAreaView className="flex-1">
         <ScrollView
         className="flex-1 px-5"
         showsVerticalScrollIndicator={false}
@@ -24,7 +26,7 @@ const Courses = () => {
         <Text className="font-montserrat mb-8">{data.subject.description}</Text>
         <Text className="font-montserrat-bold text-2xl mb-2">Courses</Text>
         <FlatList
-            data={data.courses}
+            data={chosenData}
             renderItem={(item) => (
                 <CourseCard {...item} subject={data.subject.name} />
             )}

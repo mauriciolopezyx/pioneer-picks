@@ -24,7 +24,7 @@ type Comment = {
 export default function SectionScreen() {
 
     const { id:professorId }: {id: string} = useLocalSearchParams()
-    const { user, loading } = useAuth()
+    const { user } = useAuth()
     const [comments, setComments] = useState<Comment[]>([])
     const onComment = (newComment: Comment) => {
         setComments(prev => [newComment, ...prev])

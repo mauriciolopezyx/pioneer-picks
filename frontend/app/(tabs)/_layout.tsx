@@ -83,7 +83,7 @@ const _layout = () => {
                             colorScheme={colorScheme}
                         />
                     ),
-                    headerShown: false
+                    headerTitle: () => <CustomHeader />
                 }}
             />
             <Tabs.Screen
