@@ -1,11 +1,10 @@
-import { useState, useRef, useEffect } from "react";
-import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform, ScrollView, ActionSheetIOS, Button  } from "react-native";
+import { useState } from "react";
+import { View, Text, KeyboardAvoidingView, Platform, ScrollView, Button, Modal, Pressable } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from "expo-router"
 import { useActionSheet } from '@expo/react-native-action-sheet';
-import data from "@/assets/english.json"
 import { useAuth } from "@/components/AuthProvider";
 import { LinearGradient } from 'expo-linear-gradient';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import Animated, {
   useSharedValue,
@@ -36,7 +35,11 @@ type Review = {
 
 type Form = {
     season: string
-    year: string
+    year: string,
+    location: number,
+    leniency: number,
+    assessment: number,
+    communication: number
 }
 
 export default function SectionScreen() {
@@ -44,16 +47,29 @@ export default function SectionScreen() {
     const { user } = useAuth()
 
     //use zod only for the inputs
+    // when submitting make sure to add 1 to forms
 
     const [form, setForm] = useState<Form>({
         season: "Fall",
-        year: "2025"
+        year: "2025",
+        location: 0,
+        leniency: 0,
+        assessment: 0,
+        communication: 0
     })
     const onFormUpdate = (key: string, value: any) => {
         setForm((prev) => ({...prev, [key]: value}))
     }
 
-    const { showActionSheetWithOptions } = useActionSheet();
+    const { showActionSheetWithOptions } = useActionSheet()
+
+    // probably export as const
+    const options = {
+        location: ["Online", "In-person", "Hybrid", "Cancel"],
+        leniency: ["Lenient", "Slightly rigourous", "Rigourous", "Cancel"],
+        assessment: ["Exam heavy", "Classwork heavy", "Balanced exams & classwork", "Cancel"],
+        communication: ["Organized", "Disorganized", "Unorganized", "Cancel"]
+    }
 
     return (
         <KeyboardAvoidingView
@@ -62,11 +78,38 @@ export default function SectionScreen() {
             keyboardVerticalOffset={55}
         >
             <ScrollView className="flex-1 px-5 pt-5">
-                <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto">Reviews</Text>
+                <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto">Create Review</Text>
                 <View className="border-t-[1px] mb-8"></View>
-                <View className="flex flex-row justify-between items-center mb-4">
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
                     <Text className="font-montserrat-bold font-bold text-2xl">Semester</Text>
-                    <FormButton field={"season"} title={form.season} showActionSheetWithOptions={showActionSheetWithOptions} options={["Spring", "Summer", "Fall", "Winter", "Cancel"]} onFormUpdate={onFormUpdate} />
+                    <View className="flex flex-row items-center justify-center">
+                        <FormButton field={"season"} title={form.season} showActionSheetWithOptions={showActionSheetWithOptions} options={["Spring", "Summer", "Fall", "Winter", "Cancel"]} onFormUpdate={onFormUpdate} />
+                        <FormButton field={"year"} title={form.year} showActionSheetWithOptions={showActionSheetWithOptions} options={["<2020", "2021", "2022", "2023", "2024", "2025", "Cancel"]} onFormUpdate={onFormUpdate} />
+                    </View>
+                </View>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl">Location</Text>
+                    <View className="flex flex-row items-center justify-center">
+                        <FormButton field={"location"} title={options.location[form.location]} showActionSheetWithOptions={showActionSheetWithOptions} options={options.location} onFormUpdate={onFormUpdate} useIndex={true} />
+                    </View>
+                </View>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl">Leniency</Text>
+                    <View className="flex flex-row items-center justify-center">
+                        <FormButton field={"leniency"} title={options.leniency[form.leniency]} showActionSheetWithOptions={showActionSheetWithOptions} options={options.leniency} onFormUpdate={onFormUpdate} useIndex={true} />
+                    </View>
+                </View>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl">Assignments</Text>
+                    <View className="flex flex-row items-center justify-center">
+                        <FormButton field={"assessment"} title={form.assessment != 2 ? options.assessment[form.assessment] : "Balanced"} showActionSheetWithOptions={showActionSheetWithOptions} options={options.assessment} onFormUpdate={onFormUpdate} useIndex={true} />
+                    </View>
+                </View>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl">Leniency</Text>
+                    <View className="flex flex-row items-center justify-center">
+                        <FormButton field={"communication"} title={options.communication[form.communication]} showActionSheetWithOptions={showActionSheetWithOptions} options={options.communication} onFormUpdate={onFormUpdate} useIndex={true} />
+                    </View>
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -78,10 +121,11 @@ type FormButtonProps = {
     title: string,
     showActionSheetWithOptions: any,
     options: string[],
-    onFormUpdate: (key: string, value: string) => void
+    onFormUpdate: (key: string, value: string) => void,
+    useIndex?: boolean
 }
 
-const FormButton = ({ field, title, showActionSheetWithOptions, options, onFormUpdate }: FormButtonProps) => {
+const FormButton = ({ field, title, showActionSheetWithOptions, options, onFormUpdate, useIndex }: FormButtonProps) => {
     const onPress = () => {
         const destructiveButtonIndex = -1
         const cancelButtonIndex = options.length - 1
@@ -93,13 +137,13 @@ const FormButton = ({ field, title, showActionSheetWithOptions, options, onFormU
                 case cancelButtonIndex:
                     break
                 default:
-                    onFormUpdate(field, options[i])
+                    onFormUpdate(field, !useIndex ? options[i] : i)
                     break
             }}
         )
     }
     return (
-        <Button title={title} onPress={onPress} />
+        <Button title={title} color="#d50032" onPress={onPress} />
     )
 }
 
