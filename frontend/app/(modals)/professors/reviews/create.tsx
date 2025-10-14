@@ -12,7 +12,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { Gesture, GestureDetector, TextInput } from "react-native-gesture-handler";
 import { set } from "react-hook-form";
 
 type Review = {
@@ -39,7 +39,11 @@ type Form = {
     location: number,
     leniency: number,
     assessment: number,
-    communication: number
+    communication: number,
+    curve: boolean,
+    attendance: boolean,
+    late: boolean,
+    textbook?: string
 }
 
 export default function SectionScreen() {
@@ -55,7 +59,11 @@ export default function SectionScreen() {
         location: 0,
         leniency: 0,
         assessment: 0,
-        communication: 0
+        communication: 0,
+        curve: false,
+        attendance: false,
+        late: false,
+        textbook: "",
     })
     const onFormUpdate = (key: string, value: any) => {
         setForm((prev) => ({...prev, [key]: value}))
@@ -69,7 +77,19 @@ export default function SectionScreen() {
         leniency: ["Lenient", "Slightly rigourous", "Rigourous", "Cancel"],
         assessment: ["Exam heavy", "Classwork heavy", "Balanced exams & classwork", "Cancel"],
         communication: ["Organized", "Disorganized", "Unorganized", "Cancel"]
-    }
+    }   
+
+    const [wtlof, setWtlof] = useState("")
+
+    const minHeight = 40;
+    const maxHeight = 200;
+
+    const calculateInputHeight = (contentHeight: number) => {
+        const height = Math.min(maxHeight, Math.max(minHeight, contentHeight));
+        return height;
+    };
+
+    const [inputHeight, setInputHeight] = useState(minHeight);
 
     return (
         <KeyboardAvoidingView
@@ -83,40 +103,94 @@ export default function SectionScreen() {
                 <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
                     <Text className="font-montserrat-bold font-bold text-2xl">Semester</Text>
                     <View className="flex flex-row items-center justify-center">
-                        <FormButton field={"season"} title={form.season} showActionSheetWithOptions={showActionSheetWithOptions} options={["Spring", "Summer", "Fall", "Winter", "Cancel"]} onFormUpdate={onFormUpdate} />
-                        <FormButton field={"year"} title={form.year} showActionSheetWithOptions={showActionSheetWithOptions} options={["<2020", "2021", "2022", "2023", "2024", "2025", "Cancel"]} onFormUpdate={onFormUpdate} />
+                        <FormActionButton field={"season"} title={form.season} showActionSheetWithOptions={showActionSheetWithOptions} options={["Spring", "Summer", "Fall", "Winter", "Cancel"]} onFormUpdate={onFormUpdate} />
+                        <FormActionButton field={"year"} title={form.year} showActionSheetWithOptions={showActionSheetWithOptions} options={["<2020", "2021", "2022", "2023", "2024", "2025", "Cancel"]} onFormUpdate={onFormUpdate} />
                     </View>
                 </View>
                 <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
                     <Text className="font-montserrat-bold font-bold text-2xl">Location</Text>
                     <View className="flex flex-row items-center justify-center">
-                        <FormButton field={"location"} title={options.location[form.location]} showActionSheetWithOptions={showActionSheetWithOptions} options={options.location} onFormUpdate={onFormUpdate} useIndex={true} />
+                        <FormActionButton field={"location"} title={options.location[form.location]} showActionSheetWithOptions={showActionSheetWithOptions} options={options.location} onFormUpdate={onFormUpdate} useIndex={true} />
                     </View>
                 </View>
                 <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
                     <Text className="font-montserrat-bold font-bold text-2xl">Leniency</Text>
                     <View className="flex flex-row items-center justify-center">
-                        <FormButton field={"leniency"} title={options.leniency[form.leniency]} showActionSheetWithOptions={showActionSheetWithOptions} options={options.leniency} onFormUpdate={onFormUpdate} useIndex={true} />
+                        <FormActionButton field={"leniency"} title={options.leniency[form.leniency]} showActionSheetWithOptions={showActionSheetWithOptions} options={options.leniency} onFormUpdate={onFormUpdate} useIndex={true} />
                     </View>
                 </View>
                 <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
                     <Text className="font-montserrat-bold font-bold text-2xl">Assignments</Text>
                     <View className="flex flex-row items-center justify-center">
-                        <FormButton field={"assessment"} title={form.assessment != 2 ? options.assessment[form.assessment] : "Balanced"} showActionSheetWithOptions={showActionSheetWithOptions} options={options.assessment} onFormUpdate={onFormUpdate} useIndex={true} />
+                        <FormActionButton field={"assessment"} title={form.assessment != 2 ? options.assessment[form.assessment] : "Balanced"} showActionSheetWithOptions={showActionSheetWithOptions} options={options.assessment} onFormUpdate={onFormUpdate} useIndex={true} />
                     </View>
                 </View>
                 <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
-                    <Text className="font-montserrat-bold font-bold text-2xl">Leniency</Text>
+                    <Text className="font-montserrat-bold font-bold text-2xl">Communication</Text>
                     <View className="flex flex-row items-center justify-center">
-                        <FormButton field={"communication"} title={options.communication[form.communication]} showActionSheetWithOptions={showActionSheetWithOptions} options={options.communication} onFormUpdate={onFormUpdate} useIndex={true} />
+                        <FormActionButton field={"communication"} title={options.communication[form.communication]} showActionSheetWithOptions={showActionSheetWithOptions} options={options.communication} onFormUpdate={onFormUpdate} useIndex={true} />
                     </View>
                 </View>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl">Curved exams</Text>
+                    <View className="flex flex-row items-center justify-center">
+                       <FormToggleButton title={form.curve ? "Yes" : "No"} user={true} onPress={() => { setForm((prev) => ({...prev, ["curve"]: !prev.curve})) } } />
+                    </View>
+                </View>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl">Graded attendance</Text>
+                    <View className="flex flex-row items-center justify-center">
+                       <FormToggleButton title={form.attendance ? "Yes" : "No"} user={true} onPress={() => { setForm((prev) => ({...prev, ["attendance"]: !prev.attendance})) } } />
+                    </View>
+                </View>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl">Late work accepted</Text>
+                    <View className="flex flex-row items-center justify-center">
+                       <FormToggleButton title={form.late ? "Yes" : "No"} user={true} onPress={() => { setForm((prev) => ({...prev, ["late"]: !prev.late})) } } />
+                    </View>
+                </View>
+                <View className="flex flex-col justify-start items-start mb-4 border-[1px] py-4 px-4 border-light-100 overflow-hidden">
+                    <Text className="flex-1 font-montserrat-bold font-bold text-2xl">Textbook</Text>
+                    <View className="w-full">
+                        <TextInput
+                            className="font-montserrat text-lg text-primary"
+                            placeholder="Enter a textbook title"
+                            placeholderTextColor={"#999"}
+                        />
+                    </View>
+                </View>
+                <View className="flex flex-col justify-start items-start mb-4 border-[1px] py-4 px-4 border-light-100 overflow-hidden">
+                    <Text className="flex-1 font-montserrat-bold font-bold text-2xl">What worked</Text>
+                    <View className="w-full h-[150px]">
+                        <TextInput
+                            className="w-full h-full font-montserrat text-lg text-primary"
+                            placeholder="Describe XYZ..."
+                            placeholderTextColor={"#999"}
+                            multiline
+                        />
+                    </View>
+                </View>
+                <View className="flex flex-col justify-start items-start mb-4 border-[1px] py-4 px-4 border-light-100 overflow-hidden">
+                    <Text className="flex-1 font-montserrat-bold font-bold text-2xl">What to look out for</Text>
+                    <View className="w-full h-[150px]">
+                        <TextInput
+                            className="w-full h-full font-montserrat text-lg text-primary"
+                            placeholder="Describe XYZ..."
+                            placeholderTextColor={"#999"}
+                            multiline
+                        />
+                    </View>
+                </View>
+                <View className="bg-transparent h-[65px]"></View>
             </ScrollView>
+            <View className="absolute w-[250px] bottom-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <FormToggleButton title="Post" user={false} onPress={() => {}} className="flex flex-row gap-x-2 items-center justify-center bg-blue-600 w-full py-2 rounded-full"/>
+            </View>
         </KeyboardAvoidingView>
     );
 }
 
-type FormButtonProps = {
+type FormActionButtonProps = {
     field: string,
     title: string,
     showActionSheetWithOptions: any,
@@ -125,7 +199,7 @@ type FormButtonProps = {
     useIndex?: boolean
 }
 
-const FormButton = ({ field, title, showActionSheetWithOptions, options, onFormUpdate, useIndex }: FormButtonProps) => {
+const FormActionButton = ({ field, title, showActionSheetWithOptions, options, onFormUpdate, useIndex }: FormActionButtonProps) => {
     const onPress = () => {
         const destructiveButtonIndex = -1
         const cancelButtonIndex = options.length - 1
@@ -144,6 +218,45 @@ const FormButton = ({ field, title, showActionSheetWithOptions, options, onFormU
     }
     return (
         <Button title={title} color="#d50032" onPress={onPress} />
+    )
+}
+
+const FormToggleButton = ({title, user, onPress, className}: {title: string, user: any, onPress: () => void, className?: string}) => {
+    const scale = useSharedValue(1);
+    const opacity = useSharedValue(1);
+
+    const handleSubmit = () => {
+        onPress()
+    };
+
+    const tap = Gesture.Tap()
+        .onBegin(() => {
+            scale.value = withTiming(0.97, { duration: 80 });
+            opacity.value = withTiming(0.7, { duration: 80 });
+        })
+        .onFinalize(() => {
+            scale.value = withTiming(1, { duration: 150 });
+            opacity.value = withTiming(1, { duration: 150 });
+        })
+        .onEnd(() => {
+            scheduleOnRN(handleSubmit);
+        });
+    
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+        opacity: user ? opacity.value : 0.25,
+    }));
+    
+    return (
+        <GestureDetector gesture={tap}>
+            <Animated.View
+                className={className ? className : "px-4 py-2 flex items-center justify-center rounded-full"}
+                style={animatedStyle}
+            >
+                <Text className={className ? "text-white text-xl font-montserrat-semibold" : "text-primary text-xl"}>{title}</Text>
+                {className ? <Ionicons name="send-outline" size={12} color="white" /> : null}
+            </Animated.View>
+        </GestureDetector>
     )
 }
 
