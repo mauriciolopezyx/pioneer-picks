@@ -2,7 +2,7 @@ import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, TouchableOpacity, View, useColorScheme } from "react-native";
-import { courseColorPalette } from "@/services/utils";
+import { areas, revolvingColorPalette, subjectColorMappings, areaAbbreviations, findAreaParentKey, areaColorMappings } from "@/services/utils";
 
 import Animated, {
   useSharedValue,
@@ -11,29 +11,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-
-// {
-//     "courseId": "ENGL-101",
-//     "shortName": "ENGL 101",
-//     "fullName": "Introduction to Composition",
-//     "units": 3,
-//     "attributes": ["1A", "A2", "LD"],
-//     "description": "Development of fundamental writing skills with emphasis on structure, clarity, and academic argumentation.",
-//     "sections": [
-//     {
-//         "sectionId": "ENGL-101-01",
-//         "professor": "Dr. Smith",
-//         "schedule": "MWF 10:00-11:00 AM",
-//         "location": "MI 201"
-//     },
-//     {
-//         "sectionId": "ENGL-101-02",
-//         "professor": "Dr. Johnson",
-//         "schedule": "TuTh 1:00-2:15 PM",
-//         "location": "MI 305"
-//     }
-//     ]
-// }
 
 type Section = {
     sectionId: string,
@@ -54,8 +31,9 @@ type Course = {
 const CourseCard = ({ item, index, subject }: {item: Course, index: number, subject: string}) => {
   const router = useRouter()
   const colorScheme = useColorScheme();
-  const bgColor = courseColorPalette[subject.toLowerCase()]?.primary ?? "#000";
-  const textColor = courseColorPalette[subject.toLowerCase()]?.secondary ?? "text-white"
+  const paletteKey = subjectColorMappings[subject.toLowerCase()] ?? 0
+  const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
+  const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
@@ -86,40 +64,53 @@ const CourseCard = ({ item, index, subject }: {item: Course, index: number, subj
     backgroundColor: bgColor
   }));
 
+  const seen = new Set()
+  const areaDisplays = item.areas.map((area) => {
+    if (seen.has(area)) return null
+    if (areaAbbreviations[area] && seen.has(areaAbbreviations[area])) return null
+
+    seen.add(area)
+    const parentArea = findAreaParentKey(areas, area)
+    const bgAreaColor = (parentArea && areaColorMappings[parentArea.toLowerCase()]) ? revolvingColorPalette[areaColorMappings[parentArea.toLowerCase()]].primary : "transparent"
+    const textAreaColor = (parentArea && areaColorMappings[parentArea.toLowerCase()]) ? revolvingColorPalette[areaColorMappings[parentArea.toLowerCase()]].secondary : "text-white"
+
+    if (areaAbbreviations[area]) {
+        seen.add(areaAbbreviations[area])
+        return (
+          <View key={areaAbbreviations[area]} className="rounded-full px-2 py-1" style={ { backgroundColor: bgAreaColor } }>
+            <Text className={`font-montserrat-medium text-sm ${textAreaColor}`}>{areaAbbreviations[area]}</Text>
+          </View>
+        )
+    }
+    return (
+      <View key={area} className="rounded-full px-2 py-1" style={ { backgroundColor: bgAreaColor } }>
+        <Text className={`font-montserrat-medium text-sm ${textAreaColor}`}>{area}</Text>
+      </View>
+    )
+  })
+
   return (
     <GestureDetector gesture={tap}>
       <Animated.View
-          className="flex flex-row justify-between items-center flex-1 h-24 rounded-lg p-3 overflow-hidden bg-light-100"
+          className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-light-100"
           style={animatedStyle}
       >
-        <View>
+        <View className="flex flex-col items-start justify-center gap-y-[2px]">
           <Text numberOfLines={1} className={`text-xl font-bold ${textColor}`}>
               {item.courseId}
           </Text>
-          <Text className={`font-montserrat-semibold ${textColor}`}>
+          <Text className={`font-montserrat-semibold ${textColor} mb-[4px]`}>
               {item.fullName}
           </Text>
-          <Text className={`font-montserrat ${textColor}`}>
-              {item.areas.join(", ")}
-          </Text>
+          <View className="flex flex-row justify-start items-center gap-x-[5px]">
+              {areaDisplays}
+          </View>
         </View>
         <View>
           <Text className={`font-montserrat-bold text-4xl ${textColor}`}>
               {item.units}
           </Text>
         </View>
-
-
-        {/* <Ionicons
-          name={iconName}
-          size={100} // big enough to overflow
-          color="rgba(255,255,255,0.7)"
-          style={{
-            position: "absolute",
-            bottom: -15,
-            right: -15,
-          }}
-        /> */}
       </Animated.View>
     </GestureDetector>
   );

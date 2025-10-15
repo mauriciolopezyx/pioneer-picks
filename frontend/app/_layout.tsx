@@ -35,6 +35,10 @@ export default function RootLayout() {
                 name="(modals)/professors/reviews/[id]" 
                 options={{ presentation: "modal" }} 
               />
+              <Stack.Screen
+                name="(modals)/areas"
+                options={{ presentation: "modal" }}
+              />
             </Stack>
           </GestureHandlerRootView>
         </ActionSheetProvider>

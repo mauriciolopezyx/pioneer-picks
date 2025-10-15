@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import data from "@/assets/english.json"
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation } from "@tanstack/react-query"
-import { courseColorPalette } from "@/services/utils"
+import { revolvingColorPalette, subjectColorMappings } from "@/services/utils"
 
 import {
     SafeAreaView
@@ -44,8 +44,9 @@ const Course = () => {
         )
     }
 
-    const bgColor = courseColorPalette[subject.toLowerCase()]?.primary ?? "#000";
-    const textColor = courseColorPalette[subject.toLowerCase()]?.secondary ?? "text-white"
+    const paletteKey = subjectColorMappings[subject.toLowerCase()] ?? 0
+    const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
+    const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
 
     // const {isPending:loading, isError, error, mutate} = useMutation({
     //     mutationFn: async () => {
@@ -75,9 +76,11 @@ const Course = () => {
             <View
                 className="px-5"
             >
-                <Text className="font-montserrat-bold text-lg">Professor</Text>
-                <Text className="font-montserrat-bold text-4xl">{professor.name}</Text>
-                <Text className="font-montserrat-medium text-lg mb-4">has taught {course} for {3} semesters</Text>
+                {/* <Text className="font-montserrat-bold text-lg">Professor</Text> */}
+                <Text className="font-montserrat-bold text-4xl mb-2">{professor.name}</Text>
+
+                <Text className="font-montserrat mb-4">has taught <Text className="font-montserrat-bold">{course}</Text> for <Text className="font-montserrat-bold">{3}</Text> semesters</Text>
+
                 <Text className="font-montserrat-bold text-2xl mb-2">Courses</Text>
                 <View className="flex flex-row gap-5 w-full mb-8">
                     <View className={`flex justify-center items-center py-2 px-4 rounded-full`} style={{ backgroundColor: bgColor }}>
@@ -88,10 +91,10 @@ const Course = () => {
                 {/* <View className="border-t-[1px] mb-8"></View> */}
 
                 <View className="border-t-[1px]"></View>
-                <Options title={`Reviews (${professor.reviews.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id}}) } } />
+                <Options title={`Reviews`} emphasis={`(${professor.reviews.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id}}) } } />
                 <View className="border-t-[1px]"></View>
 
-                <Options title={`Comments (${professor.comments.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id}}) } } />
+                <Options title={`Comments`} emphasis={`(${professor.comments.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id}}) } } />
                 <View className="border-t-[1px]"></View>
                 
             </View>
@@ -99,7 +102,7 @@ const Course = () => {
     )
 }
 
-const Options = ({title, onPress}: {title: string, onPress: () => void}) => {
+const Options = ({title, emphasis, onPress}: {title: string, emphasis?: string | number, onPress: () => void}) => {
     const scale = useSharedValue(1);
     const opacity = useSharedValue(1);
 
@@ -130,8 +133,13 @@ const Options = ({title, onPress}: {title: string, onPress: () => void}) => {
             <Animated.View
                 className="flex flex-row justify-between items-center py-4"
                 style={animatedStyle}
-            >
-                <Text className="font-montserrat-medium text-2xl">{title}</Text>
+            >   
+                <View className="flex flex-row justify-center items-center gap-x-2">
+                    <Text className="font-montserrat-medium text-xl">{title}</Text>
+                    {emphasis ? (
+                        <Text className="font-montserrat-semibold text-2xl">{emphasis}</Text>
+                    ): null}
+                </View>
                 <Ionicons name="chevron-forward-outline" size={30} color="black" />
             </Animated.View>
         </GestureDetector>

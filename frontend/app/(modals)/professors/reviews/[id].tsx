@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from "expo-router"
 import data from "@/assets/english.json"
 import { useAuth } from "@/components/AuthProvider";
-import { LinearGradient } from 'expo-linear-gradient';
+import Slider from '@react-native-community/slider';
+import { reviewOptions } from "@/services/utils";
 
 import Animated, {
   useSharedValue,
@@ -115,7 +116,7 @@ const ControlButton = ({user, onPress}: {user: any, onPress: () => void}) => {
                 className="border-[1px] border-dark-100 w-[75px] h-[75px] px-1 flex items-center justify-center bg-black rounded-full"
                 style={animatedStyle}
             >
-                <Ionicons name={user ? "add-outline" : "information-outline"} size={35} color="white" />
+                <Ionicons name={user ? "add-outline" : "close-outline"} size={35} color="white" />
             </Animated.View>
         </GestureDetector>
     )
@@ -158,19 +159,20 @@ const Review = ({ review }: ReviewItemProps) => {
                 </View>
             </View>
 
-            <Text className="font-montserrat-semibold text-md">Workload, hours</Text>
+            <Text className="font-montserrat-semibold text-md">Workload</Text>
             <View className="relative">
-                <View className="w-full h-[5px] rounded-full overflow-hidden">
-                    <LinearGradient
-                        colors={['#16A34A', '#FACC15', '#DC2626']} // green-600 → yellow-400 → red-600
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={{ flex: 1 }}
-                    />
-                </View>
-                <View className="absolute top-1/2 left-1/4 transform -translate-x-1/2 -translate-y-1/2 rounded-full aspect-square border-light-200 bg-black p-2">
-                    <Text className="font-montserrat-bold text-white text-xs">{review.workload === 1 ? "<5" : review.workload === 2 ? "<10" : review.workload === 3 ? "<15" :"15+"}</Text>
-                </View>
+                <Slider
+                    value={review.workload}
+                    style={{width: 340, height: 15}}
+                    minimumValue={0}
+                    maximumValue={3}
+                    minimumTrackTintColor="#d50032"
+                    maximumTrackTintColor="#000000"
+                    thumbTintColor="#d50032"
+                    step={1}
+                    disabled={true}
+                />
+                <Text className="absolute bg-black text-white rounded-full px-2 py-1 text-xs font-montserrat-bold -bottom-10 left-1/2 transform -translate-x-1/2 -translate-y-1/2">~ {reviewOptions.workload[review.workload]} hours</Text>
             </View>
 
             <Text className="font-montserrat-semibold text-md">Textbook</Text>

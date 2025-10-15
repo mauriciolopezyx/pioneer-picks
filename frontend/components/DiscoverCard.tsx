@@ -2,7 +2,7 @@ import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, TouchableOpacity, View, useColorScheme } from "react-native";
-import { courseColorPalette } from "@/services/utils";
+import { revolvingColorPalette, subjectColorMappings } from "@/services/utils";
 
 import Animated, {
   useSharedValue,
@@ -29,7 +29,8 @@ type Subject = {
 const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
   const router = useRouter()
   const colorScheme = useColorScheme();
-  const bgColor = courseColorPalette[item.name.toLowerCase()]?.primary ?? "#fff";
+  const paletteKey = subjectColorMappings[item.name.toLowerCase()] ?? 0
+  const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#fff";
   const iconName = iconMap[item.name] ?? "ellipse-outline";
 
   const scale = useSharedValue(1);
@@ -69,7 +70,7 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
       >
         <Text
           numberOfLines={2}
-          className="font-montserrat-medium text-xl text-white w-3/4"
+          className="font-montserrat-medium text-lg text-white w-3/4"
         >
           {item.name}
         </Text>

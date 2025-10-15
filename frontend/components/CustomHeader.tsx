@@ -46,7 +46,7 @@ export default function CustomHeader({ value, onChangeText, placeholder="Search 
             placeholder={placeholder}
             placeholderTextColor={colorScheme === 'dark' ? '#fff' : '#fff'}
             onBlur={() => setIsFocused(false)}
-            className={`text-white bg-light-200 flex-1 px-4 py-2 rounded-full text-lg align-middle font-montserrat-medium`}
+            className={`text-white bg-light-200 flex-1 px-4 py-2 rounded-full text-lg align-middle font-montserrat`}
             returnKeyType="search"
             autoCorrect={false}
             style={{

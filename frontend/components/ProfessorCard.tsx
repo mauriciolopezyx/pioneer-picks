@@ -2,7 +2,7 @@ import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, TouchableOpacity, View, useColorScheme } from "react-native";
-import { courseColorPalette } from "@/services/utils";
+import { revolvingColorPalette, subjectColorMappings } from "@/services/utils";
 
 import Animated, {
   useSharedValue,
@@ -53,8 +53,9 @@ type Professor = {
 const ProfessorCard = ({ item:professor, index, course, subject }: {item: Professor, index: number, course: string, subject: string}) => {
   const router = useRouter()
   const colorScheme = useColorScheme();
-  const bgColor = courseColorPalette[subject.toLowerCase()]?.primary ?? "#000";
-  const textColor = courseColorPalette[subject.toLowerCase()]?.secondary ?? "text-white"
+  const paletteKey = subjectColorMappings[subject.toLowerCase()] ?? 0
+  const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
+  const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
