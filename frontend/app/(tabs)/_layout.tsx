@@ -68,7 +68,12 @@ const _layout = () => {
                             colorScheme={colorScheme}
                         />
                     ),
-                    headerTitle: () => <CustomHeader />
+                    headerTitle: "Home",
+                    headerTitleStyle: {
+                        fontFamily: "Montserrat_700Bold",
+                        color: "#fff",
+                        fontSize: 28
+                    }
                 }}
             />
             <Tabs.Screen
@@ -83,7 +88,12 @@ const _layout = () => {
                             colorScheme={colorScheme}
                         />
                     ),
-                    headerTitle: () => <CustomHeader />
+                    headerTitle: "Discover",
+                    headerTitleStyle: {
+                        fontFamily: "Montserrat_700Bold",
+                        color: "#fff",
+                        fontSize: 28
+                    }
                 }}
             />
             <Tabs.Screen
@@ -98,7 +108,12 @@ const _layout = () => {
                             colorScheme={colorScheme}
                         />
                     ),
-                    headerTitle: () => <CustomHeader />
+                    headerTitle: "Account",
+                    headerTitleStyle: {
+                        fontFamily: "Montserrat_700Bold",
+                        color: "#fff",
+                        fontSize: 28
+                    }
                 }}
             />
         </Tabs>

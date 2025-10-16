@@ -1,7 +1,6 @@
 package com.pioneerpicks.pioneerpicks.auth;
 
 import com.pioneerpicks.pioneerpicks.auth.dto.*;
-import com.trackit.trackit.auth.dto.*;
 import com.pioneerpicks.pioneerpicks.email.EmailService;
 import com.pioneerpicks.pioneerpicks.user.User;
 import com.pioneerpicks.pioneerpicks.user.UserRepository;

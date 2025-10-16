@@ -17,6 +17,7 @@ export default function DiscoverLayout() {
             //     backgroundColor: "#000",
             // },
             // headerTransparent: false,
+            headerTransparent: true,
             headerShown: false
         }}
       />

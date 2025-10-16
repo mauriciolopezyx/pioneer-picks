@@ -1,7 +1,6 @@
 package com.pioneerpicks.pioneerpicks.auth;
 
 import com.pioneerpicks.pioneerpicks.auth.dto.*;
-import com.trackit.trackit.auth.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
