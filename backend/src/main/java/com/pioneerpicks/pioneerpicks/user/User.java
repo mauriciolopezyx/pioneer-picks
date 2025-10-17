@@ -14,7 +14,7 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column(unique=true, nullable=false)
     private String username;
@@ -25,7 +25,7 @@ public class User implements UserDetails {
     @Column(nullable=true)
     private String password;
 
-    private boolean enabled;
+    private Boolean enabled;
 
     @Column(name="verification_code")
     private String verificationCode;

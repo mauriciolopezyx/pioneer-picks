@@ -23,7 +23,7 @@ type Review = {
   id: number,
   workload: number,
   leniency: number,
-  assessment: number,
+  assignments: number,
   communication: number,
   curve: boolean,
   attendance: boolean,
@@ -55,13 +55,13 @@ export default function SectionScreen() {
 
     return (
         <KeyboardAvoidingView
-            className="relative flex-1"
+            className="relative flex-1 dark:bg-gray-800"
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={55}
         >
             <View className="flex-1 px-5 pt-5">
-                <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto">Reviews</Text>
-                <View className="border-t-[1px] mb-8"></View>
+                <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
+                <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <View className="flex-1">
                     <FlatList
                         data={reviews}
@@ -73,6 +73,7 @@ export default function SectionScreen() {
                         ItemSeparatorComponent={() => <View style={{ height: 30 }} />}
                         contentContainerStyle={{ paddingBottom: 20 }}
                         scrollEnabled={true}
+                        showsVerticalScrollIndicator={false}
                         indicatorStyle="black"
                     />
                 </View>
@@ -128,10 +129,10 @@ type ReviewItemProps = {
 
 const Review = ({ review }: ReviewItemProps) => {
     return (
-        <View className="flex flex-col border-l-[1px] border-dark-100 p-3 gap-4">
+        <View className="flex flex-col border-l-[1px] border-dark-100 dark:border-light-200 p-3 gap-4">
             <View>
-                <Text className="font-montserrat-semibold text-md">{review.name}</Text>
-                <Text className="font-montserrat-medium text-sm text-light-200">{`${review.date}; ${review.semester}`}</Text>
+                <Text className="font-montserrat-semibold text-md dark:text-white">{review.name}</Text>
+                <Text className="font-montserrat-medium text-sm text-light-200 dark:text-light-100">{`${review.date}; ${review.semester}`}</Text>
             </View>
             <View className="flex flex-row flex-wrap gap-2">
                 <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full ${review.location === 1 ? "bg-blue-600" : "bg-green-600"}`}>
@@ -149,7 +150,7 @@ const Review = ({ review }: ReviewItemProps) => {
                     <Text className="text-sm font-montserrat-bold text-white">Curved exams: {review.curve ? "Yes" : "No"}</Text>
                 </View>
                 <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full bg-blue-600`}>
-                    <Text className="text-sm font-montserrat-bold text-white">{review.assessment === 1 ? "Exam heavy" : review.assessment === 2 ? "Classwork heavy" : "Balanced exams & classwork"}</Text>
+                    <Text className="text-sm font-montserrat-bold text-white">{review.assignments === 1 ? "Exam heavy" : review.assignments === 2 ? "Classwork heavy" : "Balanced exams & classwork"}</Text>
                 </View>
                 <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full ${review.leniency === 1 ? "bg-green-600" : review.leniency === 2 ? "bg-blue-600" : "bg-red-600"}`}>
                     <Text className="text-sm font-montserrat-bold text-white">{review.leniency === 1 ? "Lenient" : review.leniency === 2 ? "Slightly rigourous" : "Rigourous"}</Text>
@@ -159,7 +160,7 @@ const Review = ({ review }: ReviewItemProps) => {
                 </View>
             </View>
 
-            <Text className="font-montserrat-semibold text-md">Workload</Text>
+            <Text className="font-montserrat-semibold text-md dark:text-white">Workload</Text>
             <View className="relative">
                 <Slider
                     value={review.workload}
@@ -172,17 +173,17 @@ const Review = ({ review }: ReviewItemProps) => {
                     step={1}
                     disabled={true}
                 />
-                <Text className="absolute bg-black text-white rounded-full px-2 py-1 text-xs font-montserrat-bold -bottom-10 left-1/2 transform -translate-x-1/2 -translate-y-1/2">~ {reviewOptions.workload[review.workload]} hours</Text>
+                <Text className="absolute bg-black text-white rounded-full px-2 py-1 text-xs font-montserrat-bold -bottom-10 left-1/2 transform -translate-x-1/2 -translate-y-1/2">{reviewOptions.workload[review.workload]} hours</Text>
             </View>
 
-            <Text className="font-montserrat-semibold text-md">Textbook</Text>
-            <Text className="font-montserrat">{review?.textbook ? review.textbook : "Not specified"}</Text>
+            <Text className="font-montserrat-semibold text-md dark:text-white">Textbook</Text>
+            <Text className="font-montserrat dark:text-white">{review?.textbook ? review.textbook : "Not specified"}</Text>
             
-            <Text className="font-montserrat-semibold text-md">What worked</Text>
-            <Text className="font-montserrat text-md">{review.positive}</Text>
+            <Text className="font-montserrat-semibold text-md dark:text-white">What worked</Text>
+            <Text className="font-montserrat text-md dark:text-white">{review.positive}</Text>
 
-            <Text className="font-montserrat-semibold text-md">What to look out for</Text>
-            <Text className="font-montserrat text-md">{review.negative}</Text>
+            <Text className="font-montserrat-semibold text-md dark:text-white">What to look out for</Text>
+            <Text className="font-montserrat text-md dark:text-white">{review.negative}</Text>
 
             {/* {replying ? (
                 <ControlButton title="Cancel" onPress={() => setReplying(false)}/>

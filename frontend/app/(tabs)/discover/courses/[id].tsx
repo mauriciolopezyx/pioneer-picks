@@ -94,7 +94,7 @@ const Course = () => {
     })
 
     return (
-        <SafeAreaView className="flex-1">
+        <SafeAreaView className="flex-1 dark:bg-gray-800">
             <ScrollView
                 className="flex-1 px-5"
                 showsVerticalScrollIndicator={false}
@@ -103,19 +103,19 @@ const Course = () => {
                 }}
             >
                 <View className="flex flex-row justify-between items-center">
-                    <Text className="font-montserrat-extrabold text-4xl mb-2">{courseId}</Text>
-                    <View className="flex items-center justify-center mb-2 w-10 aspect-square bg-black p-1 rounded-full">
+                    <Text className="font-montserrat-extrabold text-4xl mb-2 dark:text-white">{courseId}</Text>
+                    <View className="flex items-center justify-center mb-2 w-10 aspect-square bg-black p-1 rounded-full dark:bg-light-200">
                         <Text className="font-montserrat-extrabold text-lg text-white">{course.units}</Text>
                     </View>
                 </View>
 
-                <Text className="font-montserrat-bold text-2xl mb-2">Description</Text>
-                <Text className="font-montserrat mb-4">{course?.description}</Text>
+                <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Description</Text>
+                <Text className="font-montserrat mb-4 dark:text-white">{course?.description}</Text>
 
                 <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
-                    <Text className="font-montserrat-bold text-2xl">Areas</Text>
+                    <Text className="font-montserrat-bold text-2xl dark:text-white">Areas</Text>
                     <GestureDetector gesture={tap}>
-                         <Animated.View className="flex items-center justify-center w-[30px] h-[30px] rounded-full bg-black" style={animatedStyle}>
+                         <Animated.View className="flex items-center justify-center w-[30px] h-[30px] rounded-full bg-black dark:bg-light-200" style={animatedStyle}>
                             <Ionicons name="information-outline" size={20} color="white" />
                          </Animated.View>
                     </GestureDetector>
@@ -125,7 +125,7 @@ const Course = () => {
                     {areaDisplays}
                 </View>
 
-                <Text className="font-montserrat-bold text-2xl mb-2">Professors</Text>
+                <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
                 <FlatList
                     data={course.professors}
                     renderItem={(item) => (

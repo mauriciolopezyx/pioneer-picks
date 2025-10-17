@@ -5,9 +5,9 @@ import { areas, areaAbbreviations, areaColorMappings, revolvingColorPalette } fr
 const Areas = () => {
 
     return (
-        <ScrollView className="px-5 pt-5">
-            <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto">Areas</Text>
-            <View className="border-t-[1px] mb-4"></View>
+        <ScrollView className="px-5 pt-5 dark:bg-gray-800">
+            <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Areas</Text>
+            <View className="border-t-[1px] dark:border-white mb-4"></View>
             <RecursiveArea data={areas} />
             <View className="h-[50px]"></View>
         </ScrollView>
@@ -39,7 +39,7 @@ const RecursiveArea = ({ data, level = 0, previousColor = "transparent" }: any) 
                                 }}
                                 className={level === 0 ? "mt-4 mb-4" : "px-4 py-2 rounded-full"}
                             >
-                                <Text className={`${level === 0 ? "font-montserrat-extrabold text-2xl" : "font-montserrat-bold text-sm"} ${areaColorMappings[key.toLowerCase()] && revolvingColorPalette[areaColorMappings[key.toLowerCase()]].secondary}`}>{key}</Text>
+                                <Text className={`${level === 0 ? "font-montserrat-extrabold text-2xl dark:text-white" : "font-montserrat-bold text-sm dark:text-white"} ${areaColorMappings[key.toLowerCase()] && revolvingColorPalette[areaColorMappings[key.toLowerCase()]].secondary}`}>{key}</Text>
                             </View>
                         </View>
                         <RecursiveArea data={value} level={level + 1} previousColor={bgColor} />
@@ -64,7 +64,7 @@ const RecursiveArea = ({ data, level = 0, previousColor = "transparent" }: any) 
                         >
                             <Text className="font-montserrat-semibold text-white">{areaAbbreviations[key] ? areaAbbreviations[key] : key}</Text>
                         </View>
-                        <Text className="font-montserrat-medium text-xs">{value as string}</Text>
+                        <Text className="font-montserrat-medium text-xs dark:text-white">{value as string}</Text>
                     </View>
                 )
             }

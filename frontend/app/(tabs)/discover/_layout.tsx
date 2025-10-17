@@ -6,7 +6,8 @@ export default function DiscoverLayout() {
     <Stack
         screenOptions={{
             headerShown: true,
-            headerTransparent: true
+            headerTransparent: true,
+            headerTintColor: "#d50032"
         }}
     >
       <Stack.Screen

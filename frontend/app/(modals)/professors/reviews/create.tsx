@@ -20,7 +20,7 @@ type Form = {
     workload: number,
     location: number,
     leniency: number,
-    assessment: number,
+    assignments: number,
     communication: number,
     curve: boolean,
     attendance: boolean,
@@ -44,7 +44,7 @@ export default function SectionScreen() {
         workload: 3,
         location: 0,
         leniency: 0,
-        assessment: 0,
+        assignments: 0,
         communication: 0,
         curve: false,
         attendance: false,
@@ -61,28 +61,28 @@ export default function SectionScreen() {
 
     return (
         <KeyboardAvoidingView
-            className="relative flex-1"
+            className="relative flex-1 dark:bg-gray-800"
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={55}
         >
             <ScrollView className="flex-1 px-5 pt-5">
-                <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto">Create Review</Text>
-                <View className="border-t-[1px] mb-8"></View>
-                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
-                    <Text className="font-montserrat-bold font-bold text-2xl">Semester</Text>
+                <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Create Review</Text>
+                <View className="border-t-[1px] dark:border-white mb-8"></View>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Semester</Text>
                     <View className="flex flex-row items-center justify-center">
                         <FormActionButton field={"season"} title={form.season} showActionSheetWithOptions={showActionSheetWithOptions} options={["Spring", "Summer", "Fall", "Winter", "Cancel"]} onFormUpdate={onFormUpdate} />
                         <FormActionButton field={"year"} title={form.year} showActionSheetWithOptions={showActionSheetWithOptions} options={["<2020", "2021", "2022", "2023", "2024", "2025", "Cancel"]} onFormUpdate={onFormUpdate} />
                     </View>
                 </View>
-                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
-                    <Text className="font-montserrat-bold font-bold text-2xl">Location</Text>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Location</Text>
                     <View className="flex flex-row items-center justify-center">
                         <FormActionButton field={"location"} title={reviewOptions.location[form.location]} showActionSheetWithOptions={showActionSheetWithOptions} options={reviewOptions.location} onFormUpdate={onFormUpdate} useIndex={true} />
                     </View>
                 </View>
-                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100">
-                    <Text className="font-montserrat-bold font-bold text-2xl">Workload</Text>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200">
+                    <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Workload</Text>
                     <View className="relative">
                         <Slider
                             value={form.workload}
@@ -95,77 +95,77 @@ export default function SectionScreen() {
                             thumbTintColor="#d50032"
                             step={1}
                         />
-                        <Text className="absolute bg-black text-white rounded-full px-2 py-1 text-xs font-montserrat-bold -bottom-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">~ {reviewOptions.workload[form.workload]} hours</Text>
+                        <Text className="absolute bg-black text-white rounded-full px-2 py-1 text-xs font-montserrat-bold -bottom-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">{reviewOptions.workload[form.workload]} hours</Text>
                     </View>
                 </View>
-                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
-                    <Text className="font-montserrat-bold font-bold text-2xl">Leniency</Text>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 file:overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Leniency</Text>
                     <View className="flex flex-row items-center justify-center">
                         <FormActionButton field={"leniency"} title={reviewOptions.leniency[form.leniency]} showActionSheetWithOptions={showActionSheetWithOptions} options={reviewOptions.leniency} onFormUpdate={onFormUpdate} useIndex={true} />
                     </View>
                 </View>
-                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
-                    <Text className="font-montserrat-bold font-bold text-2xl">Assignments</Text>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 file:overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Assignments</Text>
                     <View className="flex flex-row items-center justify-center">
-                        <FormActionButton field={"assessment"} title={form.assessment != 2 ? reviewOptions.assessment[form.assessment] : "Balanced"} showActionSheetWithOptions={showActionSheetWithOptions} options={reviewOptions.assessment} onFormUpdate={onFormUpdate} useIndex={true} />
+                        <FormActionButton field={"assessment"} title={form.assignments != 2 ? reviewOptions.assessment[form.assignments] : "Balanced"} showActionSheetWithOptions={showActionSheetWithOptions} options={reviewOptions.assessment} onFormUpdate={onFormUpdate} useIndex={true} />
                     </View>
                 </View>
-                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
-                    <Text className="font-montserrat-bold font-bold text-2xl">Communication</Text>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Communication</Text>
                     <View className="flex flex-row items-center justify-center">
                         <FormActionButton field={"communication"} title={reviewOptions.communication[form.communication]} showActionSheetWithOptions={showActionSheetWithOptions} options={reviewOptions.communication} onFormUpdate={onFormUpdate} useIndex={true} />
                     </View>
                 </View>
-                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
-                    <Text className="font-montserrat-bold font-bold text-2xl">Curved exams</Text>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Curved exams</Text>
                     <View className="flex flex-row items-center justify-center">
                        <FormToggleButton title={form.curve ? "Yes" : "No"} user={true} onPress={() => { setForm((prev) => ({...prev, ["curve"]: !prev.curve})) } } />
                     </View>
                 </View>
-                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
-                    <Text className="font-montserrat-bold font-bold text-2xl">Graded attendance</Text>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Graded attendance</Text>
                     <View className="flex flex-row items-center justify-center">
                        <FormToggleButton title={form.attendance ? "Yes" : "No"} user={true} onPress={() => { setForm((prev) => ({...prev, ["attendance"]: !prev.attendance})) } } />
                     </View>
                 </View>
-                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 overflow-hidden">
-                    <Text className="font-montserrat-bold font-bold text-2xl">Late work accepted</Text>
+                <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 overflow-hidden">
+                    <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Late work accepted</Text>
                     <View className="flex flex-row items-center justify-center">
                        <FormToggleButton title={form.late ? "Yes" : "No"} user={true} onPress={() => { setForm((prev) => ({...prev, ["late"]: !prev.late})) } } />
                     </View>
                 </View>
-                <View className="flex flex-col justify-start items-start mb-4 border-[1px] py-4 px-4 border-light-100 overflow-hidden">
-                    <Text className="flex-1 font-montserrat-bold font-bold text-2xl">Textbook</Text>
+                <View className="flex flex-col justify-start items-start mb-4 border-[1px] py-4 px-4 border-light-100 dark:border-light-200 overflow-hidden">
+                    <Text className="flex-1 font-montserrat-bold font-bold text-2xl dark:text-white">Textbook</Text>
                     <View className="w-full">
                         <TextInput
                             value={form.textbook}
                             onChangeText={(newText) => { setForm((prev) => ({...prev, ["textbook"]: newText})) }}
-                            className="font-montserrat text-lg text-primary"
+                            className="font-montserrat text-lg text-primary dark:text-white"
                             placeholder="Enter a textbook title"
                             placeholderTextColor={"#999"}
                         />
                     </View>
                 </View>
-                <View className="flex flex-col justify-start items-start mb-4 border-[1px] py-4 px-4 border-light-100 overflow-hidden">
-                    <Text className="flex-1 font-montserrat-bold font-bold text-2xl">What worked</Text>
+                <View className="flex flex-col justify-start items-start mb-4 border-[1px] py-4 px-4 border-light-100 dark:border-light-200 overflow-hidden">
+                    <Text className="flex-1 font-montserrat-bold font-bold text-2xl dark:text-white">What worked</Text>
                     <View className="w-full h-[150px]">
                         <TextInput
                             value={form.positive}
                             onChangeText={(newText) => { setForm((prev) => ({...prev, ["positive"]: newText})) }}
-                            className="w-full h-full font-montserrat text-lg text-primary"
+                            className="w-full h-full font-montserrat text-lg text-primary dark:text-white"
                             placeholder="Describe XYZ..."
                             placeholderTextColor={"#999"}
                             multiline
                         />
                     </View>
                 </View>
-                <View className="flex flex-col justify-start items-start mb-4 border-[1px] py-4 px-4 border-light-100 overflow-hidden">
-                    <Text className="flex-1 font-montserrat-bold font-bold text-2xl">What to look out for</Text>
+                <View className="flex flex-col justify-start items-start mb-4 border-[1px] py-4 px-4 border-light-100 dark:border-light-200 overflow-hidden">
+                    <Text className="flex-1 font-montserrat-bold font-bold text-2xl dark:text-white">What to look out for</Text>
                     <View className="w-full h-[150px]">
                         <TextInput
                             value={form.negative}
                             onChangeText={(newText) => { setForm((prev) => ({...prev, ["negative"]: newText})) }}
-                            className="w-full h-full font-montserrat text-lg text-primary"
+                            className="w-full h-full font-montserrat text-lg text-primary dark:text-white"
                             placeholder="Describe XYZ..."
                             placeholderTextColor={"#999"}
                             multiline

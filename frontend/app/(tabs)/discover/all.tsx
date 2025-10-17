@@ -3,7 +3,8 @@ import data from "@/assets/data.json"
 import DiscoverCard from '@/components/DiscoverCard'
 import SearchBar from '@/components/SearchBar';
 import { Ionicons } from "@expo/vector-icons";
-import { useState, useCallback } from "react"
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import { useState, useCallback, useMemo } from "react"
 
 import {
     SafeAreaView
@@ -17,19 +18,39 @@ import Animated, {
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
+const filterOptions = ["Alphabetical", "Reset"]
+
 const discover = () => {
 
   const colorScheme = useColorScheme()
   const [query, setQuery] = useState("")
+  const [filter, setFilter] = useState(filterOptions.length - 1)
   const onChangeQuery = useCallback((text: string) => {
     setQuery(text)
   }, [])
 
+  const { showActionSheetWithOptions } = useActionSheet()
+
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
-  const handleSubmit = () => {
-      
+  const onFilterPress = () => {
+    const destructiveButtonIndex = -1
+    const cancelButtonIndex = filterOptions.length - 1
+
+    showActionSheetWithOptions({ options:filterOptions, cancelButtonIndex, destructiveButtonIndex }, (i: any) => {
+      switch (i) {
+        case destructiveButtonIndex:
+          break
+        case cancelButtonIndex:
+          setFilter(filterOptions.length - 1)
+          break
+        default:
+          //onFormUpdate(field, !useIndex ? filterOptions[i] : i)
+          setFilter(i)
+          break
+      }}
+    )
   };
 
   const tap = Gesture.Tap()
@@ -42,7 +63,7 @@ const discover = () => {
         opacity.value = withTiming(1, { duration: 150 });
     })
     .onEnd(() => {
-        scheduleOnRN(toggleFilters);
+        scheduleOnRN(onFilterPress);
     });
   
   const animatedStyle = useAnimatedStyle(() => ({
@@ -50,25 +71,21 @@ const discover = () => {
     opacity: opacity.value,
   }));
 
-  /////////////////////////////////////////////
-
-  const [showFilters, setShowFilters] = useState(false);
-
-  const popupVisible = useSharedValue(0); // 0 = hidden, 1 = visible
-
-  const toggleFilters = useCallback(() => {
-    const next = !showFilters;
-    setShowFilters(next);
-    popupVisible.value = withTiming(next ? 1 : 0, { duration: 200 });
-  }, [showFilters]);
-
-  const popupStyle = useAnimatedStyle(() => ({
-    opacity: popupVisible.value,
-    transform: [
-      { translateY: withTiming(popupVisible.value ? 0 : -10, { duration: 200 }) },
-      { scale: withTiming(popupVisible.value ? 1 : 0.95, { duration: 200 }) },
-    ],
-  }));
+  const sortedSubjects = useMemo(() => {
+    return [...data.subjects]
+      .sort((a, b) => {
+        if (a.name === "All") return -1
+        if (b.name === "All") return 1
+        return a.name.localeCompare(b.name)
+      })
+  }, [])
+  const filteredSubjects = useMemo(() => {
+    const q = query.replace(/\s+/g, '').toLowerCase()
+    return [...data.subjects]
+      .filter(item =>
+        item.name.replace(/\s+/g, '').toLowerCase().includes(q)
+      )
+  }, [query])
 
   return (
     <SafeAreaView className="flex-1 px-5 bg-white dark:bg-gray-800" edges={['left', 'right', 'bottom']}>
@@ -82,31 +99,20 @@ const discover = () => {
             placeholder="Search"
             onChangeText={onChangeQuery}
           />
-          <View>
-            <GestureDetector gesture={tap}>
-              <Animated.View
-              className="flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-900"
-                  style={animatedStyle}
-              >   
-                <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
-              </Animated.View>
-            </GestureDetector>
-
-            {showFilters && (
-              <Animated.View
-                style={[popupStyle]}
-                className="absolute top-[110%] right-0 w-[150px] rounded-xl bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-lg p-2"
-              >
-                <Text className="text-black dark:text-white font-semibold mb-1">Sort By:</Text>
-                <Text className="text-black dark:text-white text-sm">Popularity</Text>
-                <Text className="text-black dark:text-white text-sm">Newest</Text>
-                <Text className="text-black dark:text-white text-sm">Alphabetical</Text>
-              </Animated.View>
-            )}
-          </View>
+          <GestureDetector gesture={tap}>
+            <Animated.View
+              className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-900 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
+              style={animatedStyle}
+            >   
+              <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
+              {(filter != filterOptions.length - 1 && query == "") ? <View className="absolute top-0 left-0 mt-[-10px] ml-[-10px] aspect-square bg-red-600 rounded-full flex items-center justify-center p-1">
+                <Text className="text-white font-montserrat-semibold text-xs">{filter === 0 ? "A-Z" : ""}</Text>
+              </View> : null}
+            </Animated.View>
+          </GestureDetector>
         </View>
         <FlatList
-          data={data.subjects}
+          data={query != "" ? filteredSubjects : filter === 0 ? sortedSubjects : data.subjects}
           renderItem={(item) => (
             <DiscoverCard {...item} />
           )}

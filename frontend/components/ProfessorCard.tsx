@@ -27,7 +27,7 @@ type Review = {
   id: number,
   workload: number,
   leniency: number,
-  assessment: number,
+  assignments: number,
   communication: number,
   curve: boolean,
   attendance: boolean,

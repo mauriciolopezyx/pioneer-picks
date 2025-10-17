@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform  } from "react-native";
+import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform, useColorScheme  } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from "expo-router"
 import data from "@/assets/english.json"
@@ -23,6 +23,7 @@ type Comment = {
 
 export default function SectionScreen() {
 
+    const colorScheme = useColorScheme()
     const { id:professorId }: {id: string} = useLocalSearchParams()
     const { user } = useAuth()
     const [comments, setComments] = useState<Comment[]>([])
@@ -42,13 +43,13 @@ export default function SectionScreen() {
 
     return (
         <KeyboardAvoidingView
-            className="flex-1"
+            className="flex-1 dark:bg-gray-800"
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={55}
         >
             <View className="flex-1 px-5 pt-5">
-                <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto">Comments</Text>
-                <View className="border-t-[1px] mb-8"></View>
+                <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
+                <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <View className="flex-1">
                     <FlatList
                         data={comments}
@@ -60,13 +61,14 @@ export default function SectionScreen() {
                         ItemSeparatorComponent={() => <View style={{ height: 30 }} />}
                         contentContainerStyle={{ paddingBottom: 20 }}
                         scrollEnabled={true}
+                        showsVerticalScrollIndicator={false}
                         indicatorStyle="black"
                     />
                 </View>
             </View>
-            <View className="border-t-[1px] border-gray-200 pb-[25px] pt-[10px] bg-black flex items-center justify-center">
+            <View className="pb-[25px] pt-[10px] bg-black flex items-center justify-center">
                 <View className="w-[90%]">
-                    <CommentInput onComment={onComment} user={user} />
+                    <CommentInput onComment={onComment} user={user} colorScheme={colorScheme} />
                 </View>
             </View>
         </KeyboardAvoidingView>
@@ -124,12 +126,12 @@ const CommentItem = ({comment}: CommentItemProps) => {
     // }
 
     return (
-        <View className="flex flex-col border-l-[1px] border-dark-100 p-3 gap-4">
+        <View className="flex flex-col border-l-[1px] border-dark-100 dark:border-light-200 p-3 gap-4">
             <View>
-                <Text className="font-montserrat-semibold text-md">{comment.name}</Text>
-                <Text className="font-montserrat-medium text-sm text-light-200">{`${comment.date}; ${comment.semester}`}</Text>
+                <Text className="font-montserrat-semibold text-md dark:text-white">{comment.name}</Text>
+                <Text className="font-montserrat-medium text-sm text-light-200 dark:text-light-100">{`${comment.date}; ${comment.semester}`}</Text>
             </View>
-            <Text className="font-montserrat text-md">{comment.body}</Text>
+            <Text className="font-montserrat text-md dark:text-white">{comment.body}</Text>
             {/* {replying ? (
                 <ControlButton title="Cancel" onPress={() => setReplying(false)}/>
             ) : (
@@ -147,10 +149,11 @@ const CommentItem = ({comment}: CommentItemProps) => {
 
 type CommentInputProps = {
     onComment: (newComment: Comment) => void,
-    user: any
+    user: any,
+    colorScheme: string | null | undefined
 }
 
-const CommentInput = ({ onComment, user }: CommentInputProps) => {
+const CommentInput = ({ onComment, user, colorScheme }: CommentInputProps) => {
     const [commentBody, setCommentBody] = useState("");
     const inputRef = useRef<TextInput>(null);
 
@@ -194,9 +197,9 @@ const CommentInput = ({ onComment, user }: CommentInputProps) => {
                 value={commentBody}
                 onChangeText={setCommentBody}
                 placeholder={user ? "What are your thoughts?" : "Sign in to comment"}
-                placeholderTextColor={user != null ? "#555" : "#999"}
+                placeholderTextColor={user != null ? (colorScheme === "dark" ? "#a8b5db" : "#545a6d") : "#999"}
                 multiline
-                className={`font-montserrat-medium flex-1 border-[1px] p-3 border-dark-100 text-black rounded-full min-h-[40px] text-md ${user != null ? "bg-white" : "bg-light-100"}`}
+                className={`font-montserrat flex-1 p-3 text-black dark:text-white rounded-full min-h-[40px] text-md ${user != null ? "bg-white dark:bg-dark-200" : "bg-light-100 dark:bg-dark-200"}`}
                 textAlign="left"
                 editable={user != null}
             />

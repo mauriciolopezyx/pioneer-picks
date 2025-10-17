@@ -14,7 +14,7 @@ const Courses = () => {
     const chosenData = name === "All" ? data.courses : data.courses
 
     return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 dark:bg-gray-800">
         <ScrollView
         className="flex-1 px-5"
         showsVerticalScrollIndicator={false}
@@ -22,9 +22,9 @@ const Courses = () => {
           minHeight: "100%", paddingBottom: 10
         }}
       >
-        <Text className="font-montserrat-extrabold text-4xl mb-2">{name}</Text>
-        <Text className="font-montserrat mb-8">{data.subject.description}</Text>
-        <Text className="font-montserrat-bold text-2xl mb-2">Courses</Text>
+        <Text className="font-montserrat-extrabold text-4xl mb-2 dark:text-white">{name}</Text>
+        <Text className="font-montserrat mb-8 dark:text-white">{data.subject.description}</Text>
+        <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
         <FlatList
             data={chosenData}
             renderItem={(item) => (

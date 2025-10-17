@@ -1,4 +1,4 @@
-import { Text, View, Pressable } from 'react-native'
+import { Text, View, Pressable, useColorScheme } from 'react-native'
 import { useLocalSearchParams, Link, useRouter } from 'expo-router'
 import { useState, useEffect, useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -21,6 +21,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 const Course = () => {
 
+    const colorScheme = useColorScheme()
     const router = useRouter()
     const { id:professorId, course, subject }: {id: string, course: string, subject: string} = useLocalSearchParams();
     const navigation = useNavigation();
@@ -72,16 +73,16 @@ const Course = () => {
 
 
     return (
-        <SafeAreaView className="flex-1" edges={["top"]}>
+        <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["top"]}>
             <View
                 className="px-5"
             >
                 {/* <Text className="font-montserrat-bold text-lg">Professor</Text> */}
-                <Text className="font-montserrat-bold text-4xl mb-2">{professor.name}</Text>
+                <Text className="font-montserrat-bold text-4xl mb-2 dark:text-white">{professor.name}</Text>
 
-                <Text className="font-montserrat mb-4">has taught <Text className="font-montserrat-bold">{course}</Text> for <Text className="font-montserrat-bold">{3}</Text> semesters</Text>
+                <Text className="font-montserrat mb-4 dark:text-white">has taught <Text className="font-montserrat-bold dark:text-white">{course}</Text> for <Text className="font-montserrat-bold dark:text-white">{3}</Text> semesters</Text>
 
-                <Text className="font-montserrat-bold text-2xl mb-2">Courses</Text>
+                <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
                 <View className="flex flex-row gap-5 w-full mb-8">
                     <View className={`flex justify-center items-center py-2 px-4 rounded-full`} style={{ backgroundColor: bgColor }}>
                         <Text className={`font-montserrat-bold text-sm ${textColor}`}>{course}</Text>
@@ -90,19 +91,19 @@ const Course = () => {
 
                 {/* <View className="border-t-[1px] mb-8"></View> */}
 
-                <View className="border-t-[1px]"></View>
-                <Options title={`Reviews`} emphasis={`(${professor.reviews.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id}}) } } />
-                <View className="border-t-[1px]"></View>
+                <View className="border-t-[1px] dark:border-white"></View>
+                <Options title={`Reviews`} emphasis={`(${professor.reviews.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id}}) } } colorScheme={colorScheme} />
+                <View className="border-t-[1px] dark:border-white"></View>
 
-                <Options title={`Comments`} emphasis={`(${professor.comments.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id}}) } } />
-                <View className="border-t-[1px]"></View>
+                <Options title={`Comments`} emphasis={`(${professor.comments.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id}}) } } colorScheme={colorScheme} />
+                <View className="border-t-[1px] dark:border-white"></View>
                 
             </View>
         </SafeAreaView>
     )
 }
 
-const Options = ({title, emphasis, onPress}: {title: string, emphasis?: string | number, onPress: () => void}) => {
+const Options = ({title, emphasis, onPress, colorScheme}: {title: string, emphasis?: string | number, onPress: () => void, colorScheme: string | null | undefined}) => {
     const scale = useSharedValue(1);
     const opacity = useSharedValue(1);
 
@@ -135,12 +136,12 @@ const Options = ({title, emphasis, onPress}: {title: string, emphasis?: string |
                 style={animatedStyle}
             >   
                 <View className="flex flex-row justify-center items-center gap-x-2">
-                    <Text className="font-montserrat-medium text-xl">{title}</Text>
+                    <Text className="font-montserrat-medium text-xl dark:text-white">{title}</Text>
                     {emphasis ? (
-                        <Text className="font-montserrat-semibold text-2xl">{emphasis}</Text>
+                        <Text className="font-montserrat-semibold text-2xl dark:text-white">{emphasis}</Text>
                     ): null}
                 </View>
-                <Ionicons name="chevron-forward-outline" size={30} color="black" />
+                <Ionicons name="chevron-forward-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
             </Animated.View>
         </GestureDetector>
     )
