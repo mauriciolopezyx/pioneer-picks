@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View, FlatList, ScrollView, useColorScheme } from 'react-native'
-import data from "@/assets/data.json"
+import { StyleSheet, Text, View, FlatList, ScrollView, useColorScheme, ActivityIndicator } from 'react-native'
 import DiscoverCard from '@/components/DiscoverCard'
 import SearchBar from '@/components/SearchBar';
 import { Ionicons } from "@expo/vector-icons";
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { useState, useCallback, useMemo } from "react"
+import { useQuery } from '@tanstack/react-query'
+import placeholderSubjects from "@/assets/data.json"
+import * as SecureStore from "expo-secure-store";
 
 import {
     SafeAreaView
@@ -28,6 +30,30 @@ const discover = () => {
   const onChangeQuery = useCallback((text: string) => {
     setQuery(text)
   }, [])
+
+  const { isLoading:loading, isSuccess:success, error, data } = useQuery({
+    queryKey: ["all-subjects"],
+    queryFn: async () => {
+        const sessionId = await SecureStore.getItemAsync("session");
+        const response = await fetch("http://localhost:8080/subjects", {
+            method: "GET",
+            ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        })
+        if (!response.ok) {
+            const payload = await response.text()
+            throw new Error(payload)
+        }
+        const json = await response.json()
+        return json
+    },
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 60 * 24,
+    gcTime: 1000 * 60 * 60 * 48
+  })
 
   const { showActionSheetWithOptions } = useActionSheet()
 
@@ -71,21 +97,21 @@ const discover = () => {
     opacity: opacity.value,
   }));
 
-  const sortedSubjects = useMemo(() => {
+  const sortedSubjects = data ? useMemo(() => {
     return [...data.subjects]
       .sort((a, b) => {
         if (a.name === "All") return -1
         if (b.name === "All") return 1
         return a.name.localeCompare(b.name)
       })
-  }, [])
-  const filteredSubjects = useMemo(() => {
+  }, []) : []
+  const filteredSubjects = data ? useMemo(() => {
     const q = query.replace(/\s+/g, '').toLowerCase()
     return [...data.subjects]
       .filter(item =>
         item.name.replace(/\s+/g, '').toLowerCase().includes(q)
       )
-  }, [query])
+  }, [query]) : []
 
   return (
     <SafeAreaView className="flex-1 px-5 bg-white dark:bg-gray-800" edges={['left', 'right', 'bottom']}>
@@ -101,7 +127,7 @@ const discover = () => {
           />
           <GestureDetector gesture={tap}>
             <Animated.View
-              className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-900 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
+              className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-700 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
               style={animatedStyle}
             >   
               <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
@@ -111,8 +137,9 @@ const discover = () => {
             </Animated.View>
           </GestureDetector>
         </View>
-        <FlatList
-          data={query != "" ? filteredSubjects : filter === 0 ? sortedSubjects : data.subjects}
+
+        {(success && data || placeholderSubjects) ? <FlatList
+          data={query != "" ? filteredSubjects : filter === 0 ? sortedSubjects : placeholderSubjects.subjects}
           renderItem={(item) => (
             <DiscoverCard {...item} />
           )}
@@ -124,7 +151,7 @@ const discover = () => {
           }}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           scrollEnabled={false}
-        />
+        /> : loading ? <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" /> : <Text className="mx-auto text-black dark:text-white">Error loading subjects: {error?.message}</Text>}
       </ScrollView>
     </SafeAreaView>
   )

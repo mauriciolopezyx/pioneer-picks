@@ -67,6 +67,43 @@ public class Review {
 
     public Review() {}
 
+    public Review(Professor professor, Course course, String name, Date date, String semester, Integer location, Integer workload, Integer leniency, Integer communication, Integer assignments, Boolean curve, Boolean attendance, Boolean late, String positive, String negative) {
+        this.professor = professor;
+        this.course = course;
+        this.name = name;
+        this.date = date;
+        this.semester = semester;
+        this.location = location;
+        this.workload = workload;
+        this.leniency = leniency;
+        this.communication = communication;
+        this.assignments = assignments;
+        this.curve = curve;
+        this.attendance = attendance;
+        this.late = late;
+        this.positive = positive;
+        this.negative = negative;
+    }
+
+    public Review(Professor professor, Course course, String name, Date date, String semester, Integer location, Integer workload, Integer leniency, Integer communication, Integer assignments, Boolean curve, Boolean attendance, Boolean late, String textbook, String positive, String negative) {
+        this.professor = professor;
+        this.course = course;
+        this.name = name;
+        this.date = date;
+        this.semester = semester;
+        this.location = location;
+        this.workload = workload;
+        this.leniency = leniency;
+        this.communication = communication;
+        this.assignments = assignments;
+        this.curve = curve;
+        this.attendance = attendance;
+        this.late = late;
+        this.textbook = textbook;
+        this.positive = positive;
+        this.negative = negative;
+    }
+
     public UUID getId() {
         return id;
     }

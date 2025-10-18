@@ -66,7 +66,7 @@ export default function SectionScreen() {
                     />
                 </View>
             </View>
-            <View className="pb-[25px] pt-[10px] bg-black flex items-center justify-center">
+            <View className="pb-[25px] pt-[10px] bg-black dark:bg-gray-800 flex items-center justify-center">
                 <View className="w-[90%]">
                     <CommentInput onComment={onComment} user={user} colorScheme={colorScheme} />
                 </View>
@@ -197,9 +197,9 @@ const CommentInput = ({ onComment, user, colorScheme }: CommentInputProps) => {
                 value={commentBody}
                 onChangeText={setCommentBody}
                 placeholder={user ? "What are your thoughts?" : "Sign in to comment"}
-                placeholderTextColor={user != null ? (colorScheme === "dark" ? "#a8b5db" : "#545a6d") : "#999"}
+                placeholderTextColor={user != null ? (colorScheme === "dark" ? "#aaa" : "#545a6d") : "#999"}
                 multiline
-                className={`font-montserrat flex-1 p-3 text-black dark:text-white rounded-full min-h-[40px] text-md ${user != null ? "bg-white dark:bg-dark-200" : "bg-light-100 dark:bg-dark-200"}`}
+                className={`font-montserrat flex-1 p-3 text-black dark:text-white rounded-full min-h-[40px] text-md ${user != null ? "bg-white dark:bg-gray-700" : "bg-light-100 dark:bg-gray-700"}`}
                 textAlign="left"
                 editable={user != null}
             />

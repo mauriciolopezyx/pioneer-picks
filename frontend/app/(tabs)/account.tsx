@@ -54,7 +54,8 @@ const Account = () => {
         <>
           <Text style={{textAlign: "center"}} className="font-montserrat w-3/4 text-lg mb-8" numberOfLines={2}>Sign in or register to comment and bookmark</Text>
           <ControlButton title="Login" onPress={() => { router.navigate({pathname: "/login"})}} />
-          <ControlButton title="Register" onPress={() => { router.navigate({pathname: "/login"})}} />
+          <ControlButton title="Register" onPress={() => { router.navigate({pathname: "/register"})}} />
+          <ControlButton title="Verify" onPress={() => { router.navigate({pathname: "/verify"})}} />
         </>
       )}
     </View>

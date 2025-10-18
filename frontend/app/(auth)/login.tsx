@@ -99,7 +99,7 @@ export default function Login() {
   }
 
   return (
-    <View className="flex-1 bg-white dark:bg-black">
+    <View className="flex-1 bg-white dark:bg-gray-800">
       <SafeAreaView style={{ flex: 1 }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -112,150 +112,138 @@ export default function Login() {
           >
             <View className="flex-1 justify-center px-6 py-12">
 
-            <View className="mb-12">
-              <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-2">
-                Login
-              </Text>
-            </View>
-
-            {isError ? (
-              <View className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-6">
-                <Text className="text-red-600 dark:text-red-400 text-sm">
-                  {error?.message}
+              <View className="mb-12">
+                <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-2">
+                  Login
                 </Text>
               </View>
-            ) : null}
 
-            <View className="mb-4">
-              <Text className="font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email
-              </Text>
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    className={`
-                        font-montserrat
-                        bg-gray-50 dark:bg-gray-800 
-                        border rounded-lg px-4 py-3 
-                        text-gray-900 dark:text-white
-                        ${focused.email 
-                        ? "border-blue-500" 
-                        : errors.email 
-                            ? "border-red-500 dark:border-red-400"
-                            : "border-gray-300 dark:border-gray-600"
-                        }
-                    `}
-                    placeholder=""
-                    placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                    onFocus={() => setFocused(prev => ({ ...prev, email: true }))}
-                    onBlur={() => {
-                      setFocused(prev => ({ ...prev, email: false }));
-                      onBlur();
-                    }}
-                    onChangeText={onChange}
-                    value={value}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    testID="email-input"
-                  />
-                )}
-              />
-              {errors.email ? (
-                <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                  {errors.email.message}
-                </Text>
+              {isError ? (
+                <View className="flex items-center justify-center mb-8">
+                  <Text className="font-montserrat-medium text-red-600 dark:text-red-400 text-sm" style={{textAlign: "center"}}>
+                    Error logging in: {error?.message}
+                  </Text>
+                </View>
               ) : null}
-            </View>
 
-            <View className="mb-6">
-              <Text className="font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
-              </Text>
-              <View className="relative">
+              <View className="mb-4">
+                <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email
+                </Text>
                 <Controller
                   control={control}
-                  name="password"
+                  name="email"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
                       className={`
-                        font-montserrat
-                        bg-gray-50 dark:bg-gray-800 
-                        border rounded-lg px-4 py-3 pr-12
-                        text-gray-900 dark:text-white
-                        ${focused.password 
-                          ? "border-blue-500" 
-                          : errors.password 
-                            ? "border-red-500 dark:border-red-400"
-                            : "border-gray-300 dark:border-gray-600"
-                        }
+                          font-montserrat
+                          bg-gray-50 dark:bg-gray-700 
+                          rounded-full px-4 py-3 
+                          text-gray-900 dark:text-white
                       `}
                       placeholder=""
                       placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                      onFocus={() => setFocused(prev => ({ ...prev, password: true }))}
+                      onFocus={() => setFocused(prev => ({ ...prev, email: true }))}
                       onBlur={() => {
-                        setFocused(prev => ({ ...prev, password: false }));
+                        setFocused(prev => ({ ...prev, email: false }));
                         onBlur();
                       }}
                       onChangeText={onChange}
                       value={value}
-                      secureTextEntry={!showPassword}
+                      keyboardType="email-address"
                       autoCapitalize="none"
                       autoCorrect={false}
-                      testID="password-input"
+                      testID="email-input"
                     />
                   )}
                 />
-                <Pressable
-                  onPress={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3.5"
-                  testID="password-toggle"
-                >
-                  {showPassword ? (
-                    <Ionicons name="eye-off-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
-                  ) : (
-                    <Ionicons name="eye-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
-                  )}
-                </Pressable>
+                {errors.email ? (
+                  <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
+                    {errors.email.message}
+                  </Text>
+                ) : null}
               </View>
-              {errors.password ? (
-                <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                  {errors.password.message}
+
+              <View className="mb-6">
+                <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Password
                 </Text>
-              ) : null}
-            </View>
+                <View className="relative">
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        className={`
+                          font-montserrat
+                          bg-gray-50 dark:bg-gray-700 
+                          rounded-full px-4 py-3 pr-12
+                          text-gray-900 dark:text-white
+                        `}
+                        placeholder=""
+                        placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                        onFocus={() => setFocused(prev => ({ ...prev, password: true }))}
+                        onBlur={() => {
+                          setFocused(prev => ({ ...prev, password: false }));
+                          onBlur();
+                        }}
+                        onChangeText={onChange}
+                        value={value}
+                        secureTextEntry={!showPassword}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        testID="password-input"
+                      />
+                    )}
+                  />
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    className="absolute right-5 top-1/2 transform -translate-y-1/2"
+                    testID="password-toggle"
+                  >
+                    {showPassword ? (
+                      <Ionicons name="eye-off-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
+                    ) : (
+                      <Ionicons name="eye-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
+                    )}
+                  </Pressable>
+                </View>
+                {errors.password ? (
+                  <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
+                    {errors.password.message}
+                  </Text>
+                ) : null}
+              </View>
 
-            <TouchableOpacity className="mb-6">
-              <Text className="font-montserrat-semibold text-md text-blue-600 dark:text-light-100 text-right">
-                Forgot password?
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleSubmit(onSubmit)}
-              disabled={loading}
-              className={`
-                rounded-lg py-3.5 mb-4
-                ${loading 
-                  ? "bg-gray-400 dark:bg-gray-600" 
-                  : "bg-primary dark:bg-primary"
-                }
-              `}
-              testID="login-button"
-            >
-              <Text className="font-montserrat-semibold text-white text-center text-lg">
-                {loading ? "Logging in..." : "Login"}
-              </Text>
-            </TouchableOpacity>
-
-            <View className="flex-row justify-center items-center">
-                <Text className="font-montserrat text-gray-600 dark:text-gray-400 text-sm">
-                Don&apos;t have an account?{" "}
+              <TouchableOpacity className="mb-6">
+                <Text className="font-montserrat-semibold text-md text-blue-600 dark:text-light-100 text-right">
+                  Forgot password?
                 </Text>
-                <Link href="/" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Register</Link>
-            </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleSubmit(onSubmit)}
+                disabled={loading}
+                className={`
+                  rounded-lg py-3.5 mb-4
+                  ${loading 
+                    ? "bg-gray-400 dark:bg-gray-600" 
+                    : "bg-primary dark:bg-primary"
+                  }
+                `}
+                testID="login-button"
+              >
+                <Text className="font-montserrat-semibold text-white text-center text-lg">
+                  {loading ? "Logging in..." : "Login"}
+                </Text>
+              </TouchableOpacity>
+
+              <View className="flex-row justify-center items-center">
+                  <Text className="font-montserrat text-gray-600 dark:text-gray-400 text-sm">
+                  Don&apos;t have an account?{" "}
+                  </Text>
+                  <Link href="/register" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Register</Link>
+              </View>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

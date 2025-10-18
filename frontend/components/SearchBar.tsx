@@ -35,7 +35,7 @@ const SearchBar = ({
   return (
     <Pressable 
       onPress={handleContainerPress}
-      className={`flex-1 flex flex-row items-center bg-gray-200 dark:bg-dark-200 rounded-full px-4 py-3 overflow-hidden
+      className={`flex-1 flex flex-row items-center bg-gray-200 dark:bg-gray-700 rounded-full px-4 py-3 overflow-hidden
       }`}
       style={({ pressed }) => [
         {
@@ -45,12 +45,12 @@ const SearchBar = ({
       ]}
     >
       <View pointerEvents="none">
-        <Ionicons name="search-outline" size={20} color="white" />
+        <Ionicons name="search-outline" size={20} color={colorScheme === "dark" ? "#aaa" : "#545a6d"} />
       </View>
       <TextInput
         ref={textInputRef}
         placeholder={placeholder}
-        placeholderTextColor={colorScheme === "dark" ? "#a8b5db" : "#545a6d"}
+        placeholderTextColor={colorScheme === "dark" ? "#aaa" : "#545a6d"}
         onChangeText={onChangeText}
         value={value}
         onFocus={() => setIsFocused(true)}

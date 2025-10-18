@@ -114,7 +114,7 @@ const ControlButton = ({user, onPress}: {user: any, onPress: () => void}) => {
     return (
         <GestureDetector gesture={tap}>
             <Animated.View
-                className="border-[1px] border-dark-100 w-[75px] h-[75px] px-1 flex items-center justify-center bg-black rounded-full"
+                className="w-[75px] h-[75px] px-1 flex items-center justify-center bg-black dark:bg-light-200 rounded-full"
                 style={animatedStyle}
             >
                 <Ionicons name={user ? "add-outline" : "close-outline"} size={35} color="white" />
