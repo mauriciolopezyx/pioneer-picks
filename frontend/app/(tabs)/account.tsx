@@ -31,9 +31,9 @@ const Account = () => {
           const payload = await response.text()
           throw new Error(payload)
       }
+      console.log("successfully sent ok request!")
     },
     onSuccess: () => {
-      console.log("successfully sent ok request")
       setAuthenticated(true)
     },
     onError: (e: any) => {

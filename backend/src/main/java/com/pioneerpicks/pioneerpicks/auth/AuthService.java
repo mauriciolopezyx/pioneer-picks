@@ -58,6 +58,7 @@ class AuthService {
         }
 
         User user = new User(input.username(), input.email(), passwordEncoder.encode(input.password()));
+        user.setEnabled(false);
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         sendVerificationEmail(user);
@@ -93,6 +94,8 @@ class AuthService {
         SecurityContextHolder.setContext(context);
         request.getSession(true); // make sure a session exists
         new HttpSessionSecurityContextRepository().saveContext(context, request, response);
+
+        System.out.println("SESSION ID from request: " + request.getSession().getId());
 
         LoginResponseDto loginResponse = new LoginResponseDto(true);
 
@@ -166,7 +169,7 @@ class AuthService {
         String htmlMessage = "<html>"
                 + "<body style=\"font-family: Arial, sans-serif;\">"
                 + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
-                + "<h2 style=\"color: #333;\">Welcome to TrackIt!</h2>"
+                + "<h2 style=\"color: #333;\">Welcome to Pioneer Picks!</h2>"
                 + "<p style=\"font-size: 16px;\">Please enter the following verification code in the website to continue!</p>"
                 + "<div style=\"background-color: #fff; padding: 10px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
                 + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + verificationCode + "</p>"

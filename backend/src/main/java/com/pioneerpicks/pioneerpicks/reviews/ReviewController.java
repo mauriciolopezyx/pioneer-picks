@@ -19,7 +19,7 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<?> getReviews(
             @RequestParam UUID professorId,
             @RequestParam UUID courseId

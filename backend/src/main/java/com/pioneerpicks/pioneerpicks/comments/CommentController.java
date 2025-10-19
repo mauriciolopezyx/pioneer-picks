@@ -21,7 +21,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<?> getReviews(
             @RequestParam UUID professorId,
             @RequestParam UUID courseId

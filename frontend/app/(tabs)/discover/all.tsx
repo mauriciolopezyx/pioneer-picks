@@ -5,8 +5,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { useState, useCallback, useMemo } from "react"
 import { useQuery } from '@tanstack/react-query'
-import placeholderSubjects from "@/assets/data.json"
 import * as SecureStore from "expo-secure-store";
+import { LOCALHOST } from "@/services/api";
 
 import {
     SafeAreaView
@@ -34,21 +34,17 @@ const discover = () => {
   const { isLoading:loading, isSuccess:success, error, data } = useQuery({
     queryKey: ["all-subjects"],
     queryFn: async () => {
-        const sessionId = await SecureStore.getItemAsync("session");
-        const response = await fetch("http://localhost:8080/subjects", {
-            method: "GET",
-            ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-            headers: {
-                "Content-Type": "application/json"
-            },
-            credentials: "include"
-        })
-        if (!response.ok) {
-            const payload = await response.text()
-            throw new Error(payload)
-        }
-        const json = await response.json()
-        return json
+      const sessionId = await SecureStore.getItemAsync("session");
+      const response = await fetch(`http://${LOCALHOST}:8080/subjects`, {
+          method: "GET",
+          ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+      })
+      if (!response.ok) {
+          const payload = await response.text()
+          throw new Error(payload)
+      }
+      const json = await response.json()
+      return json
     },
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 60 * 24,
@@ -97,24 +93,27 @@ const discover = () => {
     opacity: opacity.value,
   }));
 
-  const sortedSubjects = data ? useMemo(() => {
+  const sortedSubjects = useMemo(() => {
+    if (!data?.subjects) return []
     return [...data.subjects]
       .sort((a, b) => {
         if (a.name === "All") return -1
         if (b.name === "All") return 1
         return a.name.localeCompare(b.name)
       })
-  }, []) : []
-  const filteredSubjects = data ? useMemo(() => {
+  }, [data])
+
+  const filteredSubjects = useMemo(() => {
+    if (!data?.subjects) return []
     const q = query.replace(/\s+/g, '').toLowerCase()
     return [...data.subjects]
       .filter(item =>
         item.name.replace(/\s+/g, '').toLowerCase().includes(q)
       )
-  }, [query]) : []
+  }, [query, data])
 
   return (
-    <SafeAreaView className="flex-1 px-5 bg-white dark:bg-gray-800" edges={['left', 'right', 'bottom']}>
+    <SafeAreaView className="flex-1 px-5 bg-white dark:bg-gray-800" edges={['left', 'right']}>
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
@@ -138,8 +137,8 @@ const discover = () => {
           </GestureDetector>
         </View>
 
-        {(success && data || placeholderSubjects) ? <FlatList
-          data={query != "" ? filteredSubjects : filter === 0 ? sortedSubjects : placeholderSubjects.subjects}
+        {(success && data) ? <FlatList
+          data={query != "" ? filteredSubjects : filter === 0 ? sortedSubjects : data.subjects}
           renderItem={(item) => (
             <DiscoverCard {...item} />
           )}
@@ -152,6 +151,7 @@ const discover = () => {
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           scrollEnabled={false}
         /> : loading ? <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" /> : <Text className="mx-auto text-black dark:text-white">Error loading subjects: {error?.message}</Text>}
+        <View className="h-5"></View>
       </ScrollView>
     </SafeAreaView>
   )

@@ -17,7 +17,7 @@ public class SubjectController {
         this.subjectService = subjectService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<?> getAllSubjects() {
         return subjectService.getAllSubjects();
     }

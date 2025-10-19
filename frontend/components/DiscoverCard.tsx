@@ -1,7 +1,7 @@
 import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Text, TouchableOpacity, View, useColorScheme } from "react-native";
+import { Text, TouchableOpacity, View, useColorScheme, Dimensions } from "react-native";
 import { revolvingColorPalette, subjectColorMappings } from "@/services/utils";
 
 import Animated, {
@@ -14,8 +14,25 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
   All: "globe-outline",
+  "Biological Sciences": "flask-outline",
+  "Chemistry": "flask-outline",
+  "Civil Engineering": "pencil-outline",
+  "Computer Engineering": "server-outline",
+  "Criminal Justice": "search-outline",
+  "Economics": "trending-up-outline",
+  "Engineering": "pencil-outline",
+  "Ethnic Studies": "search-outline",
+  "Finance": "cash-outline",
+  "Geography": "earth-outline",
+  "History": "hourglass-outline",
+  "Kinesiology": "body-outline",
+  "Mathematics": "calculator-outline",
+  "Nursing": "medkit-outline",
+  "Psychology": "man-outline",
+  "Public Health": "medkit-outline",
+  "Statistics": "stats-chart-outline",
+  "Teacher Education": "chatbubbles-outline",
   English: "book-outline",
-  History: "time-outline",
   Math: "calculator-outline",
   Physics: "flask-outline",
   "Computer Science": "laptop-outline"
@@ -32,6 +49,11 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
   const paletteKey = subjectColorMappings[item.name.toLowerCase()] ?? 0
   const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#fff";
   const iconName = iconMap[item.name] ?? "ellipse-outline";
+
+  const screenWidth = Dimensions.get('window').width
+  const horizontalPadding = 20 * 2 // px-5 on SafeAreaView = 20px each side
+  const gap = 10 // gap between columns
+  const cardWidth = (screenWidth - horizontalPadding - gap) / 2
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
@@ -65,8 +87,8 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
   return (
     <GestureDetector gesture={tap}>
       <Animated.View
-          className="flex-1 m-1 h-32 rounded-lg p-3 overflow-hidden"
-          style={animatedStyle}
+          className="h-32 rounded-lg p-3 overflow-hidden"
+          style={[animatedStyle, {width: cardWidth}]}
       >
         <Text
           numberOfLines={2}
@@ -77,7 +99,7 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
         
         <Ionicons
           name={iconName}
-          size={100} // big enough to overflow
+          size={80} // big enough to overflow
           color="rgba(255,255,255,0.7)"
           style={{
             position: "absolute",

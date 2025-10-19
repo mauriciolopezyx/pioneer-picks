@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     KeyboardAvoidingView,
     Platform,
@@ -10,6 +10,7 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as SecureStore from "expo-secure-store";
 
 import { LOCALHOST } from "@/services/api";
 
@@ -20,6 +21,24 @@ export default function Verify() {
         setCode(text)
     }, [])
 
+    const [resendCooldown, setResendCooldown] = useState(0)
+
+    useEffect(() => {
+        if (resendCooldown === 0) return
+
+        const interval = setInterval(() => {
+            setResendCooldown(prev => {
+                if (prev <= 1) {
+                    clearInterval(interval)
+                    return 0
+                }
+                return prev - 1
+            })
+        }, 1000)
+
+        return () => clearInterval(interval)
+    }, [resendCooldown])
+
     const router = useRouter()
     const { email, forgot }: {email: string, forgot: string} = useLocalSearchParams()
     const forgotPassword = forgot === "true"
@@ -28,13 +47,10 @@ export default function Verify() {
     const resendEndpoint = forgotPassword ? `http://${LOCALHOST}:8080/auth/forgot-password/code/resend` : `http://${LOCALHOST}:8080/auth/resend`
     const redirectUrl = "/" //forgotPassword ? "/reset-password" : "/home"
 
-    const [resent, setResent] = useState(false)
-
     const {isPending:loading, isError, error, mutate:confirmMutate} = useMutation({
         mutationFn: async () => {
-            const verificationCode = code
-            if (verificationCode.length !== 6) {
-                throw new Error("Please enter all 6 digits")
+            if (code.length !== 6) {
+                throw new Error("Failed to send code: Please enter a 6-digit code")
             }
             if (!email) {
                 throw new Error("Failed to send code: no email detected")
@@ -48,13 +64,25 @@ export default function Verify() {
                 credentials: "include",
                 body: JSON.stringify({
                     email: email,
-                    verificationCode: verificationCode
+                    verificationCode: code
                 })
             })
             if (!response.ok) {
                 const payload = await response.text()
                 throw new Error(payload)
             }
+
+            const setCookie = response.headers.get("set-cookie");
+            if (setCookie) {
+                const match = setCookie.match(/SESSION=([^;]+)/);
+                if (match) {
+                    const sessionId = match[1];
+                    console.log("Saving session:", sessionId);
+        
+                    await SecureStore.setItemAsync("session", sessionId);
+                }
+            }
+
             const json = await response.json()
             return json
         },
@@ -67,7 +95,7 @@ export default function Verify() {
         }
     })
 
-    const {mutate:resendCode} = useMutation({
+    const {mutate:resendCode, isError:isResendError, error:resendError} = useMutation({
         mutationFn: async () => {
             console.log("submitting resend code")
             const response = await fetch(resendEndpoint, {
@@ -84,10 +112,7 @@ export default function Verify() {
                 const payload = await response.text()
                 throw new Error(payload)
             }
-            setResent(true)
-            setTimeout( () => {
-                setResent(false)
-            }, 2000)
+            setResendCooldown(30)
         },
         onSuccess: () => {
             console.log("successfully resent code!")
@@ -128,17 +153,10 @@ export default function Verify() {
                         textContentType="oneTimeCode"
                     />
                     
-                    {isError ? (
+                    {isError || isResendError ? (
                         <View className="mt-2 mb-6">
                             <Text className="font-montserrat-semibold text-red-500 text-sm font-semibold text-center">
-                                {error?.message}
-                            </Text>
-                        </View>
-                    ) : null}
-                    {resent ? (
-                        <View className="mt-2">
-                            <Text className="text-green-500 text-sm font-semibold text-center">
-                                Successfully resent code!
+                                {isError ? error?.message : resendError?.message}
                             </Text>
                         </View>
                     ) : null}
@@ -165,9 +183,9 @@ export default function Verify() {
                         <Text className="font-montserrat text-gray-600 dark:text-gray-300 text-sm mb-2">
                             Didn't receive a code?
                         </Text>
-                        <TouchableOpacity onPress={() => {resendCode()}} disabled={loading}>
+                        <TouchableOpacity onPress={() => {resendCode()}} disabled={loading || resendCooldown > 0}>
                             <Text className="font-montserrat-semibold text-md text-blue-600 dark:text-light-100 font-semibold">
-                            Resend Code
+                            {resendCooldown > 0 ? `Resent Code! (${resendCooldown})` : "Resend Code"}
                             </Text>
                         </TouchableOpacity>
                     </View>

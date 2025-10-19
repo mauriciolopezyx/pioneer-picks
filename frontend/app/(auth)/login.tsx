@@ -71,6 +71,7 @@ export default function Login() {
       }
 
       const setCookie = response.headers.get("set-cookie");
+      console.log("setCookie is:", setCookie)
       if (setCookie) {
         const match = setCookie.match(/SESSION=([^;]+)/);
         if (match) {

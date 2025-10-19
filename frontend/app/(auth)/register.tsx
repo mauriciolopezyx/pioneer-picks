@@ -74,8 +74,8 @@ export default function Register() {
                 })
             })
             if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload + response.status)
+                const payload = await response.json()
+                throw payload
             }
             return registerData.email
         },
@@ -84,7 +84,8 @@ export default function Register() {
             reset()
         },
         onError: (e: any) => {
-            console.error(e?.message ?? "Failed to register")
+            const json = e.m
+            console.error(e?.error ?? "Failed to register")
         }
     })
 
@@ -115,7 +116,7 @@ export default function Register() {
             {isError ? (
                 <View className="flex items-center justify-center mb-8">
                     <Text className="font-montserrat-medium text-red-600 dark:text-red-400 text-sm" style={{textAlign: "center"}}>
-                        Error registering: {error?.message}
+                        Error registering: {error?.error}
                     </Text>
                 </View>
             ) : null}

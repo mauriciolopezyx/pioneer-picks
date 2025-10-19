@@ -22,8 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const restoreSession = async () => {
             const session = await SecureStore.getItemAsync("session");
             if (session) {
-                const parsed = JSON.parse(session);
-                setUser(parsed.user);
+                console.log("user would be set here")
             }
             setLoading(false);
         };

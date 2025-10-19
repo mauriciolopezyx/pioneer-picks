@@ -25,6 +25,7 @@ public class User implements UserDetails {
     @Column(nullable=true)
     private String password;
 
+    @Column(nullable = false)
     private Boolean enabled;
 
     @Column(name="verification_code")

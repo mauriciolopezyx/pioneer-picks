@@ -21,7 +21,7 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<?> getCoursesBySubject(
             @RequestParam UUID subjectId
     ) {
