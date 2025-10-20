@@ -56,6 +56,7 @@ const Account = () => {
           <ControlButton title="Login" onPress={() => { router.navigate({pathname: "/login"})}} />
           <ControlButton title="Register" onPress={() => { router.navigate({pathname: "/register"})}} />
           <ControlButton title="Verify" onPress={() => { router.navigate({pathname: "/verify"})}} />
+            <ControlButton title="Search" onPress={() => { router.navigate({pathname: "/search"})}} />
         </>
       )}
     </View>

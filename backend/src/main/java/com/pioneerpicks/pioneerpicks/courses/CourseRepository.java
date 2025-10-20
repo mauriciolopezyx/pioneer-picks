@@ -8,5 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, UUID> {
+    List<Course> findByNameContainingIgnoreCaseOrAbbreviationContainingIgnoreCase(String q1, String q2);
     List<Course> findBySubjectId(UUID subjectId);
 }

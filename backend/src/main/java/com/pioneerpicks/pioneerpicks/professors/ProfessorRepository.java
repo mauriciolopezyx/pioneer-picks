@@ -9,6 +9,9 @@ import java.util.UUID;
 
 @Repository
 public interface ProfessorRepository extends JpaRepository<Professor, UUID> {
+
+    List<Professor> findByNameContainingIgnoreCase(String query);
+
     @Query("SELECT p FROM Professor p JOIN p.courses c WHERE c.id = :courseId")
-    List<Professor> findAllByCourseId(UUID courseId);
+    List<Professor> findByCourseId(UUID courseId);
 }

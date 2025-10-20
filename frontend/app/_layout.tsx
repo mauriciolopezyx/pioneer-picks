@@ -39,6 +39,13 @@ export default function RootLayout() {
                 name="(modals)/areas"
                 options={{ presentation: "modal" }}
               />
+              <Stack.Screen
+                name="search"
+                options={{
+                  presentation: "card",
+                  animation: "fade_from_bottom"
+                }}
+              />
             </Stack>
           </GestureHandlerRootView>
         </ActionSheetProvider>

@@ -18,7 +18,7 @@ public class ProfessorService {
     }
 
     public ResponseEntity<?> getProfessorsByCourse(UUID courseId) {
-        return ResponseEntity.ok().body(Map.of("professors", professorRepository.findAllByCourseId(courseId)));
+        return ResponseEntity.ok().body(Map.of("professors", professorRepository.findByCourseId(courseId)));
     }
 
 }
