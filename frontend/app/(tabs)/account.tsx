@@ -17,48 +17,41 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 const Account = () => {
 
   const router = useRouter()
-  const [authenticated, setAuthenticated] = useState<boolean>(false)
+  // const [authenticated, setAuthenticated] = useState<boolean>(false)
 
-  const {mutate:heartbeat} = useMutation({
-    mutationFn: async () => {
-      const sessionId = await SecureStore.getItemAsync("session");
-      if (!sessionId) throw Error("Session id does not exist")
-      const response = await fetch(`http://${LOCALHOST}:8080/user/ok`, {
-          method: "GET",
-          ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-      })
-      if (!response.ok) {
-          const payload = await response.text()
-          throw new Error(payload)
-      }
-      console.log("successfully sent ok request!")
-    },
-    onSuccess: () => {
-      setAuthenticated(true)
-    },
-    onError: (e: any) => {
-      setAuthenticated(false)
-    }
-  })
+  // const {mutate:heartbeat} = useMutation({
+  //   mutationFn: async () => {
+  //     const sessionId = await SecureStore.getItemAsync("session");
+  //     if (!sessionId) throw Error("Session id does not exist")
+  //     const response = await fetch(`http://${LOCALHOST}:8080/user/ok`, {
+  //         method: "GET",
+  //         ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+  //     })
+  //     if (!response.ok) {
+  //         const payload = await response.text()
+  //         throw new Error(payload)
+  //     }
+  //     console.log("successfully sent ok request!")
+  //   },
+  //   onSuccess: () => {
+  //     setAuthenticated(true)
+  //   },
+  //   onError: (e: any) => {
+  //     setAuthenticated(false)
+  //   }
+  // })
 
-  useEffect(() => {
-    heartbeat()
-  }, [])
+  // useEffect(() => {
+  //   heartbeat()
+  // }, [])
 
   return (
     <View className="flex-1 justify-center items-center gap-4">
-      {authenticated ? (
-        <>
-        </>
-      ) : (
-        <>
-          <Text style={{textAlign: "center"}} className="font-montserrat w-3/4 text-lg mb-8" numberOfLines={2}>Sign in or register to comment and bookmark</Text>
-          <ControlButton title="Login" onPress={() => { router.navigate({pathname: "/login"})}} />
-          <ControlButton title="Register" onPress={() => { router.navigate({pathname: "/register"})}} />
-          <ControlButton title="Verify" onPress={() => { router.navigate({pathname: "/verify"})}} />
-            <ControlButton title="Search" onPress={() => { router.navigate({pathname: "/search"})}} />
-        </>
-      )}
+      <Text style={{textAlign: "center"}} className="font-montserrat w-3/4 text-lg mb-8" numberOfLines={2}>Sign in or register to comment and bookmark</Text>
+      <ControlButton title="Login" onPress={() => { router.navigate({pathname: "/login"})}} />
+      <ControlButton title="Register" onPress={() => { router.navigate({pathname: "/register"})}} />
+      <ControlButton title="Verify" onPress={() => { router.navigate({pathname: "/verify"})}} />
+      <ControlButton title="Search" onPress={() => { router.navigate({pathname: "/search"})}} />
     </View>
   )
 }

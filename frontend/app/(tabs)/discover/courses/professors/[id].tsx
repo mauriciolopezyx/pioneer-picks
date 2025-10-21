@@ -23,16 +23,16 @@ const Course = () => {
 
     const colorScheme = useColorScheme()
     const router = useRouter()
-    const { id:professorId, course, subject }: {id: string, course: string, subject: string} = useLocalSearchParams();
+    const { id:professorId, subject }: {id: string, course?: string, subject: string} = useLocalSearchParams();
     const navigation = useNavigation();
 
-    useEffect(() => {
-        if (course) {
-        navigation.setOptions({
-            headerBackTitle: course,
-        });
-        }
-    }, [course]);
+    // useEffect(() => {
+    //     if (course) {
+    //     navigation.setOptions({
+    //         headerBackTitle: course,
+    //     });
+    //     }
+    // }, [course]);
 
     const info = data.courses.find(c =>
         c.professors?.some(section => section.id === professorId)
@@ -80,12 +80,12 @@ const Course = () => {
                 {/* <Text className="font-montserrat-bold text-lg">Professor</Text> */}
                 <Text className="font-montserrat-bold text-4xl mb-2 dark:text-white">{professor.name}</Text>
 
-                <Text className="font-montserrat mb-4 dark:text-white">has taught <Text className="font-montserrat-bold dark:text-white">{course}</Text> for <Text className="font-montserrat-bold dark:text-white">{3}</Text> semesters</Text>
+                <Text className="font-montserrat mb-4 dark:text-white">has taught <Text className="font-montserrat-bold dark:text-white">{"null"}</Text> for <Text className="font-montserrat-bold dark:text-white">{3}</Text> semesters</Text>
 
                 <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
                 <View className="flex flex-row gap-5 w-full mb-8">
                     <View className={`flex justify-center items-center py-2 px-4 rounded-full`} style={{ backgroundColor: bgColor }}>
-                        <Text className={`font-montserrat-bold text-sm ${textColor}`}>{course}</Text>
+                        <Text className={`font-montserrat-bold text-sm ${textColor}`}>{"null"}</Text>
                     </View>
                 </View>
 
