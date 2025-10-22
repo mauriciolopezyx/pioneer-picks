@@ -60,8 +60,8 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
 
   const handleSubmit = () => {
     router.navigate({
-        pathname: "/(tabs)/discover/[name]",
-        params: { name: item.name },
+        pathname: "/(tabs)/discover/[id]",
+        params: { id: item.id },
     })
   };
 

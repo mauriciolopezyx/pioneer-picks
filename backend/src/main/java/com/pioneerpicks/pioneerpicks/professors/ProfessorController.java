@@ -1,10 +1,7 @@
 package com.pioneerpicks.pioneerpicks.professors;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -20,11 +17,13 @@ public class ProfessorController {
         this.professorService = professorService;
     }
 
-    @GetMapping("/course")
-    public ResponseEntity<?> getProfessorsByCourse(
-            @RequestParam UUID courseId
+    @GetMapping("/{courseId}/{professorId}")
+    public ResponseEntity<?> getProfessorCourseInformation(
+            @PathVariable UUID courseId,
+            @PathVariable UUID professorId
     ) {
-        return professorService.getProfessorsByCourse(courseId);
+        System.out.println("rec professor course information attempt");
+        return professorService.getProfessorCourseInformation(courseId, professorId);
     }
 
 }

@@ -1,11 +1,14 @@
-import { Text, ScrollView, FlatList, View } from 'react-native'
+import { Text, ScrollView, FlatList, View, ActivityIndicator, Animated as RNAnimated } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
-import data from "@/assets/english.json"
 import ProfessorCard from '@/components/ProfessorCard';
 import { Ionicons } from '@expo/vector-icons';
 import { areas, revolvingColorPalette, subjectColorMappings, areaAbbreviations, findAreaParentKey, areaColorMappings } from "@/services/utils";
+
+import { useQuery } from '@tanstack/react-query'
+import * as SecureStore from "expo-secure-store";
+import { LOCALHOST } from "@/services/api";
 
 import {
     SafeAreaView
@@ -19,27 +22,43 @@ import Animated, {
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
+//public record FullCourseDto(UUID id, String name, String abbreviation, Integer units, String areas, List<BasicProfessorDto> professors) {}
+
 const Course = () => {
 
     const router = useRouter()
-    const { id:courseId, subject }: {id: string, subject: string} = useLocalSearchParams();
+    const { id:courseId, subjectName, subjectAbbreviation }: {id: string, subjectName: string, subjectAbbreviation: string} = useLocalSearchParams();
     const navigation = useNavigation();
 
     useEffect(() => {
-        if (subject) {
+        if (subjectName) {
             navigation.setOptions({
-                headerBackTitle: subject,
+                headerBackTitle: subjectName,
             });
         }
-    }, [subject]);
+    }, [subjectName]);
 
-    const course = data.courses.find(element => element.courseId === courseId)
+    //const course = data.courses.find(element => element.courseId === courseId)
 
-    if (!course) {
-        return (
-            <View></View>
-        )
-    }
+    const { isLoading:loading, isSuccess:success, error, data:course } = useQuery({
+        queryKey: ["specific-course", courseId],
+        queryFn: async () => {
+            const sessionId = await SecureStore.getItemAsync("session");
+            const response = await fetch(`http://${LOCALHOST}:8080/courses/${courseId}`, {
+                method: "GET",
+                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+            })
+            if (!response.ok) {
+                const payload = await response.text()
+                throw new Error(payload)
+            }
+            const json = await response.json()
+            return json
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 60 * 24,
+        gcTime: 1000 * 60 * 60 * 48
+    })
 
     const scale = useSharedValue(1);
     const opacity = useSharedValue(1);
@@ -68,8 +87,30 @@ const Course = () => {
         opacity: opacity.value
     }));
 
+    ////////////
+    
+    const scrollY = useMemo(() => new RNAnimated.Value(0), []);
+
+    useLayoutEffect(() => {
+        const listenerId = scrollY.addListener(({ value }) => {
+        const opacity = Math.min(value / 30, 1)
+        navigation.setOptions({
+            headerTintColor: `rgba(213, 0, 50, ${1 - opacity})`
+        })
+        })
+
+        return () => {
+        scrollY.removeListener(listenerId)
+        }
+    }, [])
+
+    const handleScroll = RNAnimated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+        { useNativeDriver: false }
+    )
+
     const seen = new Set()
-    const areaDisplays = course.areas.map((area) => {
+    const areaDisplays = course ? course.areas.split(",").map((area: string) => {
         if (seen.has(area)) return null
         if (areaAbbreviations[area] && seen.has(areaAbbreviations[area])) return null
 
@@ -91,51 +132,53 @@ const Course = () => {
             <Text className={`font-montserrat-medium text-sm ${textAreaColor}`}>{area}</Text>
             </View>
         )
-    })
+    }) : null
 
     return (
-        <SafeAreaView className="flex-1 dark:bg-gray-800">
+        <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
             <ScrollView
                 className="flex-1 px-5"
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{
                     minHeight: "100%", paddingBottom: 10
                 }}
+                onScroll={handleScroll}
             >
-                <View className="flex flex-row justify-between items-center">
-                    <Text className="font-montserrat-extrabold text-4xl mb-2 dark:text-white">{courseId}</Text>
-                    <View className="flex items-center justify-center mb-2 w-10 aspect-square bg-black p-1 rounded-full dark:bg-light-200">
-                        <Text className="font-montserrat-extrabold text-lg text-white">{course.units}</Text>
-                    </View>
-                </View>
+                <View className="h-[50px]"></View>
+                {loading ? <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" /> : (
+                    <>
+                        <Text className="font-montserrat-extrabold text-3xl mb-2 dark:text-white">{course.name}</Text>
 
-                <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Description</Text>
-                <Text className="font-montserrat mb-4 dark:text-white">{course?.description}</Text>
+                        <Text className="font-montserrat mb-2 dark:text-white">Also known as <Text className="font-montserrat-semibold text-xl">{`${subjectAbbreviation} ${course.abbreviation}`}</Text></Text>
+                        <Text className="font-montserrat mb-4 dark:text-white"><Text className="font-montserrat-semibold text-xl">{course.units}</Text> units</Text>
 
-                <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
-                    <Text className="font-montserrat-bold text-2xl dark:text-white">Areas</Text>
-                    <GestureDetector gesture={tap}>
-                         <Animated.View className="flex items-center justify-center w-[30px] h-[30px] rounded-full bg-black dark:bg-light-200" style={animatedStyle}>
-                            <Ionicons name="information-outline" size={20} color="white" />
-                         </Animated.View>
-                    </GestureDetector>
-                </View>
+                        <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
+                            <Text className="font-montserrat-bold text-2xl dark:text-white">Areas</Text>
+                            <GestureDetector gesture={tap}>
+                                <Animated.View className="flex items-center justify-center rounded-full bg-black dark:bg-light-200" style={animatedStyle}>
+                                    <Ionicons name="information-outline" size={25} color="white" />
+                                </Animated.View>
+                            </GestureDetector>
+                        </View>
 
-                <View className="flex flex-row gap-2 w-full mb-4">
-                    {areaDisplays}
-                </View>
+                        <View className="flex flex-row gap-2 w-full mb-4">
+                            {areaDisplays}
+                        </View>
 
-                <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
-                <FlatList
-                    data={course.professors}
-                    renderItem={(item) => (
-                        <ProfessorCard {...item} course={course?.courseId} subject={subject} />
-                    )}
-                    keyExtractor={(item) => item.id.toString() ?? crypto.randomUUID()}
-                    numColumns={1}
-                    ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-                    scrollEnabled={false}
-                />
+                        <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
+                        <FlatList
+                            data={course.professors}
+                            renderItem={(item) => (
+                                <ProfessorCard professor={item.item} course={{id: courseId, abbreviation: course.abbreviation}} subject={{name: subjectName, abbreviation: subjectAbbreviation}} />
+                            )}
+                            keyExtractor={(item) => item.id.toString() ?? crypto.randomUUID()}
+                            numColumns={1}
+                            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+                            scrollEnabled={false}
+                        />
+                    </>
+                )}
+                <View className="h-[50px]"></View>
             </ScrollView>
         </SafeAreaView>
     )

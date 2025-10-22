@@ -3,6 +3,8 @@ package com.pioneerpicks.pioneerpicks.reviews;
 import com.pioneerpicks.pioneerpicks.courses.Course;
 import com.pioneerpicks.pioneerpicks.professors.Professor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,5 +15,8 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
     List<Review> findByProfessorAndCourse(Professor professor, Course course); // this would be if we had their entities (won't be used though)
     List<Review> findByProfessorIdAndCourseId(UUID professorId, UUID courseId);
+
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.professor.id = :professorId AND r.course.id = :courseId")
+    long countByProfessorAndCourse(@Param("professorId") UUID professorId, @Param("courseId") UUID courseId);
 
 }

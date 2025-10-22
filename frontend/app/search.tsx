@@ -132,8 +132,8 @@ const SearchResult = ({result, colorScheme}: {result: SearchResultProps, colorSc
 
         if (result.category === 1) {
             router.navigate({
-                pathname: "/(tabs)/discover/[name]",
-                params: { name: result.name },
+                pathname: "/(tabs)/discover/[id]",
+                params: { id: result.id },
             })
         } else if (result.category === 2) {
             router.navigate({

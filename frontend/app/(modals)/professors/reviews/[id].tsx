@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform  } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from "expo-router"
-import data from "@/assets/english.json"
 import { useAuth } from "@/components/AuthProvider";
 import Slider from '@react-native-community/slider';
 import { reviewOptions } from "@/services/utils";
@@ -14,6 +13,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+
+import { useQuery } from '@tanstack/react-query'
+import * as SecureStore from "expo-secure-store";
+import { LOCALHOST } from "@/services/api";
 
 type Review = {
   name: string,
@@ -35,23 +38,33 @@ type Review = {
 
 export default function SectionScreen() {
 
-    const { id:professorId }: {id: string} = useLocalSearchParams()
+    const { id:professorId, courseId }: {id: string, courseId: string} = useLocalSearchParams()
     const router = useRouter()
     const { user } = useAuth()
-    const [reviews, setReviews] = useState<Review[]>([])
+
     const onComment = (newComment: Review) => {
-        setReviews(prev => [newComment, ...prev])
+        // use mutation here
     }
 
-    useEffect(() => {
-        const info = data.courses.find(c =>
-            c.professors?.some(section => section.id === professorId)
-        )
-        const professor = info?.professors?.find(s => s.id === professorId)
-        if (professor) {
-            setReviews(professor.reviews)
-        }
-    }, [])
+    const { isLoading:loading, isSuccess:success, error, data:reviews } = useQuery({
+        queryKey: ["specific-course-professor-reviews", professorId, courseId],
+        queryFn: async () => {
+            const sessionId = await SecureStore.getItemAsync("session");
+            const response = await fetch(`http://${LOCALHOST}:8080/reviews/${courseId}/${professorId}`, {
+                method: "GET",
+                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+            })
+            if (!response.ok) {
+                const payload = await response.text()
+                throw new Error(payload)
+            }
+            const json = await response.json()
+            return json
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 60 * 24,
+        gcTime: 1000 * 60 * 60 * 48
+    })
 
     return (
         <KeyboardAvoidingView

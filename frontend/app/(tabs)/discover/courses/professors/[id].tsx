@@ -1,4 +1,4 @@
-import { Text, View, Pressable, useColorScheme } from 'react-native'
+import { Text, View, Pressable, useColorScheme, ActivityIndicator } from 'react-native'
 import { useLocalSearchParams, Link, useRouter } from 'expo-router'
 import { useState, useEffect, useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -10,6 +10,10 @@ import { revolvingColorPalette, subjectColorMappings } from "@/services/utils"
 import {
     SafeAreaView
 } from 'react-native-safe-area-context';
+
+import { useQuery } from '@tanstack/react-query'
+import * as SecureStore from "expo-secure-store";
+import { LOCALHOST } from "@/services/api";
 
 import Animated, {
   useSharedValue,
@@ -23,80 +27,80 @@ const Course = () => {
 
     const colorScheme = useColorScheme()
     const router = useRouter()
-    const { id:professorId, subject }: {id: string, course?: string, subject: string} = useLocalSearchParams();
+    const { id:professorId, courseId, subjectName, subjectAbbreviation, courseAbbreviation }: {id: string, courseId: string, subjectName: string, subjectAbbreviation: string, courseAbbreviation: string} = useLocalSearchParams();
     const navigation = useNavigation();
 
-    // useEffect(() => {
-    //     if (course) {
-    //     navigation.setOptions({
-    //         headerBackTitle: course,
-    //     });
-    //     }
-    // }, [course]);
+    const { isLoading:loading, isSuccess:success, error, data:professor } = useQuery({
+        queryKey: ["specific-course-professor", professorId, courseId],
+        queryFn: async () => {
+            const sessionId = await SecureStore.getItemAsync("session");
+            const response = await fetch(`http://${LOCALHOST}:8080/professors/${courseId}/${professorId}`, {
+                method: "GET",
+                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+            })
+            if (!response.ok) {
+                const payload = await response.text()
+                throw new Error(payload)
+            }
+            const json = await response.json()
+            return json
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 60 * 24,
+        gcTime: 1000 * 60 * 60 * 48
+    })
 
-    const info = data.courses.find(c =>
-        c.professors?.some(section => section.id === professorId)
-    )
-    const professor = info?.professors?.find(s => s.id === professorId)
-
-    if (!professor) {
-        return (
-            <View></View>
-        )
-    }
-
-    const paletteKey = subjectColorMappings[subject.toLowerCase()] ?? 0
+    const paletteKey = subjectColorMappings[subjectName.toLowerCase()] ?? 0
     const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
     const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
 
-    // const {isPending:loading, isError, error, mutate} = useMutation({
-    //     mutationFn: async () => {
-    //         const response = await fetch("https://csueb.instructure.com/api/v1/courses", {
-    //             method: 'GET',
-    //             //headers: { Authorization: 'Basic ' + btoa('off:off') },
-    //             headers: { Authorization: `Bearer 21145~u2xzm4mr47enFYnGWCJh7RcykARRBR9DwHk9L2nnQ8JQ2CNAYTM6kk9YuePU2cLL` }
-    //         })
-    //         if (!response.ok) {
-    //             const payload = await response.text()
-    //             throw new Error(payload)
-    //         }
-    //         const json = await response.json()
-    //         console.log("json received:")
-    //         console.log(json)
-    //         console.log("length is json is " + json)
-    //     }
-    // })
+    useEffect(() => {
+        if (subjectName) {
+            navigation.setOptions({
+                headerBackTitle: subjectAbbreviation + " " + courseAbbreviation,
+            });
+        }
+    }, [subjectName]);
 
     // useEffect( () => {
     //     mutate()
     // }, [])
 
+    // same layout 2 views spacer crap nonsense
 
     return (
         <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["top"]}>
             <View
                 className="px-5"
-            >
-                {/* <Text className="font-montserrat-bold text-lg">Professor</Text> */}
-                <Text className="font-montserrat-bold text-4xl mb-2 dark:text-white">{professor.name}</Text>
+            >   
+                {loading ? <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" /> : (
+                    <>
+                        {/* <Text className="font-montserrat-bold text-lg">Professor</Text> */}
+                        <Text className="font-montserrat-bold text-4xl mb-4 dark:text-white">{professor.name}</Text>
 
-                <Text className="font-montserrat mb-4 dark:text-white">has taught <Text className="font-montserrat-bold dark:text-white">{"null"}</Text> for <Text className="font-montserrat-bold dark:text-white">{3}</Text> semesters</Text>
+                        <View className="flex flex-row items-center justify-start">
+                            <View style={{backgroundColor: bgColor}} className="rounded-full px-4 py-1 mb-8">
+                                <Text className="font-montserrat-semibold text-md dark:text-white">{`${subjectName} ${courseAbbreviation}`}</Text>
+                            </View>
+                        </View>
 
-                <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
-                <View className="flex flex-row gap-5 w-full mb-8">
-                    <View className={`flex justify-center items-center py-2 px-4 rounded-full`} style={{ backgroundColor: bgColor }}>
-                        <Text className={`font-montserrat-bold text-sm ${textColor}`}>{"null"}</Text>
-                    </View>
-                </View>
+                        {/* <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
+                        <View className="flex flex-row gap-5 w-full mb-8">
+                            <View className={`flex justify-center items-center py-2 px-4 rounded-full`} style={{ backgroundColor: bgColor }}>
+                                <Text className={`font-montserrat-bold text-sm ${textColor}`}>{"null"}</Text>
+                            </View>
+                        </View> */}
 
-                {/* <View className="border-t-[1px] mb-8"></View> */}
+                        {/* <View className="border-t-[1px] mb-8"></View> */}
 
-                <View className="border-t-[1px] dark:border-white"></View>
-                <Options title={`Reviews`} emphasis={`(${professor.reviews.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id}}) } } colorScheme={colorScheme} />
-                <View className="border-t-[1px] dark:border-white"></View>
+                        <View className="border-t-[1px] dark:border-white"></View>
+                        <Options title={`Reviews`} emphasis={`(${professor.reviewCount})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id, courseId: courseId}}) } } colorScheme={colorScheme} />
+                        <View className="border-t-[1px] dark:border-white"></View>
 
-                <Options title={`Comments`} emphasis={`(${professor.comments.length})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id}}) } } colorScheme={colorScheme} />
-                <View className="border-t-[1px] dark:border-white"></View>
+                        <Options title={`Comments`} emphasis={`(${professor.commentCount})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id, courseid: courseId}}) } } colorScheme={colorScheme} />
+                        <View className="border-t-[1px] dark:border-white"></View>
+                    </>
+                )}
                 
             </View>
         </SafeAreaView>

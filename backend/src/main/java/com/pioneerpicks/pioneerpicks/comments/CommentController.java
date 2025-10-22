@@ -2,10 +2,7 @@ package com.pioneerpicks.pioneerpicks.comments;
 
 import com.pioneerpicks.pioneerpicks.courses.CourseService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -21,13 +18,21 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getReviews(
-            @RequestParam UUID professorId,
-            @RequestParam UUID courseId
-    ) {
-        return commentService.getComments(professorId, courseId);
-    }
+//    @GetMapping
+//    public ResponseEntity<?> getReviews(
+//            @RequestParam UUID professorId,
+//            @RequestParam UUID courseId
+//    ) {
+//        return commentService.getComments(professorId, courseId);
+//    }
 
+    @GetMapping("/{courseId}/{professorId}")
+    public ResponseEntity<?> getCourseProfessorComments(
+            @PathVariable UUID courseId,
+            @PathVariable UUID professorId
+    ) {
+        System.out.println("rec course professor comments attempt");
+        return commentService.getCourseProfessorComments(courseId, professorId);
+    }
 
 }

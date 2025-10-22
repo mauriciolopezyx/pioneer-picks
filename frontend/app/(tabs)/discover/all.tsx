@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, ScrollView, useColorScheme, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, FlatList, ScrollView, useColorScheme, ActivityIndicator, Pressable } from 'react-native'
 import DiscoverCard from '@/components/DiscoverCard'
 import SearchBar from '@/components/SearchBar';
 import { Ionicons } from "@expo/vector-icons";
@@ -19,11 +19,13 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { useRouter } from 'expo-router';
 
 const filterOptions = ["Alphabetical", "Reset"]
 
 const discover = () => {
 
+  const router = useRouter()
   const colorScheme = useColorScheme()
   const [query, setQuery] = useState("")
   const [filter, setFilter] = useState(filterOptions.length - 1)
@@ -120,10 +122,16 @@ const discover = () => {
       >
         <View className="h-5"></View>
         <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
-          <SearchBar
-            placeholder="Search"
-            onChangeText={onChangeQuery}
-          />
+          <Pressable className="flex-1" onPress={() => { router.navigate({ pathname: "/search" })}}>
+            <View className="pointer-events-none">
+              <SearchBar
+                placeholder="Search"
+                onChangeText={onChangeQuery}
+                disabled={true}
+              />
+            </View>
+          </Pressable>
+
           <GestureDetector gesture={tap}>
             <Animated.View
               className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-700 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}

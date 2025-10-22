@@ -43,17 +43,28 @@ type Comment = {
   body: string,
   id: number
 }
+
+type SubjectCourseProps = {
+  name: string,
+  abbreviation: string
+}
+
 type Professor = {
   name: string,
   id: string,
-  reviews: Review[],
-  comments: Comment[]
+  reviewCount: number,
+  commentCount: number
 }
 
-const ProfessorCard = ({ item:professor, index, course, subject }: {item: Professor, index: number, course: string, subject: string}) => {
+type CourseProps = {
+  id: string,
+  abbreviation: string
+}
+
+const ProfessorCard = ({ professor, course, subject }: {professor: Professor, course: CourseProps, subject: SubjectCourseProps}) => {
   const router = useRouter()
   const colorScheme = useColorScheme();
-  const paletteKey = subjectColorMappings[subject.toLowerCase()] ?? 0
+  const paletteKey = subjectColorMappings[subject.name.toLowerCase()] ?? 0
   const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
   const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
 
@@ -63,7 +74,7 @@ const ProfessorCard = ({ item:professor, index, course, subject }: {item: Profes
   const handleSubmit = () => {
     router.navigate({
       pathname: "/(tabs)/discover/courses/professors/[id]",
-      params: { id: professor.id, course, subject },
+      params: { id: professor.id, courseId: course.id, subjectName: subject.name, subjectAbbreviation: subject.abbreviation, courseAbbreviation: course.abbreviation },
     })
   };
 
@@ -97,24 +108,12 @@ const ProfessorCard = ({ item:professor, index, course, subject }: {item: Profes
                 {professor.name}
             </Text>
             <Text className={`font-montserrat-semibold ${textColor}`}>
-                {`${professor.reviews.length} Review${professor.reviews.length == 1 ? "" : "s"}`}, {"4 Semesters"}
+                {`${professor.reviewCount} Review${professor.reviewCount == 1 ? "" : "s"}`}, {"4 Semesters"}
             </Text>
         </View>
         <View>
             <Ionicons name="chevron-forward-outline" size={30} color="white" />
         </View>
-
-
-        {/* <Ionicons
-          name={iconName}
-          size={100} // big enough to overflow
-          color="rgba(255,255,255,0.7)"
-          style={{
-            position: "absolute",
-            bottom: -15,
-            right: -15,
-          }}
-        /> */}
       </Animated.View>
     </GestureDetector>
   );

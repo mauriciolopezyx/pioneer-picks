@@ -8,6 +8,7 @@ type Props = {
     value?: string,
     onChangeText?: (text: string) => void,
     onSubmit?: () => void,
+    disabled?: boolean
 }
 
 const SearchBar = ({
@@ -15,7 +16,8 @@ const SearchBar = ({
   onPress, 
   value, 
   onChangeText,
-  onSubmit
+  onSubmit,
+  disabled
 }: Props) => {
   const textInputRef = useRef<TextInput>(null)
   const [isFocused, setIsFocused] = useState(false)
@@ -62,6 +64,7 @@ const SearchBar = ({
         returnKeyType="search"
         clearButtonMode="never" // We'll use custom clear button
         autoFocus={false}
+        editable={!disabled}
       />
     </Pressable>
   )

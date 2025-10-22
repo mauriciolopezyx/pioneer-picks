@@ -23,7 +23,7 @@ export default function DiscoverLayout() {
         }}
       />
       <Stack.Screen
-        name="[name]"
+        name="[id]"
         options={{
             headerBackTitle: "Subjects",
             headerTitle: ""

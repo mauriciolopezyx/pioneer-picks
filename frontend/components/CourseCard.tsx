@@ -18,20 +18,33 @@ type Section = {
     schedule: string,
     location: string
 }
-type Course = {
-    courseId: string,
-    shortName: string,
-    fullName: string,
-    units: number,
-    areas: string[],
-    description: string,
-    sections: Section[]
+// type Course = {
+//     courseId: string,
+//     shortName: string,
+//     fullName: string,
+//     units: number,
+//     areas: string[],
+//     description: string,
+//     sections: Section[]
+// }
+
+type SubjectCourseProps = {
+  name: string,
+  abbreviation: string
 }
 
-const CourseCard = ({ item, index, subject }: {item: Course, index: number, subject: string}) => {
+type Course = {
+  id: string,
+  name: string,
+  abbreviation: string, // 300, 405, etc
+  units: number,
+  areas: string
+}
+
+const CourseCard = ({ course, subject }: { course: Course, subject: SubjectCourseProps }) => {
   const router = useRouter()
   const colorScheme = useColorScheme();
-  const paletteKey = subjectColorMappings[subject.toLowerCase()] ?? 0
+  const paletteKey = subjectColorMappings[subject.name.toLowerCase()] ?? 0
   const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
   const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
 
@@ -41,7 +54,7 @@ const CourseCard = ({ item, index, subject }: {item: Course, index: number, subj
   const handleSubmit = () => {
     router.navigate({
         pathname: "/(tabs)/discover/courses/[id]",
-        params: { id: item.courseId, subject: subject },
+        params: { id: course.id, subjectName: subject.name, subjectAbbreviation: subject.abbreviation },
     })
   };
 
@@ -65,7 +78,7 @@ const CourseCard = ({ item, index, subject }: {item: Course, index: number, subj
   }));
 
   const seen = new Set()
-  const areaDisplays = item.areas.map((area) => {
+  const areaDisplays = course.areas.split(",").map((area) => {
     if (seen.has(area)) return null
     if (areaAbbreviations[area] && seen.has(areaAbbreviations[area])) return null
 
@@ -97,10 +110,10 @@ const CourseCard = ({ item, index, subject }: {item: Course, index: number, subj
       >
         <View className="flex flex-col items-start justify-center gap-y-[2px]">
           <Text numberOfLines={1} className={`text-xl font-bold ${textColor}`}>
-              {item.courseId}
+              {`${subject.abbreviation} ${course.abbreviation}`}
           </Text>
           <Text className={`font-montserrat-semibold ${textColor} mb-[4px]`}>
-              {item.fullName}
+              {course.name}
           </Text>
           <View className="flex flex-row justify-start items-center gap-x-[5px]">
               {areaDisplays}
@@ -108,7 +121,7 @@ const CourseCard = ({ item, index, subject }: {item: Course, index: number, subj
         </View>
         <View>
           <Text className={`font-montserrat-bold text-4xl ${textColor}`}>
-              {item.units}
+              {course.units}
           </Text>
         </View>
       </Animated.View>
