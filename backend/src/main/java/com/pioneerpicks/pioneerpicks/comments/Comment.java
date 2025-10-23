@@ -2,9 +2,10 @@ package com.pioneerpicks.pioneerpicks.comments;
 
 import com.pioneerpicks.pioneerpicks.courses.Course;
 import com.pioneerpicks.pioneerpicks.professors.Professor;
+import com.pioneerpicks.pioneerpicks.user.User;
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -23,17 +24,23 @@ public class Comment {
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     private Course course;
 
-    @Column(nullable = false)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     @Column(nullable = false)
-    private Date date;
-
-    @Column(nullable = false)
-    private String semester;
+    private LocalDate date;
 
     @Column(nullable = false)
     private String body;
+
+    public Comment(Professor professor, Course course, User user, LocalDate date, String body) {
+        this.professor = professor;
+        this.course = course;
+        this.user = user;
+        this.date = date;
+        this.body = body;
+    }
 
     public Comment() {}
 
@@ -49,16 +56,10 @@ public class Comment {
         return course;
     }
 
-    public String getName() {
-        return name;
-    }
+    public User getUser() { return user; }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
-    }
-
-    public String getSemester() {
-        return semester;
     }
 
     public String getBody() {

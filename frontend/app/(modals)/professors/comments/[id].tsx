@@ -1,9 +1,14 @@
-import { useState, useRef, useEffect } from "react";
-import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform, useColorScheme  } from "react-native";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform, useColorScheme, ActivityIndicator  } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from "expo-router"
 import data from "@/assets/english.json"
 import { useAuth } from "@/components/AuthProvider";
+import Toast from "react-native-toast-message"
+
+import { useQuery, useMutation } from "@tanstack/react-query";
+import * as SecureStore from "expo-secure-store";
+import { LOCALHOST } from "@/services/api";
 
 import Animated, {
   useSharedValue,
@@ -13,33 +18,107 @@ import Animated, {
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
+import {
+    SafeAreaView
+} from 'react-native-safe-area-context';
+
 type Comment = {
   name: string,
-  date: string,
-  semester: string,
+  date: any,
   body: string,
-  id: number
+  id: string
 }
 
 export default function SectionScreen() {
 
     const colorScheme = useColorScheme()
-    const { id:professorId }: {id: string} = useLocalSearchParams()
+    const { id:professorId, courseId }: {id: string, courseId: string} = useLocalSearchParams()
     const { user } = useAuth()
-    const [comments, setComments] = useState<Comment[]>([])
-    const onComment = (newComment: Comment) => {
-        setComments(prev => [newComment, ...prev])
+
+    const [commentBody, setCommentBody] = useState("")
+    const onChangeBody = useCallback((text: string) => {
+        setCommentBody(text)
+    }, [])
+
+    const {isPending:commentPending, isError, error:commentError, mutate:onComment} = useMutation({
+        mutationFn: async () => {
+            console.log("attempting to post comment with body:", commentBody)
+            const sessionId = await SecureStore.getItemAsync("session");
+            const response = await fetch(`http://${LOCALHOST}:8080/comments/${courseId}/${professorId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+                body: JSON.stringify({
+                    body: commentBody
+                })
+            })
+            if (!response.ok) {
+                const payload = await response.text()
+                throw new Error(payload)
+            }
+        },
+        onSuccess: () => {
+            console.log("successfully posted comment")
+            setCommentBody("")
+            refetchComments()
+            Toast.show({
+                type: 'success',
+                text1: 'Success!',
+                text2: 'Your action was completed.',
+                position: "top",
+                visibilityTime: 3000        // optional
+            });
+        },
+        onError: (e: any) => {
+            console.error(e?.message ?? "Failed to verify")
+        }
+    })
+
+    const { isLoading:loading, isSuccess:success, error, data:comments, refetch:refetchComments } = useQuery({
+        queryKey: ["specific-course-professor-comments", professorId, courseId],
+        queryFn: async () => {
+            const sessionId = await SecureStore.getItemAsync("session");
+            const response = await fetch(`http://${LOCALHOST}:8080/comments/${courseId}/${professorId}`, {
+                method: "GET",
+                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+            })
+            if (!response.ok) {
+                const payload = await response.text()
+                throw new Error(payload)
+            }
+            const json = await response.json()
+            return json
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60,
+        gcTime: 1000 * 60 * 5
+    })
+
+    if (loading) {
+        return (
+            <View className="flex-1 dark:bg-gray-800">
+                <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+            </View>
+        )
     }
 
-    useEffect(() => {
-        const info = data.courses.find(c =>
-            c.professors?.some(section => section.id === professorId)
+    if (error) {
+        return (
+            <View className="flex-1 dark:bg-gray-800">
+                <Text>Failed to load comments: {error?.message}</Text>
+            </View>
         )
-        const professor = info?.professors?.find(s => s.id === professorId)
-        if (professor) {
-            setComments(professor.comments)
-        }
-    }, [])
+    }
+
+    if (!comments) {
+        return (
+            <View className="flex-1 dark:bg-gray-800">
+                <Text>Failed to load comments (no data found)</Text>
+            </View>
+        )
+    }
 
     return (
         <KeyboardAvoidingView
@@ -68,7 +147,7 @@ export default function SectionScreen() {
             </View>
             <View className="pb-[25px] pt-[10px] bg-black dark:bg-gray-800 flex items-center justify-center">
                 <View className="w-[90%]">
-                    <CommentInput onComment={onComment} user={user} colorScheme={colorScheme} />
+                    <CommentInput onChangeText={onChangeBody} commentBody={commentBody} onComment={onComment} user={user} colorScheme={colorScheme} />
                 </View>
             </View>
         </KeyboardAvoidingView>
@@ -77,44 +156,6 @@ export default function SectionScreen() {
 
 type CommentItemProps = {
     comment: Comment
-}
-
-const ControlButton = ({title, onPress}: {title: string, onPress: () => void}) => {
-    const scale = useSharedValue(1);
-    const opacity = useSharedValue(1);
-
-    const handleSubmit = () => {
-        onPress()
-    };
-
-    const tap = Gesture.Tap()
-        .onBegin(() => {
-            scale.value = withTiming(0.97, { duration: 80 });
-            opacity.value = withTiming(0.7, { duration: 80 });
-        })
-        .onFinalize(() => {
-            scale.value = withTiming(1, { duration: 150 });
-            opacity.value = withTiming(1, { duration: 150 });
-        })
-        .onEnd(() => {
-            scheduleOnRN(handleSubmit);
-        });
-    
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-        opacity: opacity.value,
-    }));
-    
-    return (
-        <GestureDetector gesture={tap}>
-            <Animated.View
-                className="border-[1px] border-dark-100 w-[65px] h-[20px] px-1 flex items-center justify-center bg-light-200"
-                style={animatedStyle}
-            >
-                <Text className="font-montserrat-bold text-white text-sm">{title}</Text>
-            </Animated.View>
-        </GestureDetector>
-    )
 }
 
 const CommentItem = ({comment}: CommentItemProps) => {
@@ -129,7 +170,7 @@ const CommentItem = ({comment}: CommentItemProps) => {
         <View className="flex flex-col border-l-[1px] border-dark-100 dark:border-light-200 p-3 gap-4">
             <View>
                 <Text className="font-montserrat-semibold text-md dark:text-white">{comment.name}</Text>
-                <Text className="font-montserrat-medium text-sm text-light-200 dark:text-light-100">{`${comment.date}; ${comment.semester}`}</Text>
+                <Text className="font-montserrat-medium text-sm text-light-200 dark:text-light-100">{`${comment.date}`}</Text>
             </View>
             <Text className="font-montserrat text-md dark:text-white">{comment.body}</Text>
             {/* {replying ? (
@@ -148,29 +189,18 @@ const CommentItem = ({comment}: CommentItemProps) => {
 }
 
 type CommentInputProps = {
-    onComment: (newComment: Comment) => void,
+    onChangeText: (text: string) => void,
     user: any,
-    colorScheme: string | null | undefined
+    colorScheme: string | null | undefined,
+    onComment: any,
+    commentBody: string
 }
 
-const CommentInput = ({ onComment, user, colorScheme }: CommentInputProps) => {
-    const [commentBody, setCommentBody] = useState("");
-    const inputRef = useRef<TextInput>(null);
+const CommentInput = ({ onChangeText, onComment, commentBody, user, colorScheme }: CommentInputProps) => {
 
+    const textInputRef = useRef<TextInput>(null)
     const scale = useSharedValue(1);
     const opacity = useSharedValue(1);
-
-    const handleSubmit = () => {
-        if (!commentBody.trim()) return;
-        onComment({
-            name: "dr johnson",
-            date: "10/8/2025",
-            body: commentBody,
-            semester: "random semester",
-            id: Math.floor(Math.random() * 10000) + 100,
-        })
-        setCommentBody("")
-    };
 
     const tap = Gesture.Tap()
         .onBegin(() => {
@@ -182,7 +212,7 @@ const CommentInput = ({ onComment, user, colorScheme }: CommentInputProps) => {
             opacity.value = withTiming(1, { duration: 150 });
         })
         .onEnd(() => {
-            scheduleOnRN(handleSubmit);
+            scheduleOnRN(onComment);
         });
 
     const animatedStyle = useAnimatedStyle(() => ({
@@ -193,9 +223,9 @@ const CommentInput = ({ onComment, user, colorScheme }: CommentInputProps) => {
     return (
         <View className="w-full px-2 flex flex-row justify-between items-center gap-2">
             <TextInput
-                ref={inputRef}
+                ref={textInputRef}
                 value={commentBody}
-                onChangeText={setCommentBody}
+                onChangeText={onChangeText}
                 placeholder={user ? "What are your thoughts?" : "Sign in to comment"}
                 placeholderTextColor={user != null ? (colorScheme === "dark" ? "#aaa" : "#545a6d") : "#999"}
                 multiline

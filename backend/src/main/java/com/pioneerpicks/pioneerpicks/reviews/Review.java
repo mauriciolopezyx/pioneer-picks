@@ -2,8 +2,10 @@ package com.pioneerpicks.pioneerpicks.reviews;
 
 import com.pioneerpicks.pioneerpicks.courses.Course;
 import com.pioneerpicks.pioneerpicks.professors.Professor;
+import com.pioneerpicks.pioneerpicks.user.User;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -23,11 +25,12 @@ public class Review {
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     private Course course;
 
-    @Column(nullable = false)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     @Column(nullable = false)
-    private Date date;
+    private LocalDate date;
 
     @Column(nullable = false)
     private String semester;
@@ -67,10 +70,10 @@ public class Review {
 
     public Review() {}
 
-    public Review(Professor professor, Course course, String name, Date date, String semester, Integer location, Integer workload, Integer leniency, Integer communication, Integer assignments, Boolean curve, Boolean attendance, Boolean late, String positive, String negative) {
+    public Review(Professor professor, Course course, User user, LocalDate date, String semester, Integer location, Integer workload, Integer leniency, Integer communication, Integer assignments, Boolean curve, Boolean attendance, Boolean late, String positive, String negative) {
         this.professor = professor;
         this.course = course;
-        this.name = name;
+        this.user = user;
         this.date = date;
         this.semester = semester;
         this.location = location;
@@ -85,10 +88,10 @@ public class Review {
         this.negative = negative;
     }
 
-    public Review(Professor professor, Course course, String name, Date date, String semester, Integer location, Integer workload, Integer leniency, Integer communication, Integer assignments, Boolean curve, Boolean attendance, Boolean late, String textbook, String positive, String negative) {
+    public Review(Professor professor, Course course, User user, LocalDate date, String semester, Integer location, Integer workload, Integer leniency, Integer communication, Integer assignments, Boolean curve, Boolean attendance, Boolean late, String textbook, String positive, String negative) {
         this.professor = professor;
         this.course = course;
-        this.name = name;
+        this.user = user;
         this.date = date;
         this.semester = semester;
         this.location = location;
@@ -116,11 +119,11 @@ public class Review {
         return course;
     }
 
-    public String getName() {
-        return name;
+    public User getUser() {
+        return user;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 

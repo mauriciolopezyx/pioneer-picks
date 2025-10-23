@@ -1,11 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useQuery } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
+import { LOCALHOST } from "@/services/api";
 
+// type User = {
+//   username: string,
+//   email: string,
+//   role: string
+// } | null
 type User = {
-  username: string,
-  email: string,
-  role: string
-} | null
+    authenticated: boolean
+} | null | undefined
 type AuthContext = {
   user: User;
   loading: boolean;
@@ -15,19 +20,25 @@ const AuthContext = createContext<AuthContext | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
-    const [user, setUser] = useState<User>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const restoreSession = async () => {
-            const session = await SecureStore.getItemAsync("session");
-            if (session) {
-                console.log("user would be set here")
+    const { isLoading:loading, data:user } = useQuery({
+        queryKey: ["authenticated-heartbeat"],
+        queryFn: async () => {
+            const sessionId = await SecureStore.getItemAsync("session");
+            const response = await fetch(`http://${LOCALHOST}:8080/user/ok`, {
+                method: "GET",
+                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+            })
+            if (!response.ok) {
+                const payload = await response.text()
+                throw new Error(payload)
             }
-            setLoading(false);
-        };
-        restoreSession();
-    }, []);
+            return {authenticated: true}
+        },
+        refetchOnWindowFocus: true,
+        gcTime: 1000 * 60 * 60 * 2
+    })
+
+    console.log(loading, user)
 
     return (
         <AuthContext.Provider value={{ user, loading }}>

@@ -62,47 +62,55 @@ const Course = () => {
         }
     }, [subjectName]);
 
-    // useEffect( () => {
-    //     mutate()
-    // }, [])
+    if (loading) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["top"]}>
+                <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+            </SafeAreaView>
+        )
+    }
 
-    // same layout 2 views spacer crap nonsense
+    if (error) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["top"]}>
+                <Text>Failed to load professor: {error?.message}</Text>
+            </SafeAreaView>
+        )
+    }
+
+    if (!professor) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["top"]}>
+                <Text>Failed to load professor (no data found)</Text>
+            </SafeAreaView>
+        )
+    }
 
     return (
-        <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["top"]}>
-            <View
-                className="px-5"
-            >   
-                {loading ? <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" /> : (
-                    <>
-                        {/* <Text className="font-montserrat-bold text-lg">Professor</Text> */}
-                        <Text className="font-montserrat-bold text-4xl mb-4 dark:text-white">{professor.name}</Text>
+        <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["top"]}>
+            <Text className="font-montserrat-bold text-4xl mb-4 dark:text-white">{professor.name}</Text>
 
-                        <View className="flex flex-row items-center justify-start">
-                            <View style={{backgroundColor: bgColor}} className="rounded-full px-4 py-1 mb-8">
-                                <Text className="font-montserrat-semibold text-md dark:text-white">{`${subjectName} ${courseAbbreviation}`}</Text>
-                            </View>
-                        </View>
-
-                        {/* <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
-                        <View className="flex flex-row gap-5 w-full mb-8">
-                            <View className={`flex justify-center items-center py-2 px-4 rounded-full`} style={{ backgroundColor: bgColor }}>
-                                <Text className={`font-montserrat-bold text-sm ${textColor}`}>{"null"}</Text>
-                            </View>
-                        </View> */}
-
-                        {/* <View className="border-t-[1px] mb-8"></View> */}
-
-                        <View className="border-t-[1px] dark:border-white"></View>
-                        <Options title={`Reviews`} emphasis={`(${professor.reviewCount})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id, courseId: courseId}}) } } colorScheme={colorScheme} />
-                        <View className="border-t-[1px] dark:border-white"></View>
-
-                        <Options title={`Comments`} emphasis={`(${professor.commentCount})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id, courseid: courseId}}) } } colorScheme={colorScheme} />
-                        <View className="border-t-[1px] dark:border-white"></View>
-                    </>
-                )}
-                
+            <View className="flex flex-row items-center justify-start">
+                <View style={{backgroundColor: bgColor}} className="rounded-full px-4 py-1 mb-8">
+                    <Text className="font-montserrat-semibold text-md dark:text-white">{`${subjectName} ${courseAbbreviation}`}</Text>
+                </View>
             </View>
+
+            {/* <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
+            <View className="flex flex-row gap-5 w-full mb-8">
+                <View className={`flex justify-center items-center py-2 px-4 rounded-full`} style={{ backgroundColor: bgColor }}>
+                    <Text className={`font-montserrat-bold text-sm ${textColor}`}>{"null"}</Text>
+                </View>
+            </View> */}
+
+            {/* <View className="border-t-[1px] mb-8"></View> */}
+
+            <View className="border-t-[1px] dark:border-white"></View>
+            <Options title={`Reviews`} emphasis={`(${professor.reviewCount})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id, courseId: courseId}}) } } colorScheme={colorScheme} />
+            <View className="border-t-[1px] dark:border-white"></View>
+
+            <Options title={`Comments`} emphasis={`(${professor.commentCount})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id, courseId: courseId}}) } } colorScheme={colorScheme} />
+            <View className="border-t-[1px] dark:border-white"></View>
         </SafeAreaView>
     )
 }

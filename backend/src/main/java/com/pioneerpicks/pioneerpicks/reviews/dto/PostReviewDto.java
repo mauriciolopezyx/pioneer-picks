@@ -1,13 +1,11 @@
 package com.pioneerpicks.pioneerpicks.reviews.dto;
 
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.UUID;
+import jakarta.validation.constraints.NotBlank;
 
-public record FullReviewDto(
-        UUID id,
-        String name,
-        LocalDate date,
+import java.util.Optional;
+
+public record PostReviewDto(
+        @NotBlank
         String semester,
         Integer location,
         Integer workload,
@@ -18,6 +16,8 @@ public record FullReviewDto(
         Boolean attendance,
         Boolean late,
         Optional<String> textbook,
+        @NotBlank
         String positive,
+        @NotBlank
         String negative
 ) {}

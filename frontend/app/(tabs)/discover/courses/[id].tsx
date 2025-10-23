@@ -1,5 +1,6 @@
-import { Text, ScrollView, FlatList, View, ActivityIndicator, Animated as RNAnimated } from 'react-native'
+import { Text, ScrollView, View, ActivityIndicator, Animated as RNAnimated } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
+import { FlashList } from "@shopify/flash-list";
 import { useEffect, useLayoutEffect, useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import ProfessorCard from '@/components/ProfessorCard';
@@ -166,12 +167,12 @@ const Course = () => {
                         </View>
 
                         <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
-                        <FlatList
+                        <FlashList
                             data={course.professors}
-                            renderItem={(item) => (
+                            renderItem={(item: any) => (
                                 <ProfessorCard professor={item.item} course={{id: courseId, abbreviation: course.abbreviation}} subject={{name: subjectName, abbreviation: subjectAbbreviation}} />
                             )}
-                            keyExtractor={(item) => item.id.toString() ?? crypto.randomUUID()}
+                            keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
                             numColumns={1}
                             ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
                             scrollEnabled={false}

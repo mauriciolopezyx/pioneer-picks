@@ -25,9 +25,7 @@ const formSchema = z.object({
     email: z.string().min(1, {
         message: "Email is required"
     }),
-    username: z.string().min(5, {
-        message: "Username must be at least 5 characters"
-    }),
+    username: z.string(),
     password: z.string().min(5, {
         message: "Password must be at least 5 characters"
     }),
@@ -161,7 +159,7 @@ export default function Register() {
 
             <View className="mb-4">
                 <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Username
+                First and Last Name
                 </Text>
                 <Controller
                 control={control}

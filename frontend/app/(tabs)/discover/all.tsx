@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View, FlatList, ScrollView, useColorScheme, ActivityIndicator, Pressable } from 'react-native'
+import { FlashList } from "@shopify/flash-list";
 import DiscoverCard from '@/components/DiscoverCard'
 import SearchBar from '@/components/SearchBar';
 import { Ionicons } from "@expo/vector-icons";

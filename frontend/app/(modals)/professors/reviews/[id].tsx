@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform  } from "react-native";
+import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator  } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { useAuth } from "@/components/AuthProvider";
@@ -65,6 +65,30 @@ export default function SectionScreen() {
         staleTime: 1000 * 60 * 60 * 24,
         gcTime: 1000 * 60 * 60 * 48
     })
+    
+    if (loading) {
+        return (
+            <View className="flex-1 dark:bg-gray-800">
+                <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+            </View>
+        )
+    }
+
+    if (error) {
+        return (
+            <View className="flex-1 dark:bg-gray-800">
+                <Text>Failed to load reviews: {error?.message}</Text>
+            </View>
+        )
+    }
+
+    if (!reviews) {
+        return (
+            <View className="flex-1 dark:bg-gray-800">
+                <Text>Failed to load reviews (no data found)</Text>
+            </View>
+        )
+    }
 
     return (
         <KeyboardAvoidingView
