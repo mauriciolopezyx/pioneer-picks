@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator  } from "react-native";
+import { View, Text, Pressable, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator  } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { useAuth } from "@/components/AuthProvider";
@@ -41,10 +42,6 @@ export default function SectionScreen() {
     const { id:professorId, courseId }: {id: string, courseId: string} = useLocalSearchParams()
     const router = useRouter()
     const { user } = useAuth()
-
-    const onComment = (newComment: Review) => {
-        // use mutation here
-    }
 
     const { isLoading:loading, isSuccess:success, error, data:reviews } = useQuery({
         queryKey: ["specific-course-professor-reviews", professorId, courseId],
@@ -100,12 +97,12 @@ export default function SectionScreen() {
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <View className="flex-1">
-                    <FlatList
+                    <FlashList
                         data={reviews}
-                        renderItem={(item) => (
+                        renderItem={(item: any) => (
                             <Review key={item.item.id} review={item.item} />
                         )}
-                        keyExtractor={(item) => item.id.toString() ?? crypto.randomUUID()}
+                        keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
                         numColumns={1}
                         ItemSeparatorComponent={() => <View style={{ height: 30 }} />}
                         contentContainerStyle={{ paddingBottom: 20 }}
@@ -116,7 +113,7 @@ export default function SectionScreen() {
                 </View>
             </View>
             <View className="absolute bottom-[30px] right-[30px]">
-                <ControlButton user={true} onPress={() => { router.navigate({pathname: "/(modals)/professors/reviews/create"}) }} />
+                <ControlButton user={user} onPress={() => { router.navigate({pathname: "/(modals)/professors/reviews/create", params: {professorId: professorId, courseId: courseId}}) }} />
             </View>
         </KeyboardAvoidingView>
     );

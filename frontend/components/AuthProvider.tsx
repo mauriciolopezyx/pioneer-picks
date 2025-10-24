@@ -35,7 +35,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             return {authenticated: true}
         },
         refetchOnWindowFocus: true,
-        gcTime: 1000 * 60 * 60 * 2
     })
 
     console.log(loading, user)

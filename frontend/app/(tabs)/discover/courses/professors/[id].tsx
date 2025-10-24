@@ -94,6 +94,8 @@ const Course = () => {
                 <View style={{backgroundColor: bgColor}} className="rounded-full px-4 py-1 mb-8">
                     <Text className="font-montserrat-semibold text-md dark:text-white">{`${subjectName} ${courseAbbreviation}`}</Text>
                 </View>
+
+                <Options onPress={() => {}} colorScheme={colorScheme} category={2} />
             </View>
 
             {/* <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
@@ -106,16 +108,16 @@ const Course = () => {
             {/* <View className="border-t-[1px] mb-8"></View> */}
 
             <View className="border-t-[1px] dark:border-white"></View>
-            <Options title={`Reviews`} emphasis={`(${professor.reviewCount})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id, courseId: courseId}}) } } colorScheme={colorScheme} />
+            <Options title={`Reviews`} category={2} emphasis={`(${professor.reviewCount})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professor.id, courseId: courseId}}) } } colorScheme={colorScheme} />
             <View className="border-t-[1px] dark:border-white"></View>
 
-            <Options title={`Comments`} emphasis={`(${professor.commentCount})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id, courseId: courseId}}) } } colorScheme={colorScheme} />
+            <Options title={`Comments`} category={1} emphasis={`(${professor.commentCount})`} onPress={ () => { router.navigate({pathname: "/(modals)/professors/comments/[id]", params: {id: professor.id, courseId: courseId}}) } } colorScheme={colorScheme} />
             <View className="border-t-[1px] dark:border-white"></View>
         </SafeAreaView>
     )
 }
 
-const Options = ({title, emphasis, onPress, colorScheme}: {title: string, emphasis?: string | number, onPress: () => void, colorScheme: string | null | undefined}) => {
+const Options = ({title, emphasis, onPress, colorScheme, category}: {title?: string, emphasis?: string | number, onPress: () => void, colorScheme: string | null | undefined, category: number}) => {
     const scale = useSharedValue(1);
     const opacity = useSharedValue(1);
 
@@ -141,19 +143,32 @@ const Options = ({title, emphasis, onPress, colorScheme}: {title: string, emphas
         opacity: opacity.value,
     }));
 
+    if (category === 1) {
+        return (
+            <GestureDetector gesture={tap}>
+                <Animated.View
+                    className="flex flex-row justify-between items-center py-4"
+                    style={animatedStyle}
+                >   
+                    <View className="flex flex-row justify-center items-center gap-x-2">
+                        <Text className="font-montserrat-medium text-xl dark:text-white">{title}</Text>
+                        {emphasis ? (
+                            <Text className="font-montserrat-semibold text-2xl dark:text-white">{emphasis}</Text>
+                        ): null}
+                    </View>
+                    <Ionicons name="chevron-forward-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
+                </Animated.View>
+            </GestureDetector>
+        )
+    }
+
     return (
         <GestureDetector gesture={tap}>
             <Animated.View
                 className="flex flex-row justify-between items-center py-4"
                 style={animatedStyle}
             >   
-                <View className="flex flex-row justify-center items-center gap-x-2">
-                    <Text className="font-montserrat-medium text-xl dark:text-white">{title}</Text>
-                    {emphasis ? (
-                        <Text className="font-montserrat-semibold text-2xl dark:text-white">{emphasis}</Text>
-                    ): null}
-                </View>
-                <Ionicons name="chevron-forward-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
+                <Ionicons name="bookmark-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
             </Animated.View>
         </GestureDetector>
     )

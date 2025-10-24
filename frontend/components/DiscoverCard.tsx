@@ -88,7 +88,7 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
     <GestureDetector gesture={tap}>
       <Animated.View
           className="h-32 rounded-lg p-3 overflow-hidden"
-          style={[animatedStyle, {width: cardWidth}]}
+          style={[animatedStyle, {width: cardWidth, marginRight: index % 2 === 0 ? 10 : 0}]}
       >
         <Text
           numberOfLines={2}

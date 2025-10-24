@@ -1,4 +1,5 @@
-import { StyleSheet, Text, ScrollView, FlatList, View, ActivityIndicator, Linking, TouchableOpacity, Animated } from 'react-native'
+import { StyleSheet, Text, ScrollView, View, ActivityIndicator, Linking, TouchableOpacity, Animated } from 'react-native'
+import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams } from 'expo-router'
 import React, { useLayoutEffect, useMemo } from 'react'
 import CourseCard from '@/components/CourseCard'
@@ -77,12 +78,12 @@ const Courses = () => {
                     <Text className="font-montserrat dark:text-white underline">{data.description}</Text>
               </TouchableOpacity>
               <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
-              <FlatList
+              <FlashList
                   data={data.courses}
-                  renderItem={(item) => (
+                  renderItem={(item: any) => (
                       <CourseCard course={item.item} subject={{name: data.name, abbreviation: data.abbreviation}} />
                   )}
-                  keyExtractor={(item) => item.id.toString() ?? crypto.randomUUID()}
+                  keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
                   numColumns={1}
                   ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
                   scrollEnabled={false}

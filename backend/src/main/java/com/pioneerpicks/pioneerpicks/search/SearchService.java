@@ -30,6 +30,7 @@ public class SearchService {
         this.professorRepository = professorRepository;
     }
 
+    // maybe just send categories of results (professor/course/subject)
     public ResponseEntity<?> getSearchResults(String query) {
         List<SearchResultDto> results = new ArrayList<>();
         subjectRepository.findByNameContainingIgnoreCaseOrAbbreviationContainingIgnoreCase(query, query)
@@ -48,7 +49,7 @@ public class SearchService {
                     ));
                 });
 
-        //professorRepository.findByNameContainingIgnoreCase(query).forEach(subject -> results.add(new SearchResultDto(subject.getId(), subject.getName(), Optional.empty(), Optional.empty(), 3)));
+        professorRepository.findByNameContainingIgnoreCase(query).forEach(subject -> results.add(new SearchResultDto(subject.getId(), subject.getName(), Optional.empty(), Optional.empty(), 3)));
 
         return ResponseEntity.ok().body(Map.of("results", results));
     }

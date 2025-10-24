@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { View, Text, FlatList, Pressable, TextInput, KeyboardAvoidingView, Platform, useColorScheme, ActivityIndicator  } from "react-native";
+import { View, Text, Pressable, TextInput, KeyboardAvoidingView, Platform, useColorScheme, ActivityIndicator  } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from "expo-router"
 import data from "@/assets/english.json"
 import { useAuth } from "@/components/AuthProvider";
-import Toast from "react-native-toast-message"
+
+import { ToastInstance } from "@/components/ToastWrapper";
+import MasterToast from "@/components/ToastWrapper"
 
 import { useQuery, useMutation } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
@@ -63,13 +66,9 @@ export default function SectionScreen() {
             console.log("successfully posted comment")
             setCommentBody("")
             refetchComments()
-            Toast.show({
-                type: 'success',
-                text1: 'Success!',
-                text2: 'Your action was completed.',
-                position: "top",
-                visibilityTime: 3000        // optional
-            });
+            MasterToast.show({
+                text1: "Successfully posted comment!"
+            })
         },
         onError: (e: any) => {
             console.error(e?.message ?? "Failed to verify")
@@ -130,12 +129,12 @@ export default function SectionScreen() {
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <View className="flex-1">
-                    <FlatList
+                    <FlashList
                         data={comments}
-                        renderItem={(item) => (
+                        renderItem={(item: any) => (
                             <CommentItem comment={item.item} />
                         )}
-                        keyExtractor={(item) => item.id.toString() ?? crypto.randomUUID()}
+                        keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
                         numColumns={1}
                         ItemSeparatorComponent={() => <View style={{ height: 30 }} />}
                         contentContainerStyle={{ paddingBottom: 20 }}
@@ -150,6 +149,7 @@ export default function SectionScreen() {
                     <CommentInput onChangeText={onChangeBody} commentBody={commentBody} onComment={onComment} user={user} colorScheme={colorScheme} />
                 </View>
             </View>
+            <ToastInstance />
         </KeyboardAvoidingView>
     );
 }

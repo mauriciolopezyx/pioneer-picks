@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, ScrollView, useColorScheme, ActivityIndicator, Pressable } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, useColorScheme, ActivityIndicator, Pressable } from 'react-native'
 import { FlashList } from "@shopify/flash-list";
 import DiscoverCard from '@/components/DiscoverCard'
 import SearchBar from '@/components/SearchBar';
@@ -146,17 +146,13 @@ const discover = () => {
           </GestureDetector>
         </View>
 
-        {(success && data) ? <FlatList
+        {(success && data) ? <FlashList
           data={query != "" ? filteredSubjects : filter === 0 ? sortedSubjects : data.subjects}
-          renderItem={(item) => (
+          renderItem={(item: any) => (
             <DiscoverCard {...item} />
           )}
-          keyExtractor={(item) => item.id.toString() ?? crypto.randomUUID()}
+          keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
           numColumns={2}
-          columnWrapperStyle={{
-            justifyContent: 'flex-start',
-            gap: 10
-          }}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           scrollEnabled={false}
         /> : loading ? <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" /> : <Text className="mx-auto text-black dark:text-white">Error loading subjects: {error?.message}</Text>}

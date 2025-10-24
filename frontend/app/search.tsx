@@ -1,4 +1,5 @@
-import { View, Text, ScrollView, FlatList, useColorScheme, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, ScrollView, useColorScheme, KeyboardAvoidingView, Platform } from 'react-native'
+import { FlashList } from "@shopify/flash-list";
 import { useRouter } from 'expo-router';
 import React, { useState, useEffect,useCallback } from 'react'
 import SearchBar from '@/components/SearchBar';
@@ -90,18 +91,18 @@ const search = () => {
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <Text className="font-montserrat-bold text-xl dark:text-white mb-4">{query.trim() ? "Search results" : "Recent searches"}</Text>
                     {isSearching ? 
-                        <FlatList
+                        <FlashList
                             data={searchResults}
-                            renderItem={(item) => (
+                            renderItem={(item: any) => (
                                 <SearchResult result={item.item} colorScheme={colorScheme}/>
                             )}
                             numColumns={1}
                             ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
                             scrollEnabled={false}
                         /> :
-                        <FlatList
+                        <FlashList
                             data={recentSearches}
-                            renderItem={({item}) => (
+                            renderItem={({item}: any) => (
                                 <SearchResult result={item} colorScheme={colorScheme} />
                             )}
                             numColumns={1}

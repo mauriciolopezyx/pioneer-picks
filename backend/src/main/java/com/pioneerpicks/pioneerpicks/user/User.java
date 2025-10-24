@@ -1,5 +1,7 @@
 package com.pioneerpicks.pioneerpicks.user;
 
+import com.pioneerpicks.pioneerpicks.courses.Course;
+import com.pioneerpicks.pioneerpicks.professors.Professor;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -7,7 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="users")
@@ -48,6 +52,22 @@ public class User implements UserDetails {
     private String forgotPasswordToken;
     @Column(name="forgot_expiration")
     private LocalDateTime forgotPasswordTokenExpiresAt;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_course_favorites",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private final Set<Course> favoriteCourses = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_professor_favorites",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "professor_id")
+    )
+    private final Set<Professor> favoriteProfessors = new HashSet<>();
 
     // regular signups
     public User(String username, String email, String password) {
@@ -160,4 +180,13 @@ public class User implements UserDetails {
     public boolean hasPassword() {
         return password != null && !password.isEmpty();
     }
+
+    public Set<Course> getFavoriteCourses() {
+        return favoriteCourses;
+    }
+
+    public Set<Professor> getFavoriteProfessors() {
+        return favoriteProfessors;
+    }
+
 }
