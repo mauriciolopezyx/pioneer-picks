@@ -6,9 +6,12 @@ import { useAuth } from "@/components/AuthProvider";
 import Slider from '@react-native-community/slider';
 import { reviewOptions } from "@/services/utils";
 import { useMutation } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router"
+import { useRouter, useLocalSearchParams } from "expo-router"
 import * as SecureStore from "expo-secure-store";
 import { LOCALHOST } from "@/services/api";
+
+import { ToastInstance } from "@/components/ToastWrapper";
+import MasterToast from "@/components/ToastWrapper"
 
 import Animated, {
   useSharedValue,
@@ -38,10 +41,7 @@ export default function SectionScreen() {
 
     const { professorId, courseId }: {professorId: string, courseId: string} = useLocalSearchParams()
     const { user } = useAuth()
-
-    // zod not needed, but in mutations just make sure to check if textbook specifically is empty string or not. if so then specifically pass null
-    // when submitting make sure to add 1 to forms
-    // check in every iteration if we can show post in full opacity
+    const router = useRouter()
 
     const [form, setForm] = useState<Form>({
         season: "Fall",
@@ -66,7 +66,9 @@ export default function SectionScreen() {
         mutationFn: async () => {
             console.log("attempting to post review with:", form)
             if (form.positive.trim() === "" || form.negative.trim() === "") {
-                throw new Error("The following fields are required:", )
+                const extra1 = form.positive.trim() === "" ? "What worked?" : ""
+                const extra2 = form.negative.trim() === "" ? "What to look out for?" : ""
+                throw new Error(`The following fields are required: ${extra1} ${extra2}`)
             }
             const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`http://${LOCALHOST}:8080/reviews/${courseId}/${professorId}`, {
@@ -77,6 +79,9 @@ export default function SectionScreen() {
                 ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
                 body: JSON.stringify({
                    ...form,
+                   ["season"]: undefined,
+                   ["year"]: undefined,
+                   ["semester"]: form.season + " " + form.year,
                    ["textbook"]: form.textbook.trim() != "" ? form.textbook : null
                 })
             })
@@ -87,7 +92,10 @@ export default function SectionScreen() {
         },
         onSuccess: () => {
             console.log("successfully posted review!")
-            // do later (show toast, read those github craps)
+            router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professorId, courseId: courseId} })
+            MasterToast.show({
+                text1: "Successfully posted review!"
+            })
         },
         onError: (e: any) => {
             console.error(e?.message ?? "Failed to verify")
@@ -214,6 +222,7 @@ export default function SectionScreen() {
             <View className="absolute w-[250px] bottom-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                 <FormToggleButton title="Post" user={user} onPress={onReview} className="flex flex-row gap-x-2 items-center justify-center bg-blue-600 w-full py-2 rounded-full"/>
             </View>
+            <ToastInstance />
         </KeyboardAvoidingView>
     );
 }

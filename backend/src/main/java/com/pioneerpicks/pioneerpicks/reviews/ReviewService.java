@@ -36,22 +36,19 @@ public class ReviewService {
     }
 
     public ResponseEntity<?> postCourseProfessorReview(UUID courseId, UUID professorId, PostReviewDto postReviewDto) {
-        Optional<Professor> professor = professorRepository.findById(professorId);
-        if (professor.isEmpty()) {
-            throw new RuntimeException("Professor not found");
-        }
-        Optional<Course> course = courseRepository.findById(courseId);
-        if (course.isEmpty()) {
-            throw new RuntimeException("Course not found");
-        }
+        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
+
+        System.out.println("processing post review request (ReviewService)");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
+        Review review;
         if (postReviewDto.textbook().isPresent()) {
-            Review review = new Review(
-                    professor.get(),
-                    course.get(),
+            review = new Review(
+                    professor,
+                    course,
                     user,
                     LocalDate.now(),
                     postReviewDto.semester(),
@@ -67,11 +64,10 @@ public class ReviewService {
                     postReviewDto.positive(),
                     postReviewDto.negative()
             );
-            reviewRepository.save(review);
         } else {
-            Review review = new Review(
-                    professor.get(),
-                    course.get(),
+            review = new Review(
+                    professor,
+                    course,
                     user,
                     LocalDate.now(),
                     postReviewDto.semester(),
@@ -86,23 +82,17 @@ public class ReviewService {
                     postReviewDto.positive(),
                     postReviewDto.negative()
             );
-            reviewRepository.save(review);
         }
+        reviewRepository.save(review);
 
         return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> getCourseProfessorReviews(UUID courseId, UUID professorId) {
-        Optional<Professor> professor = professorRepository.findById(professorId);
-        if (professor.isEmpty()) {
-            throw new RuntimeException("Professor not found");
-        }
-        Optional<Course> course = courseRepository.findById(courseId);
-        if (course.isEmpty()) {
-            throw new RuntimeException("Course not found");
-        }
+        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
 
-        List<FullReviewDto> dtos = professor.get().getReviews().stream()
+        List<FullReviewDto> dtos = professor.getReviews().stream()
                 .filter(review -> review.getCourse() != null && courseId.equals(review.getCourse().getId()))
                 .map(review -> new FullReviewDto(review.getId(), review.getUser().getUsername(), review.getDate(), review.getSemester(), review.getLocation(), review.getWorkload(), review.getLeniency(), review.getAssignments(), review.getCommunication(), review.getCurve(), review.getAttendance(), review.getLate(), Optional.ofNullable(review.getTextbook()), review.getPositive(), review.getNegative()))
                 .toList();

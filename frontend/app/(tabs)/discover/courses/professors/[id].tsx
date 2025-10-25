@@ -4,14 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
 import data from "@/assets/english.json"
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation } from "@tanstack/react-query"
 import { revolvingColorPalette, subjectColorMappings } from "@/services/utils"
 
 import {
     SafeAreaView
 } from 'react-native-safe-area-context';
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
 import { LOCALHOST } from "@/services/api";
 
@@ -96,6 +95,7 @@ const Course = () => {
                 </View>
 
                 <Options onPress={() => {}} colorScheme={colorScheme} category={2} />
+                    
             </View>
 
             {/* <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>

@@ -115,6 +115,30 @@ const discover = () => {
       )
   }, [query, data])
 
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
+        <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+      </SafeAreaView>
+    )
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
+        <Text>Failed to load professor: {error?.message}</Text>
+      </SafeAreaView>
+    )
+  }
+
+  if (!data) {
+    return (
+      <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
+        <Text>Failed to load all subjects information (no data found)</Text>
+      </SafeAreaView>
+    )
+  }
+
   return (
     <SafeAreaView className="flex-1 px-5 bg-white dark:bg-gray-800" edges={['left', 'right']}>
       <ScrollView
@@ -146,7 +170,7 @@ const discover = () => {
           </GestureDetector>
         </View>
 
-        {(success && data) ? <FlashList
+        <FlashList
           data={query != "" ? filteredSubjects : filter === 0 ? sortedSubjects : data.subjects}
           renderItem={(item: any) => (
             <DiscoverCard {...item} />
@@ -155,7 +179,7 @@ const discover = () => {
           numColumns={2}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           scrollEnabled={false}
-        /> : loading ? <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" /> : <Text className="mx-auto text-black dark:text-white">Error loading subjects: {error?.message}</Text>}
+        />
         <View className="h-5"></View>
       </ScrollView>
     </SafeAreaView>

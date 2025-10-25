@@ -135,6 +135,30 @@ const Course = () => {
         )
     }) : null
 
+    if (loading) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
+                <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+            </SafeAreaView>
+        )
+    }
+
+    if (error) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
+                <Text>Failed to load professor: {error?.message}</Text>
+            </SafeAreaView>
+        )
+    }
+
+    if (!course) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
+                <Text>Failed to load course information (no data found)</Text>
+            </SafeAreaView>
+        )
+    }
+
     return (
         <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
             <ScrollView
@@ -146,39 +170,35 @@ const Course = () => {
                 onScroll={handleScroll}
             >
                 <View className="h-[50px]"></View>
-                {loading ? <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" /> : (
-                    <>
-                        <Text className="font-montserrat-extrabold text-3xl mb-2 dark:text-white">{course.name}</Text>
+                <Text className="font-montserrat-extrabold text-3xl mb-2 dark:text-white">{course.name}</Text>
 
-                        <Text className="font-montserrat mb-2 dark:text-white">Also known as <Text className="font-montserrat-semibold text-xl">{`${subjectAbbreviation} ${course.abbreviation}`}</Text></Text>
-                        <Text className="font-montserrat mb-4 dark:text-white"><Text className="font-montserrat-semibold text-xl">{course.units}</Text> units</Text>
+                <Text className="font-montserrat mb-2 dark:text-white">Also known as <Text className="font-montserrat-semibold text-xl">{`${subjectAbbreviation} ${course.abbreviation}`}</Text></Text>
+                <Text className="font-montserrat mb-4 dark:text-white"><Text className="font-montserrat-semibold text-xl">{course.units}</Text> units</Text>
 
-                        <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
-                            <Text className="font-montserrat-bold text-2xl dark:text-white">Areas</Text>
-                            <GestureDetector gesture={tap}>
-                                <Animated.View className="flex items-center justify-center rounded-full bg-black dark:bg-light-200" style={animatedStyle}>
-                                    <Ionicons name="information-outline" size={25} color="white" />
-                                </Animated.View>
-                            </GestureDetector>
-                        </View>
+                <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
+                    <Text className="font-montserrat-bold text-2xl dark:text-white">Areas</Text>
+                    <GestureDetector gesture={tap}>
+                        <Animated.View className="flex items-center justify-center rounded-full bg-black dark:bg-light-200" style={animatedStyle}>
+                            <Ionicons name="information-outline" size={25} color="white" />
+                        </Animated.View>
+                    </GestureDetector>
+                </View>
 
-                        <View className="flex flex-row gap-2 w-full mb-4">
-                            {areaDisplays}
-                        </View>
+                <View className="flex flex-row gap-2 w-full mb-4">
+                    {areaDisplays}
+                </View>
 
-                        <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
-                        <FlashList
-                            data={course.professors}
-                            renderItem={(item: any) => (
-                                <ProfessorCard professor={item.item} course={{id: courseId, abbreviation: course.abbreviation}} subject={{name: subjectName, abbreviation: subjectAbbreviation}} />
-                            )}
-                            keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
-                            numColumns={1}
-                            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-                            scrollEnabled={false}
-                        />
-                    </>
-                )}
+                <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
+                <FlashList
+                    data={course.professors}
+                    renderItem={(item: any) => (
+                        <ProfessorCard professor={item.item} course={{id: courseId, abbreviation: course.abbreviation}} subject={{name: subjectName, abbreviation: subjectAbbreviation}} />
+                    )}
+                    keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
+                    numColumns={1}
+                    ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+                    scrollEnabled={false}
+                />
                 <View className="h-[50px]"></View>
             </ScrollView>
         </SafeAreaView>

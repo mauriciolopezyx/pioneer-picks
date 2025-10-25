@@ -30,16 +30,13 @@ public class SubjectService {
     }
 
     public ResponseEntity<?> getSubjectInformation(UUID id) {
-        Optional<Subject> subject = subjectRepository.findById(id);
+        Subject subject = subjectRepository.findById(id).orElseThrow(() -> new RuntimeException("Subject not found"));
         System.out.println("received subject id query:" + id);
-        if (subject.isEmpty()) {
-            throw new RuntimeException("Subject not found");
-        }
 
-        List<BasicCourseDto> courseDtos = subject.get().getCourses().stream()
+        List<BasicCourseDto> courseDtos = subject.getCourses().stream()
                 .map(course -> new BasicCourseDto(course.getId(), course.getName(), course.getAbbreviation(), course.getUnits(), course.getAreas()))
                 .toList();
-        FullSubjectDto dto = new FullSubjectDto(id, subject.get().getName(), subject.get().getAbbreviation(), subject.get().getDescription(), courseDtos);
+        FullSubjectDto dto = new FullSubjectDto(id, subject.getName(), subject.getAbbreviation(), subject.getDescription(), courseDtos);
         return ResponseEntity.ok().body(dto);
     }
 

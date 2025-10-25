@@ -32,15 +32,12 @@ public class ProfessorService {
     }
 
     public ResponseEntity<?> getProfessorCourseInformation(UUID courseId, UUID professorId) {
-        Optional<Professor> professor = professorRepository.findById(professorId);
-        if (professor.isEmpty()) {
-            throw new RuntimeException("Professor not found");
-        }
+        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
 
         long reviewCount = reviewRepository.countByProfessorAndCourse(professorId, courseId);
         long commentCount = commentRepository.countByProfessorAndCourse(professorId, courseId);
 
-        BasicProfessorDto dto = new BasicProfessorDto(professorId, professor.get().getName(), reviewCount, commentCount);
+        BasicProfessorDto dto = new BasicProfessorDto(professorId, professor.getName(), reviewCount, commentCount);
         return ResponseEntity.ok().body(dto);
     }
 

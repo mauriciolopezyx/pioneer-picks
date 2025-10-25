@@ -6,7 +6,10 @@ import com.pioneerpicks.pioneerpicks.courses.dto.FullCourseDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
 import com.pioneerpicks.pioneerpicks.reviews.ReviewRepository;
 import com.pioneerpicks.pioneerpicks.subjects.dto.FullSubjectDto;
+import com.pioneerpicks.pioneerpicks.user.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,19 +34,19 @@ public class CourseService {
     }
 
     public ResponseEntity<?> getCourseInformation(UUID id) {
-        Optional<Course> course = courseRepository.findById(id);
-        if (course.isEmpty()) {
-            throw new RuntimeException("Course not found");
-        }
+        Course course = courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
 
-        List<BasicProfessorDto> professorDtos = course.get().getProfessors().stream()
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        List<BasicProfessorDto> professorDtos = course.getProfessors().stream()
                 .map(professor -> {
                     long reviewCount = reviewRepository.countByProfessorAndCourse(professor.getId(), id);
                     long commentCount = commentRepository.countByProfessorAndCourse(professor.getId(), id);
                     return new BasicProfessorDto(professor.getId(), professor.getName(), reviewCount, commentCount);
                 })
                 .toList();
-        FullCourseDto dto = new FullCourseDto(id, course.get().getName(), course.get().getAbbreviation(), course.get().getUnits(), course.get().getAreas(), professorDtos);
+        FullCourseDto dto = new FullCourseDto(id, course.getName(), course.getAbbreviation(), course.getUnits(), course.getAreas(), professorDtos, user.getFavoriteCourses().contains(course));
         return ResponseEntity.ok().body(dto);
     }
 

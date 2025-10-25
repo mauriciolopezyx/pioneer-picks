@@ -40,35 +40,23 @@ public class CommentService {
     }
 
     public ResponseEntity<?> postCourseProfessorComment(UUID courseId, UUID professorId, PostCommentDto postCommentDto) {
-        Optional<Professor> professor = professorRepository.findById(professorId);
-        if (professor.isEmpty()) {
-            throw new RuntimeException("Professor not found");
-        }
-        Optional<Course> course = courseRepository.findById(courseId);
-        if (course.isEmpty()) {
-            throw new RuntimeException("Course not found");
-        }
+        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        Comment comment = new Comment(professor.get(), course.get(), user, LocalDate.now(), postCommentDto.body());
+        Comment comment = new Comment(professor, course, user, LocalDate.now(), postCommentDto.body());
         commentRepository.save(comment);
 
         return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> getCourseProfessorComments(UUID courseId, UUID professorId) {
-        Optional<Professor> professor = professorRepository.findById(professorId);
-        if (professor.isEmpty()) {
-            throw new RuntimeException("Professor not found");
-        }
-        Optional<Course> course = courseRepository.findById(courseId);
-        if (course.isEmpty()) {
-            throw new RuntimeException("Course not found");
-        }
+        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
 
-        List<FullCommentDto> dtos = professor.get().getComments().stream()
+        List<FullCommentDto> dtos = professor.getComments().stream()
                 .filter(comment -> comment.getCourse() != null && courseId.equals(comment.getCourse().getId()))
                 .map(comment -> new FullCommentDto(comment.getId(), comment.getUser().getUsername(), comment.getDate(), comment.getBody()))
                 .toList();
