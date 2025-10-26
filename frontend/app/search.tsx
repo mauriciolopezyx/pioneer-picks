@@ -143,8 +143,8 @@ const SearchResult = ({result, colorScheme}: {result: SearchResultProps, colorSc
             })
         } else {
             router.navigate({
-                pathname: "/(tabs)/discover/courses/professors/[id]",
-                params: { id: result.id, subject: result.subject },
+                pathname: "/(tabs)/discover/professors/[id]",
+                params: { id: result.id, subject: result.subject, getAll: "true" },
             })
         }
     }

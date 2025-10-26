@@ -3,6 +3,7 @@ package com.pioneerpicks.pioneerpicks.professors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -17,13 +18,28 @@ public class ProfessorController {
         this.professorService = professorService;
     }
 
+    @GetMapping("/{professorId}/courses")
+    public ResponseEntity<?> getProfessorCourseInformation(
+            @PathVariable UUID professorId
+    ) {
+        try {
+            return professorService.getProfessorCourses(professorId);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @GetMapping("/{courseId}/{professorId}")
     public ResponseEntity<?> getProfessorCourseInformation(
             @PathVariable UUID courseId,
             @PathVariable UUID professorId
     ) {
         System.out.println("rec professor course information attempt");
-        return professorService.getProfessorCourseInformation(courseId, professorId);
+        try {
+            return professorService.getProfessorCourseInformation(courseId, professorId);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
 }

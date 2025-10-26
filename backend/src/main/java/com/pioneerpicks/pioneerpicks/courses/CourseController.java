@@ -4,6 +4,7 @@ import com.pioneerpicks.pioneerpicks.professors.ProfessorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,7 +24,11 @@ public class CourseController {
             @PathVariable UUID id
     ) {
         System.out.println("rec course information attempt");
-        return courseService.getCourseInformation(id);
+        try {
+            return courseService.getCourseInformation(id);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
 }

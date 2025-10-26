@@ -3,6 +3,7 @@ package com.pioneerpicks.pioneerpicks.subjects;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -27,7 +28,11 @@ public class SubjectController {
             @PathVariable UUID id
     ) {
         System.out.println("rec subject information attempt");
-        return subjectService.getSubjectInformation(id);
+        try {
+            return subjectService.getSubjectInformation(id);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
 }

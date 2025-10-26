@@ -10,6 +10,13 @@ export default function DiscoverLayout() {
             headerShown: false
         }}
       />
+      <Stack.Screen
+        name="[category]"
+        options={{
+            headerTransparent: true,
+            headerShown: false
+        }}
+      />
     </Stack>
   );
 }

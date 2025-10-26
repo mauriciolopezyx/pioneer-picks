@@ -36,7 +36,7 @@ export default function DiscoverLayout() {
         }}
       />
       <Stack.Screen
-        name="courses/professors/[id]"
+        name="professors/[id]"
         options={{
             headerTitle: ""
         }}

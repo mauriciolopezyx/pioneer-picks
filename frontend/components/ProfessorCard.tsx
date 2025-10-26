@@ -73,8 +73,8 @@ const ProfessorCard = ({ professor, course, subject }: {professor: Professor, co
 
   const handleSubmit = () => {
     router.navigate({
-      pathname: "/(tabs)/discover/courses/professors/[id]",
-      params: { id: professor.id, courseId: course.id, subjectName: subject.name, subjectAbbreviation: subject.abbreviation, courseAbbreviation: course.abbreviation },
+      pathname: "/(tabs)/discover/professors/[id]",
+      params: { id: professor.id, courseId: course.id, subjectName: subject.name, subjectAbbreviation: subject.abbreviation, courseAbbreviation: course.abbreviation, getAll: "false" },
     })
   };
 

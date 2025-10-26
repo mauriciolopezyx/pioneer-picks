@@ -82,6 +82,28 @@ public class FavoriteService {
         return ResponseEntity.ok().build();
     }
 
+    public ResponseEntity<?> getCourseFavorites() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        List<FavoriteCourseDto> courses = user.getFavoriteCourses().stream()
+                .map(course -> new FavoriteCourseDto(course.getId(), course.getName(), course.getSubject().getName(), course.getAbbreviation(), course.getSubject().getAbbreviation()))
+                .toList();
+
+        return ResponseEntity.ok().body(courses);
+    }
+
+    public ResponseEntity<?> getProfessorFavorites() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        List<FavoriteProfessorDto> professors = user.getFavoriteProfessors().stream()
+                .map(professor -> new FavoriteProfessorDto(professor.getId(), professor.getName()))
+                .toList();
+
+        return ResponseEntity.ok().body(professors);
+    }
+
     public ResponseEntity<?> getFavorites() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();

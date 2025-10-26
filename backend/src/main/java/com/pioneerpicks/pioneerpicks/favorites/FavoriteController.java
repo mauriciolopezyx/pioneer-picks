@@ -18,6 +18,21 @@ public class FavoriteController {
         this.favoriteService = favoriteService;
     }
 
+    @GetMapping("/courses")
+    public ResponseEntity<?> getCourseFavorites() {
+        return favoriteService.getCourseFavorites();
+    }
+
+    @GetMapping("/professors")
+    public ResponseEntity<?> getProfessorFavorites() {
+        return favoriteService.getProfessorFavorites();
+    }
+
+    @GetMapping()
+    public ResponseEntity<?> getUserFavorites() {
+        return favoriteService.getFavorites();
+    }
+
     @PostMapping("/course/{courseId}")
     public ResponseEntity<?> addCourseToFavorites(
             @PathVariable UUID courseId
@@ -61,11 +76,5 @@ public class FavoriteController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
-
-    @GetMapping()
-    public ResponseEntity<?> getUserFavorites() {
-        return favoriteService.getFavorites();
-    }
-
 
 }
