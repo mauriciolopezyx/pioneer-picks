@@ -50,7 +50,7 @@ const Professor = () => {
     const endpoint = getAll ? `/professors/${professorId}/courses` : `/professors/${courseId}/${professorId}`
 
     const { isLoading:loading, isSuccess:success, error, data } = useQuery({
-        queryKey: ["specific-course-professor", professorId, courseId],
+        queryKey: ["specific-professor", professorId, courseId, getAll === true ? "all" : "course"],
         queryFn: async () => {
             const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`http://${LOCALHOST}:8080${endpoint}`, {
@@ -102,7 +102,6 @@ const Professor = () => {
     }
 
     if (getAll) {
-        // since data will have all the courses that this professor has, 
         return (
             <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["top"]}>
                 <Text>do get all functionality here later</Text>
@@ -115,9 +114,7 @@ const Professor = () => {
     const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
 
     return (
-        <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["top"]}>
-            <SpecificProfessorCourse loading={loading} error={error} professor={data} params={{professorId: professorId, courseId: courseId!, subjectName: subjectName!, subjectAbbreviation: subjectAbbreviation!, courseAbbreviation: courseAbbreviation!}}/>
-        </SafeAreaView>
+        <SpecificProfessorCourse professor={data} params={{professorId: professorId, courseId: courseId!, subjectName: subjectName!, subjectAbbreviation: subjectAbbreviation!, courseAbbreviation: courseAbbreviation!}}/>
     )
 }
 

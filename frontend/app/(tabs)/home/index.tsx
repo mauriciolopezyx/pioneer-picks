@@ -96,10 +96,10 @@ const FavoriteSection = <T,>({loading, error, data, ItemComponent}: SectionProps
     )
   }
 
-  if (!data) {
+  if (!data || (data && data.length == 0)) {
     return (
       <View className="flex flex-row justify-center items-center">
-        <Text>Failed to load favorites (no data found)</Text>
+        <Text>No favorites found</Text>
       </View>
     )
   }

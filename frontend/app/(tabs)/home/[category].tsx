@@ -55,10 +55,10 @@ const Category = () => {
       )
     }
   
-    if (!favorites) {
+    if (!favorites || (favorites && favorites.length == 0)) {
       return (
         <View className="flex flex-row justify-center items-center">
-          <Text>Failed to load favorites (no data found)</Text>
+          <Text>No favorites found</Text>
         </View>
       )
     }
