@@ -3,7 +3,6 @@ import { Tabs } from 'expo-router'
 import React from 'react'
 import { Text, View, useColorScheme } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-import CustomHeader from '@/components/CustomHeader';
 
 const TabSection = ({focused, iconName, title, colorScheme}: any) => {
 

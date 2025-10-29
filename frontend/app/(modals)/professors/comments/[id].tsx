@@ -1,9 +1,8 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { View, Text, Pressable, TextInput, KeyboardAvoidingView, Platform, useColorScheme, ActivityIndicator  } from "react-native";
+import { useState, useRef, useCallback } from "react";
+import { View, Text, TextInput, KeyboardAvoidingView, Platform, useColorScheme, ActivityIndicator  } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from "expo-router"
-import data from "@/assets/english.json"
 import { useAuth } from "@/components/AuthProvider";
 
 import { ToastInstance } from "@/components/ToastWrapper";
@@ -20,10 +19,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-
-import {
-    SafeAreaView
-} from 'react-native-safe-area-context';
 
 type Comment = {
   name: string,

@@ -1,5 +1,4 @@
-import { View, Text, Button, Pressable } from 'react-native'
-import { useState, useEffect } from "react"
+import { View, Text } from 'react-native'
 import { useRouter } from 'expo-router';
 
 import Animated, {

@@ -1,4 +1,6 @@
 // can be used for course cards and area buttons background colors
+import { Ionicons } from "@expo/vector-icons";
+
 export const revolvingColorPalette: Record<string, string>[] = [
   {
     primary: "#000000",
@@ -230,3 +232,29 @@ export function findAreaParentKey(
   }
   return null
 }
+
+export const subjectIconMappings: Record<string, keyof typeof Ionicons.glyphMap> = {
+  All: "globe-outline",
+  "Biological Sciences": "flask-outline",
+  "Chemistry": "flask-outline",
+  "Civil Engineering": "pencil-outline",
+  "Computer Engineering": "server-outline",
+  "Criminal Justice": "search-outline",
+  "Economics": "trending-up-outline",
+  "Engineering": "pencil-outline",
+  "Ethnic Studies": "search-outline",
+  "Finance": "cash-outline",
+  "Geography": "earth-outline",
+  "History": "hourglass-outline",
+  "Kinesiology": "body-outline",
+  "Mathematics": "calculator-outline",
+  "Nursing": "medkit-outline",
+  "Psychology": "man-outline",
+  "Public Health": "medkit-outline",
+  "Statistics": "stats-chart-outline",
+  "Teacher Education": "chatbubbles-outline",
+  English: "book-outline",
+  Math: "calculator-outline",
+  Physics: "flask-outline",
+  "Computer Science": "laptop-outline"
+};

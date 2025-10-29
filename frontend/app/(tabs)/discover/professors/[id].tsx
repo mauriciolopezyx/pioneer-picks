@@ -1,12 +1,10 @@
-import { Text, View, Pressable, useColorScheme, ActivityIndicator } from 'react-native'
-import { useLocalSearchParams as originalUseLocalSearchParams , Link, useRouter } from 'expo-router'
-import { useState, useEffect, useRef } from "react";
+import { Text, ActivityIndicator } from 'react-native'
+import { useLocalSearchParams as originalUseLocalSearchParams } from 'expo-router'
+import { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import data from "@/assets/english.json"
-import { Ionicons } from '@expo/vector-icons';
 import { revolvingColorPalette, subjectColorMappings } from "@/services/utils"
 import SpecificProfessorCourse from '@/components/professors/SpecificCourse';
-import { FlashList } from "@shopify/flash-list";
+import AllProfessorCourses from '@/components/professors/AllCourses';
 
 import {
     SafeAreaView
@@ -31,9 +29,6 @@ export function useParsedLocalSearchParams<TParsed>(parser: (raw: Record<string,
 }
 
 const Professor = () => {
-
-    const colorScheme = useColorScheme()
-    const router = useRouter()
 
     const params = useParsedLocalSearchParams<ProfessorParams>((raw) => ({
         id: raw.id!,
@@ -101,11 +96,17 @@ const Professor = () => {
         )
     }
 
+    const sendParams = {
+        professorId: professorId,
+        courseId: courseId,
+        subjectName: subjectName,
+        subjectAbbreviation: subjectAbbreviation,
+        courseAbbreviation: courseAbbreviation
+    }
+
     if (getAll) {
         return (
-            <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["top"]}>
-                <Text>do get all functionality here later</Text>
-            </SafeAreaView>
+            <AllProfessorCourses data={data} params={{professorId: professorId}} />
         )
     }
 

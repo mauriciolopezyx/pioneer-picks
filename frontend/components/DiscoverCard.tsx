@@ -1,8 +1,8 @@
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Text, TouchableOpacity, View, useColorScheme, Dimensions } from "react-native";
-import { revolvingColorPalette, subjectColorMappings } from "@/services/utils";
+import { Text, useColorScheme, Dimensions } from "react-native";
+import { revolvingColorPalette, subjectColorMappings, subjectIconMappings } from "@/services/utils";
 
 import Animated, {
   useSharedValue,
@@ -11,32 +11,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-
-const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
-  All: "globe-outline",
-  "Biological Sciences": "flask-outline",
-  "Chemistry": "flask-outline",
-  "Civil Engineering": "pencil-outline",
-  "Computer Engineering": "server-outline",
-  "Criminal Justice": "search-outline",
-  "Economics": "trending-up-outline",
-  "Engineering": "pencil-outline",
-  "Ethnic Studies": "search-outline",
-  "Finance": "cash-outline",
-  "Geography": "earth-outline",
-  "History": "hourglass-outline",
-  "Kinesiology": "body-outline",
-  "Mathematics": "calculator-outline",
-  "Nursing": "medkit-outline",
-  "Psychology": "man-outline",
-  "Public Health": "medkit-outline",
-  "Statistics": "stats-chart-outline",
-  "Teacher Education": "chatbubbles-outline",
-  English: "book-outline",
-  Math: "calculator-outline",
-  Physics: "flask-outline",
-  "Computer Science": "laptop-outline"
-};
 
 type Subject = {
     name: string,
@@ -48,7 +22,7 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
   const colorScheme = useColorScheme();
   const paletteKey = subjectColorMappings[item.name.toLowerCase()] ?? 0
   const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#fff";
-  const iconName = iconMap[item.name] ?? "ellipse-outline";
+  const iconName = subjectIconMappings[item.name] ?? "ellipse-outline";
 
   const screenWidth = Dimensions.get('window').width
   const horizontalPadding = 20 * 2 // px-5 on SafeAreaView = 20px each side

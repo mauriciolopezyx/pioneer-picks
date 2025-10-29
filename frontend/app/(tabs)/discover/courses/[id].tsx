@@ -1,35 +1,33 @@
-import { Text, ScrollView, View, ActivityIndicator, Animated as RNAnimated } from 'react-native'
+import { Text, ScrollView, View, ActivityIndicator, Animated as RNAnimated, useColorScheme } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { FlashList } from "@shopify/flash-list";
-import { useEffect, useLayoutEffect, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import ProfessorCard from '@/components/ProfessorCard';
 import { Ionicons } from '@expo/vector-icons';
-import { areas, revolvingColorPalette, subjectColorMappings, areaAbbreviations, findAreaParentKey, areaColorMappings } from "@/services/utils";
+import { areas, revolvingColorPalette, areaAbbreviations, findAreaParentKey, areaColorMappings } from "@/services/utils";
+import { GestureWrapper } from '../../home';
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
 import { LOCALHOST } from "@/services/api";
+
+import MasterToast from "@/components/ToastWrapper"
 
 import {
     SafeAreaView
 } from 'react-native-safe-area-context';
-
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 //public record FullCourseDto(UUID id, String name, String abbreviation, Integer units, String areas, List<BasicProfessorDto> professors) {}
 
 const Course = () => {
 
     const router = useRouter()
+    const colorScheme = useColorScheme()
     const { id:courseId, subjectName, subjectAbbreviation }: {id: string, subjectName: string, subjectAbbreviation: string} = useLocalSearchParams();
     const navigation = useNavigation();
+
+    const [favorited, setFavorited] = useState<boolean | null>(null)
 
     useEffect(() => {
         if (subjectName) {
@@ -38,8 +36,6 @@ const Course = () => {
             });
         }
     }, [subjectName]);
-
-    //const course = data.courses.find(element => element.courseId === courseId)
 
     const { isLoading:loading, isSuccess:success, error, data:course } = useQuery({
         queryKey: ["specific-course", courseId],
@@ -54,6 +50,7 @@ const Course = () => {
                 throw new Error(payload)
             }
             const json = await response.json()
+            setFavorited(json.favorited)
             return json
         },
         refetchOnWindowFocus: false,
@@ -61,34 +58,11 @@ const Course = () => {
         gcTime: 1000 * 60 * 60 * 48
     })
 
-    const scale = useSharedValue(1);
-    const opacity = useSharedValue(1);
-
-    const handleSubmit = () => {
+    const onAreaPress = () => {
         router.navigate({
             pathname: "/(modals)/areas"
         })
     }
-
-    const tap = Gesture.Tap()
-        .onBegin(() => {
-            scale.value = withTiming(0.97, { duration: 80 });
-            opacity.value = withTiming(0.7, { duration: 80 });
-        })
-        .onFinalize(() => {
-            scale.value = withTiming(1, { duration: 150 });
-            opacity.value = withTiming(1, { duration: 150 });
-        })
-        .onEnd(() => {
-            scheduleOnRN(handleSubmit);
-        })
-    
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-        opacity: opacity.value
-    }));
-
-    ////////////
     
     const scrollY = useMemo(() => new RNAnimated.Value(0), []);
 
@@ -135,6 +109,39 @@ const Course = () => {
         )
     }) : null
 
+    ///////////////////////
+
+    const {isPending:favoriteLoading, isError, error:favoriteError, mutate:toggleFavorite} = useMutation({
+        mutationFn: async () => {
+            console.log("attempting to toggle favorite course when favorited status is:", favorited)
+            const sessionId = await SecureStore.getItemAsync("session");
+            const response = await fetch(`http://${LOCALHOST}:8080/favorites/course/${courseId}`, {
+                method: favorited ? "DELETE" : "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {})
+            })
+            if (!response.ok) {
+                const payload = await response.text()
+                throw new Error(payload)
+            }
+        },
+        onMutate: () => {
+            setFavorited(prev => !prev)
+        },
+        onSuccess: () => {
+            console.log("successfully toggled favorite")
+            MasterToast.show({
+                text1: "Successfully toggled favorite! (change text later)"
+            })
+        },
+        onError: (e: any) => {
+            console.error(e?.message ?? "Failed to toggle favorite")
+            setFavorited(prev => !prev) // reverts immediate change if failed
+        }
+    })
+
     if (loading) {
         return (
             <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
@@ -146,7 +153,7 @@ const Course = () => {
     if (error) {
         return (
             <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
-                <Text>Failed to load professor: {error?.message}</Text>
+                <Text>Failed to load course information: {error?.message}</Text>
             </SafeAreaView>
         )
     }
@@ -177,11 +184,18 @@ const Course = () => {
 
                 <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
                     <Text className="font-montserrat-bold text-2xl dark:text-white">Areas</Text>
-                    <GestureDetector gesture={tap}>
-                        <Animated.View className="flex items-center justify-center rounded-full bg-black dark:bg-light-200" style={animatedStyle}>
+                    <View className="flex flex-row justify-center items-center">
+                        <GestureWrapper className="flex items-center justify-center rounded-full bg-black dark:bg-light-200" onPress={onAreaPress}>
                             <Ionicons name="information-outline" size={25} color="white" />
-                        </Animated.View>
-                    </GestureDetector>
+                        </GestureWrapper>
+                        {(favorited === null || favoriteLoading) ? <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+                        : favoriteError ? <Ionicons name="alert-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} /> :
+                        (
+                            <GestureWrapper className="flex flex-row justify-between items-center py-4" onPress={toggleFavorite} >
+                                <Ionicons name={`bookmark${favorited ? "" : "-outline"}`} size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
+                            </GestureWrapper>
+                        )}
+                    </View> 
                 </View>
 
                 <View className="flex flex-row gap-2 w-full mb-4">

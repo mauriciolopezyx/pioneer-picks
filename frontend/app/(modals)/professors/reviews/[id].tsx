@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from "react";
-import { View, Text, Pressable, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator  } from "react-native";
+import { View, Text, KeyboardAvoidingView, Platform, ActivityIndicator  } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from "expo-router"

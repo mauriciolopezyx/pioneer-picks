@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, KeyboardAvoidingView, Platform, ScrollView, Button, Modal, Pressable } from "react-native";
+import { View, Text, KeyboardAvoidingView, Platform, ScrollView, Button } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { useAuth } from "@/components/AuthProvider";

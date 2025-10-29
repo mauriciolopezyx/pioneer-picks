@@ -7,8 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
 import { LOCALHOST } from "@/services/api";
 
-import { FavoriteCourse, FavoriteProfessor, GestureWrapper } from '.';
-import { revolvingColorPalette, subjectColorMappings } from "@/services/utils";
+import { FavoriteCourseCard, FavoriteProfessorCard } from '.';
 
 import {
     SafeAreaView
@@ -65,17 +64,18 @@ const Category = () => {
 
     return (
       <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["left", "right"]}>
-        <FavoriteSection data={favorites} ItemComponent={FavoriteCourseCard} />
+        {category === "course" ? <FavoriteSection data={favorites} ItemComponent={FavoriteCourseCard} /> : null}
+        {category === "professor" ? <FavoriteSection data={favorites} ItemComponent={FavoriteProfessorCard} /> : null}
       </SafeAreaView>
     )
 }
 
-type SectionProps<T> = {
+export type SectionProps<T> = {
   data: T[] | null,
   ItemComponent: React.ComponentType<{ data: T }>
 }
 
-const FavoriteSection = <T,>({data, ItemComponent}: SectionProps<T>) => {
+export const FavoriteSection = <T,>({data, ItemComponent}: SectionProps<T>) => {
   return (
     <FlashList
       data={data}
@@ -90,28 +90,6 @@ const FavoriteSection = <T,>({data, ItemComponent}: SectionProps<T>) => {
   )
 }
 
-const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
 
-  const paletteKey = subjectColorMappings[data.subject.toLowerCase()] ?? 0
-  const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
-  const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
-
-  const onPress = () => {
-    console.log("navigate to actual course link here (2)")
-  };
-
-  return (
-    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-light-100" backgroundColor={bgColor} onPress={onPress}>
-      <View className="flex flex-col items-start justify-center gap-y-[2px]">
-        <Text numberOfLines={1} className={`text-xl font-bold ${textColor}`}>
-          {`${data.subjectAbbreivation} ${data.abbreviation}`}
-        </Text>
-        <Text className={`font-montserrat-semibold ${textColor} mb-[4px]`}>
-          {data.name}
-        </Text>
-      </View>
-    </GestureWrapper>
-  )
-}
 
 export default Category

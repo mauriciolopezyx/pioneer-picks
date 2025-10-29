@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRef, useState } from 'react'
-import { Image, Pressable, TextInput, View, useColorScheme } from 'react-native'
+import { Pressable, TextInput, View, useColorScheme } from 'react-native'
 
 type Props = {
     placeholder: string,

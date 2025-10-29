@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, useColorScheme, ActivityIndicator, Pressable } from 'react-native'
+import { Text, View, ScrollView, useColorScheme, ActivityIndicator, Pressable } from 'react-native'
 import { FlashList } from "@shopify/flash-list";
 import DiscoverCard from '@/components/DiscoverCard'
 import SearchBar from '@/components/SearchBar';

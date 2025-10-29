@@ -1,32 +1,21 @@
-import { Text, View, Pressable, useColorScheme, ActivityIndicator } from 'react-native'
-import { useLocalSearchParams, Link, useRouter } from 'expo-router'
-import { useState, useEffect, useRef } from "react";
-import { useNavigation } from "@react-navigation/native";
-import data from "@/assets/english.json"
+import { Text, View, useColorScheme } from 'react-native'
+import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
-import { revolvingColorPalette, subjectColorMappings } from "@/services/utils"
 import { GestureWrapper } from '@/app/(tabs)/home';
 
 import {
     SafeAreaView
 } from 'react-native-safe-area-context';
 
-import { useQuery, useMutation } from '@tanstack/react-query'
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
-
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-
 // params should be { id:professorId, courseId, subjectName, subjectAbbreviation, courseAbbreviation }
 
 type SpecificProfessorCourseProps = {
-    professor: any,
+    professor: {
+        id: string,
+        name: string,
+        reviewCount: number,
+        commentCount: number
+    },
     params: {
         professorId: string,
         courseId: string,

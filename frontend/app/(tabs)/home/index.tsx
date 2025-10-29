@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
 import { LOCALHOST } from "@/services/api";
 
-import { revolvingColorPalette, subjectColorMappings } from "@/services/utils";
+import { revolvingColorPalette, subjectColorMappings, subjectIconMappings } from "@/services/utils";
 
 import {
     SafeAreaView
@@ -60,12 +60,20 @@ const Home = () => {
 
       <View className="flex flex-row justify-between items-center">
         <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Favorite Courses</Text>
-        <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-full" onPress={() => {console.log("expand button hit?")}}>
-          <Ionicons name="information-outline" size={25} color="white" />
+        <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-full" onPress={() => {console.log("fav. courses expand button hit? (Set category param to course)")}}>
+          <Ionicons name="expand-outline" size={25} color="white" />
         </GestureWrapper>
       </View>
-
       <FavoriteSection loading={loading} error={error} data={favorites ? favorites.courses.slice(0, 10) : null} ItemComponent={FavoriteCourseCard} />
+
+
+      <View className="flex flex-row justify-between items-center">
+        <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Favorite Professors</Text>
+        <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-full" onPress={() => {console.log("fav. professors expand button hit? (Set category param to professor)")}}>
+          <Ionicons name="expand-outline" size={25} color="white" />
+        </GestureWrapper>
+      </View>
+      <FavoriteSection loading={loading} error={error} data={favorites ? favorites.professors.slice(0, 10) : null} ItemComponent={FavoriteProfessorCard} />
 
     </SafeAreaView>
   )
@@ -118,14 +126,16 @@ const FavoriteSection = <T,>({loading, error, data, ItemComponent}: SectionProps
   )
 }
 
-const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
+export const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
 
   const paletteKey = subjectColorMappings[data.subject.toLowerCase()] ?? 0
   const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
   const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
+  const iconName = subjectIconMappings[data.subject] ?? "ellipse-outline";
 
   const onPress = () => {
-    console.log("navigate to actual course link here (1)")
+    console.log("navigate to actual course link here")
+    //  ^ which needs: const { id:courseId, subjectName, subjectAbbreviation }
   };
 
   return (
@@ -137,10 +147,38 @@ const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
         <Text className={`font-montserrat-semibold ${textColor} mb-[4px]`}>
           {data.name}
         </Text>
+
+        <Ionicons
+          name={iconName}
+          size={80} // big enough to overflow
+          color="rgba(255,255,255,0.7)"
+          style={{
+            position: "absolute",
+            bottom: -15,
+            right: -15,
+          }}
+        />
       </View>
     </GestureWrapper>
   )
 }
+
+export const FavoriteProfessorCard = ({data}: {data: FavoriteProfessor}) => {
+
+  const onPress = () => {
+    console.log("navigate to actual professor link here")
+    //  ^ which needs: id and getAll. since we dont know what course, we have to get all their courses
+  };
+
+  return (
+    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-primary" onPress={onPress}>
+      <View className="flex flex-col items-start justify-center gap-y-[2px]">
+        <Text numberOfLines={1} className="text-xl font-bold text-white">{data.name}</Text>
+      </View>
+    </GestureWrapper>
+  )
+}
+
 
 export const GestureWrapper = ({onPress, backgroundColor, className, children}: { onPress?: (...args: any[]) => void, backgroundColor?: string, className?: string, children: React.ReactNode }) => {
 

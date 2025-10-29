@@ -1,7 +1,6 @@
-import { Link, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
-import { Text, TouchableOpacity, View, useColorScheme } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
 import { areas, revolvingColorPalette, subjectColorMappings, areaAbbreviations, findAreaParentKey, areaColorMappings } from "@/services/utils";
 
 import Animated, {
