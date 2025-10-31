@@ -189,4 +189,7 @@ public class User implements UserDetails {
         return favoriteProfessors;
     }
 
+    public Long getId() {
+        return id;
+    }
 }

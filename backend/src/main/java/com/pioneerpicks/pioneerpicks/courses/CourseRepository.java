@@ -1,6 +1,11 @@
 package com.pioneerpicks.pioneerpicks.courses;
 
+import com.pioneerpicks.pioneerpicks.comments.Comment;
+import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorCommentCountDto;
+import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorReviewCountDto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

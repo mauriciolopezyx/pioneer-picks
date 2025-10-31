@@ -21,13 +21,13 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-//    @GetMapping
-//    public ResponseEntity<?> getReviews(
-//            @RequestParam UUID professorId,
-//            @RequestParam UUID courseId
-//    ) {
-//        return commentService.getComments(professorId, courseId);
-//    }
+    @GetMapping("/{courseId}/{professorId}")
+    public ResponseEntity<?> getComments(
+            @PathVariable UUID courseId,
+            @PathVariable UUID professorId
+    ) {
+        return commentService.getComments(professorId, courseId);
+    }
 
     @PostMapping("/{courseId}/{professorId}")
     public ResponseEntity<?> postCourseProfessorComment(

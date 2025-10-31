@@ -28,7 +28,7 @@ public class FavoriteController {
         return favoriteService.getProfessorFavorites();
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<?> getUserFavorites() {
         return favoriteService.getFavorites();
     }

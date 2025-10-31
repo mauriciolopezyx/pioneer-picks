@@ -28,7 +28,7 @@ public class Course {
     @Column(nullable = true)
     private String areas;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subject_id", referencedColumnName = "id")
     private Subject subject;
 

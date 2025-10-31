@@ -92,8 +92,9 @@ public class ReviewService {
         Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
 
-        List<FullReviewDto> dtos = professor.getReviews().stream()
-                .filter(review -> review.getCourse() != null && courseId.equals(review.getCourse().getId()))
+        List<Review> reviews = reviewRepository.findReviewsWithUserAndCourse(professorId, courseId);
+
+        List<FullReviewDto> dtos = reviews.stream()
                 .map(review -> new FullReviewDto(review.getId(), review.getUser().getUsername(), review.getDate(), review.getSemester(), review.getLocation(), review.getWorkload(), review.getLeniency(), review.getAssignments(), review.getCommunication(), review.getCurve(), review.getAttendance(), review.getLate(), Optional.ofNullable(review.getTextbook()), review.getPositive(), review.getNegative()))
                 .toList();
 

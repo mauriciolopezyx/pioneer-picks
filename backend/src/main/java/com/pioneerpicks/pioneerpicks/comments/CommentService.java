@@ -36,7 +36,7 @@ public class CommentService {
     }
 
     public ResponseEntity<?> getComments(UUID professorId, UUID courseId) {
-        return ResponseEntity.ok().body(Map.of("comments", commentRepository.findByProfessorIdAndCourseId(professorId, courseId)));
+        return ResponseEntity.ok().body(Map.of("comments", commentRepository.findCommentsWithUserAndCourse(professorId, courseId)));
     }
 
     public ResponseEntity<?> postCourseProfessorComment(UUID courseId, UUID professorId, PostCommentDto postCommentDto) {
@@ -56,8 +56,9 @@ public class CommentService {
         Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
 
-        List<FullCommentDto> dtos = professor.getComments().stream()
-                .filter(comment -> comment.getCourse() != null && courseId.equals(comment.getCourse().getId()))
+        List<Comment> comments = commentRepository.findCommentsWithUserAndCourse(professorId, courseId);
+
+        List<FullCommentDto> dtos = comments.stream()
                 .map(comment -> new FullCommentDto(comment.getId(), comment.getUser().getUsername(), comment.getDate(), comment.getBody()))
                 .toList();
 

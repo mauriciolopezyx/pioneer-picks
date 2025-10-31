@@ -86,7 +86,9 @@ public class FavoriteService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        List<FavoriteCourseDto> courses = user.getFavoriteCourses().stream()
+        User userWithFavorites = userRepository.findUserWithFavoriteCoursesAndSubjects(user.getId()).orElseThrow(); // should never throw
+
+        List<FavoriteCourseDto> courses = userWithFavorites.getFavoriteCourses().stream()
                 .map(course -> new FavoriteCourseDto(course.getId(), course.getName(), course.getSubject().getName(), course.getAbbreviation(), course.getSubject().getAbbreviation()))
                 .toList();
 
@@ -97,7 +99,9 @@ public class FavoriteService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        List<FavoriteProfessorDto> professors = user.getFavoriteProfessors().stream()
+        User userWithFavorites = userRepository.findUserWithFavoriteProfessors(user.getId()).orElseThrow(); // should never throw
+
+        List<FavoriteProfessorDto> professors = userWithFavorites.getFavoriteProfessors().stream()
                 .map(professor -> new FavoriteProfessorDto(professor.getId(), professor.getName()))
                 .toList();
 
@@ -108,12 +112,15 @@ public class FavoriteService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        List<FavoriteProfessorDto> professors = user.getFavoriteProfessors().stream()
-                .map(professor -> new FavoriteProfessorDto(professor.getId(), professor.getName()))
+        User userWithFavorites1 = userRepository.findUserWithFavoriteCoursesAndSubjects(user.getId()).orElseThrow(); // should never throw
+        User userWithFavorites2 = userRepository.findUserWithFavoriteProfessors(user.getId()).orElseThrow(); // should never throw
+
+        List<FavoriteCourseDto> courses = userWithFavorites1.getFavoriteCourses().stream()
+                .map(course -> new FavoriteCourseDto(course.getId(), course.getName(), course.getSubject().getName(), course.getAbbreviation(), course.getSubject().getAbbreviation()))
                 .toList();
 
-        List<FavoriteCourseDto> courses = user.getFavoriteCourses().stream()
-                .map(course -> new FavoriteCourseDto(course.getId(), course.getName(), course.getSubject().getName(), course.getAbbreviation(), course.getSubject().getAbbreviation()))
+        List<FavoriteProfessorDto> professors = userWithFavorites2.getFavoriteProfessors().stream()
+                .map(professor -> new FavoriteProfessorDto(professor.getId(), professor.getName()))
                 .toList();
 
         return ResponseEntity.ok().body(Map.of("professors", professors, "courses", courses));

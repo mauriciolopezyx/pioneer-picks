@@ -1,18 +1,17 @@
 package com.pioneerpicks.pioneerpicks.professors;
 
 import com.pioneerpicks.pioneerpicks.comments.CommentRepository;
-import com.pioneerpicks.pioneerpicks.courses.Course;
-import com.pioneerpicks.pioneerpicks.courses.dto.FullCourseDto;
 import com.pioneerpicks.pioneerpicks.favorites.dto.FavoriteCourseDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
 import com.pioneerpicks.pioneerpicks.reviews.ReviewRepository;
-import jakarta.persistence.Basic;
+import com.pioneerpicks.pioneerpicks.user.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,14 +32,17 @@ public class ProfessorService {
     }
 
     public ResponseEntity<?> getProfessorCourses(UUID professorId) {
-        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
+        Professor professor = professorRepository.findProfessorWithCoursesAndSubjects(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
 
         // FavoriteCourseDto basically gives us all information that we want for a specific course (from all courses of a professor), so I'm using that
         List<FavoriteCourseDto> courses = professor.getCourses().stream()
                 .map(course -> new FavoriteCourseDto(course.getId(), course.getName(), course.getSubject().getName(), course.getAbbreviation(), course.getSubject().getAbbreviation()))
                 .toList();
 
-        return ResponseEntity.ok().body(courses);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        return ResponseEntity.ok().body(Map.of("courses", courses, "favorited", user.getFavoriteProfessors().contains(professor), "info", Map.of("name", professor.getName())));
     }
 
     public ResponseEntity<?> getProfessorCourseInformation(UUID courseId, UUID professorId) {
