@@ -43,6 +43,7 @@ const Professor = () => {
     const navigation = useNavigation();
 
     const endpoint = getAll ? `/professors/${professorId}/courses` : `/professors/${courseId}/${professorId}`
+    console.log("at professor/[id]. getAll?:", getAll)
 
     const { isLoading:loading, isSuccess:success, error, data } = useQuery({
         queryKey: ["specific-professor", professorId, courseId, getAll === true ? "all" : "course"],
@@ -74,7 +75,7 @@ const Professor = () => {
 
     if (loading) {
         return (
-            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["top"]}>
+            <SafeAreaView className="flex-1 dark:bg-gray-800">
                 <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
             </SafeAreaView>
         )
@@ -82,26 +83,18 @@ const Professor = () => {
 
     if (error) {
         return (
-            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["top"]}>
-                <Text>Failed to load professor: {error?.message}</Text>
+            <SafeAreaView className="flex-1 dark:bg-gray-800 flex flex-col justify-center items-center px-5">
+                <Text className="font-montserrat dark:text-white">Failed to load professor: {error?.message}</Text>
             </SafeAreaView>
         )
     }
 
     if (!data) {
         return (
-            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["top"]}>
-                <Text>Failed to load professor information (no data found)</Text>
+            <SafeAreaView className="flex-1 dark:bg-gray-800 flex flex-col justify-center items-center px-5">
+                <Text className="font-montserrat dark:text-white">Failed to load professor information (no data found)</Text>
             </SafeAreaView>
         )
-    }
-
-    const sendParams = {
-        professorId: professorId,
-        courseId: courseId,
-        subjectName: subjectName,
-        subjectAbbreviation: subjectAbbreviation,
-        courseAbbreviation: courseAbbreviation
     }
 
     if (getAll) {
@@ -109,10 +102,6 @@ const Professor = () => {
             <AllProfessorCourses data={data} params={{professorId: professorId}} />
         )
     }
-
-    const paletteKey = subjectColorMappings[subjectName!.toLowerCase()] ?? 0
-    const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
-    const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
 
     return (
         <SpecificProfessorCourse professor={data} params={{professorId: professorId, courseId: courseId!, subjectName: subjectName!, subjectAbbreviation: subjectAbbreviation!, courseAbbreviation: courseAbbreviation!}}/>

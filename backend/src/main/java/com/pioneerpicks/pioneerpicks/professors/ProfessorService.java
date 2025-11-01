@@ -5,6 +5,7 @@ import com.pioneerpicks.pioneerpicks.favorites.dto.FavoriteCourseDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
 import com.pioneerpicks.pioneerpicks.reviews.ReviewRepository;
 import com.pioneerpicks.pioneerpicks.user.User;
+import com.pioneerpicks.pioneerpicks.user.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,15 +21,18 @@ public class ProfessorService {
     private final ProfessorRepository professorRepository;
     private final ReviewRepository reviewRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     public ProfessorService(
             ProfessorRepository professorRepository,
             ReviewRepository reviewRepository,
-            CommentRepository commentRepository
+            CommentRepository commentRepository,
+            UserRepository userRepository
     ) {
         this.professorRepository = professorRepository;
         this.reviewRepository = reviewRepository;
         this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
     }
 
     public ResponseEntity<?> getProfessorCourses(UUID professorId) {
@@ -42,7 +46,9 @@ public class ProfessorService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        return ResponseEntity.ok().body(Map.of("courses", courses, "favorited", user.getFavoriteProfessors().contains(professor), "info", Map.of("name", professor.getName())));
+        boolean favorited = userRepository.isProfessorFavoritedByUser(user.getId(), professorId);
+
+        return ResponseEntity.ok().body(Map.of("courses", courses, "favorited", favorited, "info", Map.of("name", professor.getName())));
     }
 
     public ResponseEntity<?> getProfessorCourseInformation(UUID courseId, UUID professorId) {

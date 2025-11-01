@@ -125,16 +125,16 @@ const discover = () => {
 
   if (error) {
     return (
-      <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
-        <Text>Failed to load professor: {error?.message}</Text>
+      <SafeAreaView className="flex-1 dark:bg-gray-800 flex flex-col items-center justify-center" edges={['left', 'right']}>
+        <Text className="font-montserrat dark:text-white">Failed to load professor: {error?.message}</Text>
       </SafeAreaView>
     )
   }
 
   if (!data) {
     return (
-      <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
-        <Text>Failed to load all subjects information (no data found)</Text>
+      <SafeAreaView className="flex-1 dark:bg-gray-800 flex flex-col items-center justify-center" edges={['left', 'right']}>
+        <Text className="font-montserrat dark:text-white">Failed to load all subjects information (no data found)</Text>
       </SafeAreaView>
     )
   }
@@ -148,7 +148,7 @@ const discover = () => {
         <View className="h-5"></View>
         <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
           <Pressable className="flex-1" onPress={() => { router.navigate({ pathname: "/search" })}}>
-            <View className="pointer-events-none">
+            <View className="pointer-events-none flex-1">
               <SearchBar
                 placeholder="Search"
                 onChangeText={onChangeQuery}

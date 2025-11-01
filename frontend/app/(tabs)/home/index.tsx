@@ -2,6 +2,7 @@ import { View, Text, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 import { useQuery } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
@@ -37,6 +38,7 @@ export type FavoriteProfessor = {
 
 const Home = () => {
 
+  const router = useRouter()
   const { isLoading:loading, isSuccess:success, error, data:favorites } = useQuery({
     queryKey: ["favorite-course-professors"],
     queryFn: async () => {
@@ -53,14 +55,14 @@ const Home = () => {
         return json
     },
     gcTime: 1000 * 60 * 5
-  })
+  })  
 
   return (
-    <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["left", "right"]}>
+    <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["left", "right"]}>
 
-      <View className="flex flex-row justify-between items-center">
+      <View className="flex flex-row justify-between items-center mt-5">
         <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Favorite Courses</Text>
-        <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-full" onPress={() => {console.log("fav. courses expand button hit? (Set category param to course)")}}>
+        <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-lg" onPress={() => { router.navigate({pathname: "/(tabs)/home/[category]", params: {category: "course"}}) }} backgroundColor="#767576">
           <Ionicons name="expand-outline" size={25} color="white" />
         </GestureWrapper>
       </View>
@@ -69,7 +71,7 @@ const Home = () => {
 
       <View className="flex flex-row justify-between items-center">
         <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Favorite Professors</Text>
-        <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-full" onPress={() => {console.log("fav. professors expand button hit? (Set category param to professor)")}}>
+        <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-lg" onPress={() => { router.navigate({pathname: "/(tabs)/home/[category]", params: {category: "professor"}}) }} backgroundColor="#767576">
           <Ionicons name="expand-outline" size={25} color="white" />
         </GestureWrapper>
       </View>
@@ -91,23 +93,23 @@ const FavoriteSection = <T,>({loading, error, data, ItemComponent}: SectionProps
   if (loading) {
     return (
       <View className="flex flex-row justify-center items-center">
-        <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+        <ActivityIndicator size="large" color="#fff" className="self-center" />
       </View>
     )
   }
 
   if (error) {
     return (
-      <View className="flex flex-row justify-center items-center">
-        <Text>Failed to load favorites: {error?.message}</Text>
+      <View className="flex flex-row justify-center items-center mb-10 px-5">
+        <Text className="font-montserrat dark:text-white">Failed to load favorites: {error?.message}</Text>
       </View>
     )
   }
 
   if (!data || (data && data.length == 0)) {
     return (
-      <View className="flex flex-row justify-center items-center">
-        <Text>No favorites found</Text>
+      <View className="flex flex-row justify-center items-center mb-10">
+        <Text className="font-montserrat dark:text-white">No favorites found</Text>
       </View>
     )
   }
@@ -128,15 +130,18 @@ const FavoriteSection = <T,>({loading, error, data, ItemComponent}: SectionProps
 
 export const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
 
+  const router = useRouter()
   const paletteKey = subjectColorMappings[data.subject.toLowerCase()] ?? 0
   const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
   const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
   const iconName = subjectIconMappings[data.subject] ?? "ellipse-outline";
 
   const onPress = () => {
-    console.log("navigate to actual course link here")
-    //  ^ which needs: const { id:courseId, subjectName, subjectAbbreviation }
-  };
+    router.navigate({
+      pathname: "/(tabs)/discover/courses/[id]",
+      params: { id: data.id, subjectName: data.subject, subjectAbbreviation: data.subjectAbbreivation },
+    })
+  }
 
   return (
     <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-light-100" backgroundColor={bgColor} onPress={onPress}>
@@ -165,10 +170,14 @@ export const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
 
 export const FavoriteProfessorCard = ({data}: {data: FavoriteProfessor}) => {
 
+  const router = useRouter()
+
   const onPress = () => {
-    console.log("navigate to actual professor link here")
-    //  ^ which needs: id and getAll. since we dont know what course, we have to get all their courses
-  };
+    router.navigate({
+      pathname: "/(tabs)/discover/professors/[id]",
+      params: { id: data.id, getAll: "true" },
+    })
+  }
 
   return (
     <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-primary" onPress={onPress}>

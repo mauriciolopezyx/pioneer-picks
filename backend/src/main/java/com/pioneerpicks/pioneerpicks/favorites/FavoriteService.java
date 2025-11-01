@@ -40,9 +40,11 @@ public class FavoriteService {
 
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
 
-        if (!user.getFavoriteCourses().contains(course)) {
-            user.getFavoriteCourses().add(course);
-            userRepository.save(user);
+        User userWithFavorites = userRepository.findUserWithFavoriteCoursesAndSubjects(user.getId()).orElseThrow(); // should never throw
+
+        if (!userWithFavorites.getFavoriteCourses().contains(course)) {
+            userWithFavorites.getFavoriteCourses().add(course);
+            userRepository.save(userWithFavorites);
         }
 
         return ResponseEntity.ok().build();
@@ -52,8 +54,10 @@ public class FavoriteService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        user.getFavoriteCourses().removeIf(c -> c.getId().equals(courseId));
-        userRepository.save(user);
+        User userWithFavorites = userRepository.findUserWithFavoriteCoursesAndSubjects(user.getId()).orElseThrow(); // should never throw
+
+        userWithFavorites.getFavoriteCourses().removeIf(c -> c.getId().equals(courseId));
+        userRepository.save(userWithFavorites);
 
         return ResponseEntity.ok().build();
     }
@@ -63,10 +67,11 @@ public class FavoriteService {
         User user = (User) authentication.getPrincipal();
 
         Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
+        User userWithFavorites = userRepository.findUserWithFavoriteProfessors(user.getId()).orElseThrow(); // should never throw
 
-        if (!user.getFavoriteProfessors().contains(professor)) {
-            user.getFavoriteProfessors().add(professor);
-            userRepository.save(user);
+        if (!userWithFavorites.getFavoriteProfessors().contains(professor)) {
+            userWithFavorites.getFavoriteProfessors().add(professor);
+            userRepository.save(userWithFavorites);
         }
 
         return ResponseEntity.ok().build();
@@ -76,8 +81,10 @@ public class FavoriteService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        user.getFavoriteProfessors().removeIf(p -> p.getId().equals(professorId));
-        userRepository.save(user);
+        User userWithFavorites = userRepository.findUserWithFavoriteProfessors(user.getId()).orElseThrow(); // should never throw
+
+        userWithFavorites.getFavoriteProfessors().removeIf(p -> p.getId().equals(professorId));
+        userRepository.save(userWithFavorites);
 
         return ResponseEntity.ok().build();
     }

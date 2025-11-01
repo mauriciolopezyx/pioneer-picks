@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,10 +33,6 @@ public class CommentService {
         this.courseRepository = courseRepository;
     }
 
-    public ResponseEntity<?> getComments(UUID professorId, UUID courseId) {
-        return ResponseEntity.ok().body(Map.of("comments", commentRepository.findCommentsWithUserAndCourse(professorId, courseId)));
-    }
-
     public ResponseEntity<?> postCourseProfessorComment(UUID courseId, UUID professorId, PostCommentDto postCommentDto) {
         Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
@@ -52,7 +46,7 @@ public class CommentService {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<?> getCourseProfessorComments(UUID courseId, UUID professorId) {
+    public ResponseEntity<?> getComments(UUID courseId, UUID professorId) {
         Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
 

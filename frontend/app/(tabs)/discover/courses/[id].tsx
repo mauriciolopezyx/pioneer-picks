@@ -144,7 +144,7 @@ const Course = () => {
 
     if (loading) {
         return (
-            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
+            <SafeAreaView className="flex-1 dark:bg-gray-800">
                 <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
             </SafeAreaView>
         )
@@ -152,16 +152,16 @@ const Course = () => {
 
     if (error) {
         return (
-            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
-                <Text>Failed to load course information: {error?.message}</Text>
+            <SafeAreaView className="flex-1 dark:bg-gray-800 flex flex-col justify-center items-center px-5">
+                <Text className="font-montserrat dark:text-white">Failed to load course information: {error?.message}</Text>
             </SafeAreaView>
         )
     }
 
     if (!course) {
         return (
-            <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
-                <Text>Failed to load course information (no data found)</Text>
+            <SafeAreaView className="flex-1 dark:bg-gray-800">
+                <Text className="font-montserrat dark:text-white">Failed to load course information (no data found)</Text>
             </SafeAreaView>
         )
     }

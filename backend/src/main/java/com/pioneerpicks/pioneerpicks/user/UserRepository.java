@@ -27,6 +27,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
     """)
     Optional<User> findUserWithFavoriteProfessors(Long userId);
 
+    @Query("""
+    SELECT COUNT(p) > 0
+    FROM User u
+    JOIN u.favoriteProfessors p
+    WHERE u.id = :userId AND p.id = :professorId
+    """)
+    boolean isProfessorFavoritedByUser(Long userId, UUID professorId);
+
+    @Query("""
+    SELECT COUNT(p) > 0
+    FROM User u
+    JOIN u.favoriteCourses c
+    WHERE u.id = :userId AND c.id = :courseId
+    """)
+    boolean isCourseFavoritedByUser(Long userId, UUID courseId);
+
     Optional<User> findByEmail(String email);
     Optional<User> findByVerificationCode(String verificationCode);
     Optional<User> findByUsername(String username);

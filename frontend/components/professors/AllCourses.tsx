@@ -1,6 +1,7 @@
-import { Text, useColorScheme, ActivityIndicator } from 'react-native'
+import { Text, useColorScheme, ActivityIndicator, View } from 'react-native'
 import React, { useState } from 'react'
 import { FavoriteCourse as ProfessorCourse } from '@/app/(tabs)/home'
+import { FlashList } from '@shopify/flash-list'
 
 import { useMutation } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
@@ -8,7 +9,7 @@ import { LOCALHOST } from "@/services/api";
 
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MasterToast from "@/components/ToastWrapper"
-import { GestureWrapper } from '@/app/(tabs)/home';
+import { GestureWrapper, FavoriteCourseCard } from '@/app/(tabs)/home';
 import { Ionicons } from '@expo/vector-icons';
 
 type DataProps = {
@@ -66,8 +67,30 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
                 </GestureWrapper>
             )}
 
+            <CatalogSection data={data.courses} ItemComponent={FavoriteCourseCard} />
+
         </SafeAreaView>
     )
+}
+
+export type CatalogSectionProps<T> = {
+  data: T[] | null,
+  ItemComponent: React.ComponentType<{ data: T }>
+}
+
+export const CatalogSection = <T,>({data, ItemComponent}: CatalogSectionProps<T>) => {
+  return (
+    <FlashList
+      data={data}
+      renderItem={(item: any) => (
+          <ItemComponent data={item.item} />
+      )}
+      numColumns={3}
+      keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
+      showsVerticalScrollIndicator={false}
+      ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+    />
+  )
 }
 
 export default AllProfessorCourses

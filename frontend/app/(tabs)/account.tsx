@@ -14,7 +14,7 @@ const Account = () => {
   const router = useRouter()
 
   return (
-    <View className="flex-1 justify-center items-center gap-4">
+    <View className="flex-1 justify-center items-center gap-4 dark:bg-white">
       <Text style={{textAlign: "center"}} className="font-montserrat w-3/4 text-lg mb-8" numberOfLines={2}>Sign in or register to comment and bookmark</Text>
       <ControlButton title="Login" onPress={() => { router.navigate({pathname: "/login"})}} />
       <ControlButton title="Register" onPress={() => { router.navigate({pathname: "/register"})}} />

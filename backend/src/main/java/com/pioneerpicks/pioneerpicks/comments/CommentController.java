@@ -21,14 +21,6 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @GetMapping("/{courseId}/{professorId}")
-    public ResponseEntity<?> getComments(
-            @PathVariable UUID courseId,
-            @PathVariable UUID professorId
-    ) {
-        return commentService.getComments(professorId, courseId);
-    }
-
     @PostMapping("/{courseId}/{professorId}")
     public ResponseEntity<?> postCourseProfessorComment(
             @PathVariable UUID courseId,
@@ -44,13 +36,13 @@ public class CommentController {
     }
 
     @GetMapping("/{courseId}/{professorId}")
-    public ResponseEntity<?> getCourseProfessorComments(
+    public ResponseEntity<?> getComments(
             @PathVariable UUID courseId,
             @PathVariable UUID professorId
     ) {
         System.out.println("rec course professor comments attempt");
         try {
-            return commentService.getCourseProfessorComments(courseId, professorId);
+            return commentService.getComments(courseId, professorId);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
