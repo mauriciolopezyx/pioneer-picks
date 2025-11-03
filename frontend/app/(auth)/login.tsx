@@ -20,6 +20,7 @@ import { Link, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import { useAuth } from "@/components/AuthProvider";
 
 const formSchema = z.object({
     email: z.string().min(1, {
@@ -33,6 +34,7 @@ const formSchema = z.object({
 export default function Login() {
   
   const router = useRouter()
+  const { refetch:refetchAuth } = useAuth()
   const [showPassword, setShowPassword] = useState(false);
   const [focused, setFocused] = useState({email: false, password: false})
   
@@ -86,7 +88,8 @@ export default function Login() {
       console.log("login json response:")
       console.log(json)
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      refetchAuth()
       router.push("/")
       reset()
     },

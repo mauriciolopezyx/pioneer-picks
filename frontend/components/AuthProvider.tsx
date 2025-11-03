@@ -3,28 +3,27 @@ import { useQuery } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
 import { LOCALHOST } from "@/services/api";
 
-// type User = {
-//   username: string,
-//   email: string,
-//   role: string
-// } | null
 type User = {
-    authenticated: boolean
+    username: string,
+    email: string,
+    role: string
 } | null | undefined
+
 type AuthContext = {
-  user: User;
-  loading: boolean;
+  user: User,
+  loading: boolean,
+  refetch: () => void
 }
 
 const AuthContext = createContext<AuthContext | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
-    const { isLoading:loading, data:user } = useQuery({
+    const { isLoading:loading, data:user, refetch } = useQuery({
         queryKey: ["authenticated-heartbeat"],
         queryFn: async () => {
             const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080/user/ok`, {
+            const response = await fetch(`http://${LOCALHOST}:8080/user`, {
                 method: "GET",
                 ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
             })
@@ -32,7 +31,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 const payload = await response.text()
                 throw new Error(payload)
             }
-            return {authenticated: true}
+            const json = await response.json()
+            return json
         },
         refetchOnWindowFocus: true,
     })
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log(loading, user)
 
     return (
-        <AuthContext.Provider value={{ user, loading }}>
+        <AuthContext.Provider value={{ user, loading, refetch }}>
             {children}
         </AuthContext.Provider>
     )

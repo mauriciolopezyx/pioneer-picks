@@ -192,4 +192,9 @@ public class User implements UserDetails {
     public Long getId() {
         return id;
     }
+
+    public Role getRole() {
+        return role;
+    }
+
 }

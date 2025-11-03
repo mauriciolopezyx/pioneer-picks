@@ -10,16 +10,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
-    // private final UserService userService;
+    private final UserService userService;
 
-//    public UserController(UserService userService) {
-//        this.userService = userService;
-//    }
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-    @GetMapping("/ok")
-    public ResponseEntity<?> isAuthenticated() {
-        System.out.println("Received ok request?");
-        return ResponseEntity.status(HttpStatus.OK).build();
+    @GetMapping
+    public ResponseEntity<?> getUserInformation() {
+        return userService.getUserInformation();
     }
 
 }
