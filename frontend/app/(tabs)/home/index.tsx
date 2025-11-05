@@ -1,5 +1,5 @@
-import { View, Text, ActivityIndicator } from 'react-native'
-import React from 'react'
+import { View, Text, ActivityIndicator, ScrollView, RefreshControl } from 'react-native'
+import React, { useState } from 'react'
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -28,7 +28,7 @@ export type FavoriteCourse = {
   name: string,
   subject: string,
   abbreviation: string,
-  subjectAbbreivation: string
+  subjectAbbreviation: string
 }
 
 export type FavoriteProfessor = {
@@ -39,7 +39,9 @@ export type FavoriteProfessor = {
 const Home = () => {
 
   const router = useRouter()
-  const { isLoading:loading, isSuccess:success, error, data:favorites } = useQuery({
+  const [refreshing, setRefreshing] = useState<boolean>(false)
+
+  const { isLoading:loading, isSuccess:success, error, data:favorites, refetch } = useQuery({
     queryKey: ["favorite-course-professors"],
     queryFn: async () => {
         const sessionId = await SecureStore.getItemAsync("session");
@@ -54,29 +56,44 @@ const Home = () => {
         const json = await response.json()
         return json
     },
-    gcTime: 1000 * 60 * 5
-  })  
+    gcTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: true
+  })
 
+  console.log("refetching")
+  
   return (
     <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["left", "right"]}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refetch}
+            tintColor="#fff" // makes the spinner white
+            colors={['#fff']} // for Android
+          />
+        }
+      >
+        <View className="flex flex-row justify-between items-center mt-5">
+          <Text className="font-montserrat-bold text-2xl dark:text-white">Favorite Courses</Text>
+          { (favorites && favorites.courses.length > 5) ? <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-lg" onPress={() => { router.navigate({pathname: "/(tabs)/home/[category]", params: {category: "course"}}) }} backgroundColor="#767576">
+            <Ionicons name="expand-outline" size={25} color="white" />
+          </GestureWrapper> : null }
+        </View>
+        <View className="my-4">
+          <FavoriteSection loading={loading} error={error} data={favorites ? favorites.courses.slice(0, 5) : null} ItemComponent={FavoriteCourseCard} />
+        </View>
 
-      <View className="flex flex-row justify-between items-center mt-5">
-        <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Favorite Courses</Text>
-        <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-lg" onPress={() => { router.navigate({pathname: "/(tabs)/home/[category]", params: {category: "course"}}) }} backgroundColor="#767576">
-          <Ionicons name="expand-outline" size={25} color="white" />
-        </GestureWrapper>
-      </View>
-      <FavoriteSection loading={loading} error={error} data={favorites ? favorites.courses.slice(0, 10) : null} ItemComponent={FavoriteCourseCard} />
-
-
-      <View className="flex flex-row justify-between items-center">
-        <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Favorite Professors</Text>
-        <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-lg" onPress={() => { router.navigate({pathname: "/(tabs)/home/[category]", params: {category: "professor"}}) }} backgroundColor="#767576">
-          <Ionicons name="expand-outline" size={25} color="white" />
-        </GestureWrapper>
-      </View>
-      <FavoriteSection loading={loading} error={error} data={favorites ? favorites.professors.slice(0, 10) : null} ItemComponent={FavoriteProfessorCard} />
-
+        <View className="flex flex-row justify-between items-center">
+          <Text className="font-montserrat-bold text-2xl dark:text-white">Favorite Professors</Text>
+          { (favorites && favorites.professors.length > 5) ?<GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-lg" onPress={() => { router.navigate({pathname: "/(tabs)/home/[category]", params: {category: "professor"}}) }} backgroundColor="#767576">
+            <Ionicons name="expand-outline" size={25} color="white" />
+          </GestureWrapper> : null }
+        </View>
+        <View className="my-4">
+          <FavoriteSection loading={loading} error={error} data={favorites ? favorites.professors.slice(0, 5) : null} ItemComponent={FavoriteProfessorCard} />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -123,7 +140,7 @@ const FavoriteSection = <T,>({loading, error, data, ItemComponent}: SectionProps
       horizontal
       keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
       showsHorizontalScrollIndicator={false}
-      ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+      ItemSeparatorComponent={() => <View style={{ width: 15 }} />}
     />
   )
 }
@@ -139,15 +156,15 @@ export const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
   const onPress = () => {
     router.navigate({
       pathname: "/(tabs)/discover/courses/[id]",
-      params: { id: data.id, subjectName: data.subject, subjectAbbreviation: data.subjectAbbreivation },
+      params: { id: data.id, subjectName: data.subject, subjectAbbreviation: data.subjectAbbreviation },
     })
   }
 
   return (
-    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-light-100" backgroundColor={bgColor} onPress={onPress}>
+    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-light-100 max-w-[175px] h-[90px]" backgroundColor={bgColor} onPress={onPress}>
       <View className="flex flex-col items-start justify-center gap-y-[2px]">
         <Text numberOfLines={1} className={`text-xl font-bold ${textColor}`}>
-          {`${data.subjectAbbreivation} ${data.abbreviation}`}
+          {`${data.subjectAbbreviation} ${data.abbreviation}`}
         </Text>
         <Text className={`font-montserrat-semibold ${textColor} mb-[4px]`}>
           {data.name}
@@ -155,7 +172,7 @@ export const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
 
         <Ionicons
           name={iconName}
-          size={80} // big enough to overflow
+          size={35}
           color="rgba(255,255,255,0.7)"
           style={{
             position: "absolute",
@@ -180,7 +197,7 @@ export const FavoriteProfessorCard = ({data}: {data: FavoriteProfessor}) => {
   }
 
   return (
-    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-primary" onPress={onPress}>
+    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden" backgroundColor="#d50032" onPress={onPress}>
       <View className="flex flex-col items-start justify-center gap-y-[2px]">
         <Text numberOfLines={1} className="text-xl font-bold text-white">{data.name}</Text>
       </View>

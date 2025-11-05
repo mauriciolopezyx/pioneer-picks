@@ -1,7 +1,9 @@
 import { Text, useColorScheme, ActivityIndicator, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { FavoriteCourse as ProfessorCourse } from '@/app/(tabs)/home'
 import { FlashList } from '@shopify/flash-list'
+import { useNavigation } from "@react-navigation/native";
+import SearchBar from '../SearchBar';
 
 import { useMutation } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
@@ -23,7 +25,20 @@ type DataProps = {
 const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professorId: string}}) => {
 
     const colorScheme = useColorScheme()
+    const navigation = useNavigation()
     const [favorited, setFavorited] = useState(data.favorited) // data.favorited is initial favorited status
+
+    const [query, setQuery] = useState("")
+    //const [filter, setFilter] = useState(filterOptions.length - 1)
+    const onChangeQuery = useCallback((text: string) => {
+        setQuery(text)
+    }, [])
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerBackTitle: "Back",
+        })
+    }, [])
 
     const {isPending:favoriteLoading, isError, error:favoriteError, mutate:toggleFavorite} = useMutation({
         mutationFn: async () => {
@@ -56,9 +71,36 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
         }
     })
 
+    const filteredCourses = useMemo(() => {
+        if (!data?.courses) return []
+        const q = query.replace(/\s+/g, '').toLowerCase()
+        return [...data.courses]
+            .filter(item =>
+                item.name.replace(/\s+/g, '').toLowerCase().includes(q)
+            )
+    }, [query, data])
+
     return (
         <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["top"]}>
-            <Text>{data.info.name}'s Courses</Text>
+            <Text className="font-montserrat-bold text-4xl dark:text-white">{data.info.name}'s Courses</Text>
+
+            <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
+                <SearchBar
+                    placeholder="Search"
+                    onChangeText={onChangeQuery}
+                    disabled={true}
+                />
+
+                {/* <GestureWrapper
+                    className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-700 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
+                    backgroundColor={colorScheme === "dark" ? "#d1d1d1" : "#d1d1d1"}
+                >
+                    <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
+                    {(filter != filterOptions.length - 1 && query == "") ? <View className="absolute top-0 left-0 mt-[-10px] ml-[-10px] aspect-square bg-red-600 rounded-full flex items-center justify-center p-1">
+                        <Text className="text-white font-montserrat-semibold text-xs">{filter === 0 ? "A-Z" : ""}</Text>
+                    </View> : null}
+                </GestureWrapper> */}
+            </View>
 
             {favoriteLoading ? <ActivityIndicator size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} /> : 
             favoriteError ? <Ionicons name="alert-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} /> : (
@@ -67,7 +109,7 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
                 </GestureWrapper>
             )}
 
-            <CatalogSection data={data.courses} ItemComponent={FavoriteCourseCard} />
+            <CatalogSection data={query != "" ? filteredCourses : data.courses} ItemComponent={FavoriteCourseCard} />
 
         </SafeAreaView>
     )
@@ -85,7 +127,7 @@ export const CatalogSection = <T,>({data, ItemComponent}: CatalogSectionProps<T>
       renderItem={(item: any) => (
           <ItemComponent data={item.item} />
       )}
-      numColumns={3}
+      numColumns={2}
       keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
       showsVerticalScrollIndicator={false}
       ItemSeparatorComponent={() => <View style={{ height: 10 }} />}

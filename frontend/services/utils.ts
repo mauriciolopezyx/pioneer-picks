@@ -1,5 +1,6 @@
 // can be used for course cards and area buttons background colors
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams as originalUseLocalSearchParams } from 'expo-router'
 
 export const revolvingColorPalette: Record<string, string>[] = [
   {
@@ -258,3 +259,8 @@ export const subjectIconMappings: Record<string, keyof typeof Ionicons.glyphMap>
   Physics: "flask-outline",
   "Computer Science": "laptop-outline"
 };
+
+export function useParsedLocalSearchParams<TParsed>(parser: (raw: Record<string, string | undefined>) => TParsed): TParsed {
+  const rawParams = originalUseLocalSearchParams() as Record<string, string | undefined>;
+  return parser(rawParams);
+}

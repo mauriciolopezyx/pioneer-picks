@@ -40,7 +40,7 @@ const Category = () => {
 
     if (loading) {
       return (
-        <View className="flex flex-row justify-center items-center">
+        <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800">
           <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
         </View>
       )
@@ -48,16 +48,16 @@ const Category = () => {
   
     if (error) {
       return (
-        <View className="flex flex-row justify-center items-center">
-          <Text>Failed to load favorites: {error?.message}</Text>
+        <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800">
+          <Text className="font-montserrat dark:text-white">Failed to load favorites: {error?.message}</Text>
         </View>
       )
     }
   
     if (!favorites || (favorites && favorites.length == 0)) {
       return (
-        <View className="flex flex-row justify-center items-center">
-          <Text>No favorites found</Text>
+        <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800">
+          <Text className="font-montserrat dark:text-white">No favorites found</Text>
         </View>
       )
     }

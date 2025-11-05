@@ -108,7 +108,7 @@ const ProfessorCard = ({ professor, course, subject }: {professor: Professor, co
                 {professor.name}
             </Text>
             <Text className={`font-montserrat-semibold ${textColor}`}>
-                {`${professor.reviewCount} Review${professor.reviewCount == 1 ? "" : "s"}`}, {"4 Semesters"}
+                {`${professor.reviewCount} Review${professor.reviewCount == 1 ? "" : "s"}`}
             </Text>
         </View>
         <View>

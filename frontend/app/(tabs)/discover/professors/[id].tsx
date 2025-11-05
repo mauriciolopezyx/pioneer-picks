@@ -1,10 +1,10 @@
 import { Text, ActivityIndicator } from 'react-native'
-import { useLocalSearchParams as originalUseLocalSearchParams } from 'expo-router'
 import { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { revolvingColorPalette, subjectColorMappings } from "@/services/utils"
 import SpecificProfessorCourse from '@/components/professors/SpecificCourse';
 import AllProfessorCourses from '@/components/professors/AllCourses';
+import { useParsedLocalSearchParams } from '@/services/utils';
 
 import {
     SafeAreaView
@@ -23,11 +23,6 @@ type ProfessorParams = {
     getAll: boolean
 }
 
-export function useParsedLocalSearchParams<TParsed>(parser: (raw: Record<string, string | undefined>) => TParsed): TParsed {
-  const rawParams = originalUseLocalSearchParams() as Record<string, string | undefined>;
-  return parser(rawParams);
-}
-
 const Professor = () => {
 
     const params = useParsedLocalSearchParams<ProfessorParams>((raw) => ({
@@ -37,13 +32,11 @@ const Professor = () => {
         subjectAbbreviation: raw.subjectAbbreviation,
         courseAbbreviation: raw.courseAbbreviation,
         getAll: raw.getAll === "true",
-    }));
+    }))
 
-    const { id: professorId, courseId, subjectName, subjectAbbreviation, courseAbbreviation, getAll } = params;
-    const navigation = useNavigation();
-
+    const { id: professorId, courseId, subjectName, subjectAbbreviation, courseAbbreviation, getAll } = params
+    const navigation = useNavigation()
     const endpoint = getAll ? `/professors/${professorId}/courses` : `/professors/${courseId}/${professorId}`
-    console.log("at professor/[id]. getAll?:", getAll)
 
     const { isLoading:loading, isSuccess:success, error, data } = useQuery({
         queryKey: ["specific-professor", professorId, courseId, getAll === true ? "all" : "course"],
@@ -60,9 +53,7 @@ const Professor = () => {
             const json = await response.json()
             return json
         },
-        refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 60 * 24,
-        gcTime: 1000 * 60 * 60 * 48
+        refetchOnWindowFocus: true
     })
 
     useEffect(() => {

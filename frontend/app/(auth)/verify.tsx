@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as SecureStore from "expo-secure-store";
 
 import { LOCALHOST } from "@/services/api";
+import { useAuth } from "@/components/AuthProvider";
 
 export default function Verify() {
 
@@ -42,10 +43,11 @@ export default function Verify() {
     const router = useRouter()
     const { email, forgot }: {email: string, forgot: string} = useLocalSearchParams()
     const forgotPassword = forgot === "true"
+    const { refetch } = useAuth()
 
     const verifyEndpoint = forgotPassword ? `http://${LOCALHOST}:8080/auth/forgot-password/code` : `http://${LOCALHOST}:8080/auth/verify`
     const resendEndpoint = forgotPassword ? `http://${LOCALHOST}:8080/auth/forgot-password/code/resend` : `http://${LOCALHOST}:8080/auth/resend`
-    const redirectUrl = "/" //forgotPassword ? "/reset-password" : "/home"
+    const redirectUrl = forgotPassword ? "/(auth)/reset-password" : "/"
 
     const {isPending:loading, isError, error, mutate:confirmMutate} = useMutation({
         mutationFn: async () => {
@@ -72,23 +74,18 @@ export default function Verify() {
                 throw new Error(payload)
             }
 
-            const setCookie = response.headers.get("set-cookie");
-            if (setCookie) {
-                const match = setCookie.match(/SESSION=([^;]+)/);
-                if (match) {
-                    const sessionId = match[1];
-                    console.log("Saving session:", sessionId);
-        
-                    await SecureStore.setItemAsync("session", sessionId);
-                }
+            const json = await response.json()
+
+            if (json.sessionId) {
+                console.log("Saving session:", json.sessionId)
+                await SecureStore.setItemAsync("session", json.sessionId)
             }
 
-            const json = await response.json()
             return json
         },
-        onSuccess: (json) => {
-            const suffix = "" //(json?.token && forgotPassword) ? `?token=${json.token}&email=${verificationEmail}` : ""
-            router.push(redirectUrl)
+        onSuccess: async (json) => {
+            await refetch()
+            router.navigate({pathname: redirectUrl, params: {token: (json?.token && forgotPassword) ? json.token : undefined, email: (json?.token && forgotPassword) ? email : undefined}})
         },
         onError: (e: any) => {
             console.error(e?.message ?? "Failed to verify")

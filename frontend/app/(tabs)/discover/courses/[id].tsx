@@ -1,12 +1,13 @@
 import { Text, ScrollView, View, ActivityIndicator, Animated as RNAnimated, useColorScheme } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { FlashList } from "@shopify/flash-list";
-import { useState, useEffect, useLayoutEffect, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo, useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
 import ProfessorCard from '@/components/ProfessorCard';
 import { Ionicons } from '@expo/vector-icons';
 import { areas, revolvingColorPalette, areaAbbreviations, findAreaParentKey, areaColorMappings } from "@/services/utils";
 import { GestureWrapper } from '../../home';
+import SearchBar from '@/components/SearchBar';
 
 import { useQuery, useMutation } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
@@ -28,6 +29,12 @@ const Course = () => {
     const navigation = useNavigation();
 
     const [favorited, setFavorited] = useState<boolean | null>(null)
+
+    const [query, setQuery] = useState("")
+    //const [filter, setFilter] = useState(filterOptions.length - 1)
+    const onChangeQuery = useCallback((text: string) => {
+        setQuery(text)
+    }, [])
 
     useEffect(() => {
         if (subjectName) {
@@ -53,9 +60,7 @@ const Course = () => {
             setFavorited(json.favorited)
             return json
         },
-        refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 60 * 24,
-        gcTime: 1000 * 60 * 60 * 48
+        refetchOnWindowFocus: true
     })
 
     const onAreaPress = () => {
@@ -142,6 +147,15 @@ const Course = () => {
         }
     })
 
+    const filteredProfessors = useMemo(() => {
+        if (!course?.professors) return []
+        const q = query.replace(/\s+/g, '').toLowerCase()
+        return [...course.professors]
+            .filter(item =>
+                item.name.replace(/\s+/g, '').toLowerCase().includes(q)
+            )
+    }, [query, course])
+
     if (loading) {
         return (
             <SafeAreaView className="flex-1 dark:bg-gray-800">
@@ -184,15 +198,15 @@ const Course = () => {
 
                 <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
                     <Text className="font-montserrat-bold text-2xl dark:text-white">Areas</Text>
-                    <View className="flex flex-row justify-center items-center">
-                        <GestureWrapper className="flex items-center justify-center rounded-full bg-black dark:bg-light-200" onPress={onAreaPress}>
+                    <View className="flex flex-row justify-center items-center gap-x-4">
+                        <GestureWrapper className="flex items-center justify-center rounded-full" backgroundColor={colorScheme === "dark" ? "#767576" : "#000"} onPress={onAreaPress}>
                             <Ionicons name="information-outline" size={25} color="white" />
                         </GestureWrapper>
-                        {(favorited === null || favoriteLoading) ? <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
-                        : favoriteError ? <Ionicons name="alert-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} /> :
+                        {(favorited === null || favoriteLoading) ? <ActivityIndicator size="small" color="#fff" className="self-center" />
+                        : favoriteError ? <Ionicons name="alert-outline" size={25} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} /> :
                         (
-                            <GestureWrapper className="flex flex-row justify-between items-center py-4" onPress={toggleFavorite} >
-                                <Ionicons name={`bookmark${favorited ? "" : "-outline"}`} size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
+                            <GestureWrapper className="flex flex-row justify-between items-center" onPress={toggleFavorite} >
+                                <Ionicons name={`bookmark${favorited ? "" : "-outline"}`} size={25} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
                             </GestureWrapper>
                         )}
                     </View> 
@@ -202,9 +216,27 @@ const Course = () => {
                     {areaDisplays}
                 </View>
 
+                <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
+                    <SearchBar
+                        placeholder="Search"
+                        onChangeText={onChangeQuery}
+                        disabled={true}
+                    />
+
+                    {/* <GestureWrapper
+                        className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-700 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
+                        backgroundColor={colorScheme === "dark" ? "#d1d1d1" : "#d1d1d1"}
+                    >
+                        <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
+                        {(filter != filterOptions.length - 1 && query == "") ? <View className="absolute top-0 left-0 mt-[-10px] ml-[-10px] aspect-square bg-red-600 rounded-full flex items-center justify-center p-1">
+                            <Text className="text-white font-montserrat-semibold text-xs">{filter === 0 ? "A-Z" : ""}</Text>
+                        </View> : null}
+                    </GestureWrapper> */}
+                </View>
+
                 <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
                 <FlashList
-                    data={course.professors}
+                    data={query != "" ? filteredProfessors : course.professors}
                     renderItem={(item: any) => (
                         <ProfessorCard professor={item.item} course={{id: courseId, abbreviation: course.abbreviation}} subject={{name: subjectName, abbreviation: subjectAbbreviation}} />
                     )}

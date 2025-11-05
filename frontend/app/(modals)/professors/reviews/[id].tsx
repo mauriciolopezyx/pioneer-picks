@@ -102,7 +102,7 @@ export default function SectionScreen() {
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <View className="flex-1">
-                    <FlashList
+                    { reviews.length > 0 ? <FlashList
                         data={reviews}
                         renderItem={(item: any) => (
                             <Review key={item.item.id} review={item.item} />
@@ -114,7 +114,7 @@ export default function SectionScreen() {
                         scrollEnabled={true}
                         showsVerticalScrollIndicator={false}
                         indicatorStyle="black"
-                    />
+                    /> : <Text className="font-montserrat dark:text-white mx-auto">No reviews found</Text> }
                 </View>
             </View>
             <View className="absolute bottom-[30px] right-[30px]">

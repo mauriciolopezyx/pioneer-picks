@@ -1,8 +1,9 @@
 import { StyleSheet, Text, ScrollView, View, ActivityIndicator, Linking, TouchableOpacity, Animated } from 'react-native'
 import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams } from 'expo-router'
-import React, { useLayoutEffect, useMemo } from 'react'
+import React, { useLayoutEffect, useMemo, useState, useCallback } from 'react'
 import CourseCard from '@/components/CourseCard'
+import SearchBar from '@/components/SearchBar';
 
 import { useQuery } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
@@ -15,7 +16,14 @@ import {
 } from 'react-native-safe-area-context';
 
 const Courses = () => {
+
   const {id} = useLocalSearchParams()
+
+  const [query, setQuery] = useState("")
+  //const [filter, setFilter] = useState(filterOptions.length - 1)
+  const onChangeQuery = useCallback((text: string) => {
+    setQuery(text)
+  }, [])
 
   const { isLoading:loading, isSuccess:success, error, data:subject } = useQuery({
     queryKey: ["specific-subject", id],
@@ -60,6 +68,15 @@ const Courses = () => {
     { useNativeDriver: false }
   )
 
+  const filteredCourses = useMemo(() => {
+    if (!subject?.courses) return []
+    const q = query.replace(/\s+/g, '').toLowerCase()
+    return [...subject.courses]
+      .filter(item =>
+        item.name.replace(/\s+/g, '').toLowerCase().includes(q)
+      )
+  }, [query, subject])
+
   if (loading) {
     return (
       <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
@@ -99,9 +116,28 @@ const Courses = () => {
         <TouchableOpacity className="mb-8" onPress={() => {openExternalLink(subject.description)}}>
               <Text className="font-montserrat dark:text-white underline">{subject.description}</Text>
         </TouchableOpacity>
+
+        <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
+          <SearchBar
+            placeholder="Search"
+            onChangeText={onChangeQuery}
+            disabled={true}
+          />
+
+          {/* <GestureWrapper
+            className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-700 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
+            backgroundColor={colorScheme === "dark" ? "#d1d1d1" : "#d1d1d1"}
+          >
+            <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
+              {(filter != filterOptions.length - 1 && query == "") ? <View className="absolute top-0 left-0 mt-[-10px] ml-[-10px] aspect-square bg-red-600 rounded-full flex items-center justify-center p-1">
+                <Text className="text-white font-montserrat-semibold text-xs">{filter === 0 ? "A-Z" : ""}</Text>
+              </View> : null}
+          </GestureWrapper> */}
+        </View>
+
         <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
         <FlashList
-            data={subject.courses}
+            data={query != "" ? filteredCourses : subject.courses}
             renderItem={(item: any) => (
                 <CourseCard course={item.item} subject={{name: subject.name, abbreviation: subject.abbreviation}} />
             )}

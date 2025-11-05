@@ -8,18 +8,12 @@ import { useState, useCallback, useMemo } from "react"
 import { useQuery } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
 import { LOCALHOST } from "@/services/api";
+import { GestureWrapper } from '../home';
 
 import {
     SafeAreaView
 } from 'react-native-safe-area-context';
 
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useRouter } from 'expo-router';
 
 const filterOptions = ["Alphabetical", "Reset"]
@@ -29,7 +23,7 @@ const discover = () => {
   const router = useRouter()
   const colorScheme = useColorScheme()
   const [query, setQuery] = useState("")
-  const [filter, setFilter] = useState(filterOptions.length - 1)
+  //const [filter, setFilter] = useState(filterOptions.length - 1)
   const onChangeQuery = useCallback((text: string) => {
     setQuery(text)
   }, [])
@@ -54,57 +48,34 @@ const discover = () => {
     gcTime: 1000 * 60 * 60 * 48
   })
 
-  const { showActionSheetWithOptions } = useActionSheet()
+  // const onFilterPress = () => {
+  //   const destructiveButtonIndex = -1
+  //   const cancelButtonIndex = filterOptions.length - 1
 
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
+  //   showActionSheetWithOptions({ options:filterOptions, cancelButtonIndex, destructiveButtonIndex }, (i: any) => {
+  //     switch (i) {
+  //       case destructiveButtonIndex:
+  //         break
+  //       case cancelButtonIndex:
+  //         setFilter(filterOptions.length - 1)
+  //         break
+  //       default:
+  //         //onFormUpdate(field, !useIndex ? filterOptions[i] : i)
+  //         setFilter(i)
+  //         break
+  //     }}
+  //   )
+  // };
 
-  const onFilterPress = () => {
-    const destructiveButtonIndex = -1
-    const cancelButtonIndex = filterOptions.length - 1
-
-    showActionSheetWithOptions({ options:filterOptions, cancelButtonIndex, destructiveButtonIndex }, (i: any) => {
-      switch (i) {
-        case destructiveButtonIndex:
-          break
-        case cancelButtonIndex:
-          setFilter(filterOptions.length - 1)
-          break
-        default:
-          //onFormUpdate(field, !useIndex ? filterOptions[i] : i)
-          setFilter(i)
-          break
-      }}
-    )
-  };
-
-  const tap = Gesture.Tap()
-    .onBegin(() => {
-        scale.value = withTiming(0.97, { duration: 80 });
-        opacity.value = withTiming(0.7, { duration: 80 });
-    })
-    .onFinalize(() => {
-        scale.value = withTiming(1, { duration: 150 });
-        opacity.value = withTiming(1, { duration: 150 });
-    })
-    .onEnd(() => {
-        scheduleOnRN(onFilterPress);
-    });
-  
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
-
-  const sortedSubjects = useMemo(() => {
-    if (!data?.subjects) return []
-    return [...data.subjects]
-      .sort((a, b) => {
-        if (a.name === "All") return -1
-        if (b.name === "All") return 1
-        return a.name.localeCompare(b.name)
-      })
-  }, [data])
+  // const sortedSubjects = useMemo(() => {
+  //   if (!data?.subjects) return []
+  //   return [...data.subjects]
+  //     .sort((a, b) => {
+  //       if (a.name === "All") return -1
+  //       if (b.name === "All") return 1
+  //       return a.name.localeCompare(b.name)
+  //     })
+  // }, [data])
 
   const filteredSubjects = useMemo(() => {
     if (!data?.subjects) return []
@@ -157,21 +128,20 @@ const discover = () => {
             </View>
           </Pressable>
 
-          <GestureDetector gesture={tap}>
-            <Animated.View
-              className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-700 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
-              style={animatedStyle}
-            >   
-              <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
+          {/* <GestureWrapper
+            className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-700 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
+            backgroundColor={colorScheme === "dark" ? "#d1d1d1" : "#d1d1d1"}
+          >
+            <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
               {(filter != filterOptions.length - 1 && query == "") ? <View className="absolute top-0 left-0 mt-[-10px] ml-[-10px] aspect-square bg-red-600 rounded-full flex items-center justify-center p-1">
                 <Text className="text-white font-montserrat-semibold text-xs">{filter === 0 ? "A-Z" : ""}</Text>
               </View> : null}
-            </Animated.View>
-          </GestureDetector>
+          </GestureWrapper> */}
         </View>
 
         <FlashList
-          data={query != "" ? filteredSubjects : filter === 0 ? sortedSubjects : data.subjects}
+          //data={query != "" ? filteredSubjects : filter === 0 ? sortedSubjects : data.subjects}
+          data={query != "" ? filteredSubjects : data.subjects}
           renderItem={(item: any) => (
             <DiscoverCard {...item} />
           )}

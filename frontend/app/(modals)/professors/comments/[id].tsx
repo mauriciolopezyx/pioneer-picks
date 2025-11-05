@@ -130,7 +130,7 @@ export default function SectionScreen() {
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <View className="flex-1">
-                    <FlashList
+                    { comments.length > 0 ? <FlashList
                         data={comments}
                         renderItem={(item: any) => (
                             <CommentItem comment={item.item} />
@@ -142,7 +142,7 @@ export default function SectionScreen() {
                         scrollEnabled={true}
                         showsVerticalScrollIndicator={false}
                         indicatorStyle="black"
-                    />
+                    /> : <Text className="font-montserrat dark:text-white mx-auto">No comments found</Text> }
                 </View>
             </View>
             <View className="pb-[25px] pt-[10px] bg-black dark:bg-gray-800 flex items-center justify-center">
