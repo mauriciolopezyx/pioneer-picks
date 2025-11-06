@@ -1,18 +1,11 @@
-import { View, Text, KeyboardAvoidingView, Platform, ActivityIndicator  } from "react-native";
+import { View, Text, KeyboardAvoidingView, Platform, ActivityIndicator, useColorScheme  } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { useAuth } from "@/components/AuthProvider";
 import Slider from '@react-native-community/slider';
 import { reviewOptions } from "@/services/utils";
-
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { GestureWrapper } from "@/app/(tabs)/home";
 
 import { useQuery } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
@@ -41,6 +34,7 @@ export default function SectionScreen() {
     const { id:professorId, courseId }: {id: string, courseId: string} = useLocalSearchParams()
     const router = useRouter()
     const { user } = useAuth()
+    const colorScheme = useColorScheme()
 
     const { isLoading:loading, isSuccess:success, error, data:reviews } = useQuery({
         queryKey: ["specific-course-professor-reviews", professorId, courseId],
@@ -117,49 +111,18 @@ export default function SectionScreen() {
                     /> : <Text className="font-montserrat dark:text-white mx-auto">No reviews found</Text> }
                 </View>
             </View>
+            
             <View className="absolute bottom-[30px] right-[30px]">
-                <ControlButton user={user} onPress={() => { router.navigate({pathname: "/(modals)/professors/reviews/create", params: {professorId: professorId, courseId: courseId}}) }} />
+                <GestureWrapper
+                    className="w-[75px] h-[75px] px-1 flex items-center justify-center rounded-full"
+                    backgroundColor={colorScheme === "dark" ? "#767576" : "#000"}
+                    onPress={() => { router.navigate({pathname: "/(modals)/professors/reviews/create", params: {professorId: professorId, courseId: courseId}}) }}
+                >
+                    <Ionicons name={user ? "add-outline" : "close-outline"} size={35} color="white" />
+                </GestureWrapper>
             </View>
         </KeyboardAvoidingView>
     );
-}
-
-const ControlButton = ({user, onPress}: {user: any, onPress: () => void}) => {
-    const scale = useSharedValue(1);
-    const opacity = useSharedValue(1);
-
-    const handleSubmit = () => {
-        onPress()
-    };
-
-    const tap = Gesture.Tap()
-        .onBegin(() => {
-            scale.value = withTiming(0.97, { duration: 80 });
-            opacity.value = withTiming(0.7, { duration: 80 });
-        })
-        .onFinalize(() => {
-            scale.value = withTiming(1, { duration: 150 });
-            opacity.value = withTiming(1, { duration: 150 });
-        })
-        .onEnd(() => {
-            scheduleOnRN(handleSubmit);
-        });
-    
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-        opacity: user ? opacity.value : 0.25,
-    }));
-    
-    return (
-        <GestureDetector gesture={tap}>
-            <Animated.View
-                className="w-[75px] h-[75px] px-1 flex items-center justify-center bg-black dark:bg-light-200 rounded-full"
-                style={animatedStyle}
-            >
-                <Ionicons name={user ? "add-outline" : "close-outline"} size={35} color="white" />
-            </Animated.View>
-        </GestureDetector>
-    )
 }
 
 type ReviewItemProps = {
@@ -174,9 +137,9 @@ const Review = ({ review }: ReviewItemProps) => {
                 <Text className="font-montserrat-medium text-sm text-light-200 dark:text-light-100">{`${review.date}; ${review.semester}`}</Text>
             </View>
             <View className="flex flex-row flex-wrap gap-2">
-                <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full ${review.location === 1 ? "bg-blue-600" : "bg-green-600"}`}>
-                    <Text className="text-sm font-montserrat-bold text-white">{review.location === 1 ? "Online" : "In-person"}</Text>
-                    {review.location === 1 ? <Ionicons name="laptop-outline" size={15} color="white" /> : <Ionicons name="person-outline" size={15} color="white" />}
+                <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full ${review.location === 0 ? "bg-blue-600" : "bg-green-600"}`}>
+                    <Text className="text-sm font-montserrat-bold text-white">{review.location === 0 ? "Online" : review.location === 1 ? "In-person" : "Hybrid"}</Text>
+                    {review.location === 0 ? <Ionicons name="laptop-outline" size={15} color="white" /> : <Ionicons name="person-outline" size={15} color="white" />}
                 </View>
                 <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full ${review.late ? "bg-green-600" : "bg-red-600"}`}>
                     <Text className="text-sm font-montserrat-bold text-white">Late work: {review.late ? "Yes" : "No"}</Text>
@@ -189,13 +152,13 @@ const Review = ({ review }: ReviewItemProps) => {
                     <Text className="text-sm font-montserrat-bold text-white">Curved exams: {review.curve ? "Yes" : "No"}</Text>
                 </View>
                 <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full bg-blue-600`}>
-                    <Text className="text-sm font-montserrat-bold text-white">{review.assignments === 1 ? "Exam heavy" : review.assignments === 2 ? "Classwork heavy" : "Balanced exams & classwork"}</Text>
+                    <Text className="text-sm font-montserrat-bold text-white">{review.assignments === 0 ? "Exam heavy" : review.assignments === 1 ? "Classwork heavy" : "Balanced exams & classwork"}</Text>
                 </View>
-                <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full ${review.leniency === 1 ? "bg-green-600" : review.leniency === 2 ? "bg-blue-600" : "bg-red-600"}`}>
-                    <Text className="text-sm font-montserrat-bold text-white">{review.leniency === 1 ? "Lenient" : review.leniency === 2 ? "Slightly rigourous" : "Rigourous"}</Text>
+                <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full ${review.leniency === 0 ? "bg-green-600" : review.leniency === 1 ? "bg-blue-600" : "bg-red-600"}`}>
+                    <Text className="text-sm font-montserrat-bold text-white">{review.leniency === 0 ? "Lenient" : review.leniency === 1 ? "Slightly rigourous" : "Rigourous"}</Text>
                 </View>
-                <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full ${review.communication === 1 ? "bg-green-600" : review.communication === 2 ? "bg-blue-600" : "bg-red-600"}`}>
-                    <Text className="text-sm font-montserrat-bold text-white">{review.communication === 1 ? "Organized" : review.communication === 2 ? "Disorganized" : "Unorganized"}</Text>
+                <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full ${review.communication === 0 ? "bg-green-600" : review.communication === 1 ? "bg-blue-600" : "bg-red-600"}`}>
+                    <Text className="text-sm font-montserrat-bold text-white">{review.communication === 0 ? "Organized" : review.communication === 1 ? "Disorganized" : "Unorganized"}</Text>
                 </View>
             </View>
 

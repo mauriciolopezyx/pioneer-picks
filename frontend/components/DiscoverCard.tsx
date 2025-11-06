@@ -3,14 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, useColorScheme, Dimensions } from "react-native";
 import { revolvingColorPalette, subjectColorMappings, subjectIconMappings } from "@/services/utils";
-
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { GestureWrapper } from "@/app/(tabs)/home";
 
 type Subject = {
     name: string,
@@ -29,9 +22,6 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
   const gap = 10 // gap between columns
   const cardWidth = (screenWidth - horizontalPadding - gap) / 2
 
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
-
   const handleSubmit = () => {
     router.navigate({
         pathname: "/(tabs)/discover/[id]",
@@ -39,50 +29,26 @@ const DiscoverCard = ({ item, index }: {item: Subject, index: number}) => {
     })
   };
 
-  const tap = Gesture.Tap()
-    .onBegin(() => {
-        scale.value = withTiming(0.97, { duration: 80 });
-        opacity.value = withTiming(0.7, { duration: 80 });
-    })
-    .onFinalize(() => {
-        scale.value = withTiming(1, { duration: 150 });
-        opacity.value = withTiming(1, { duration: 150 });
-    })
-    .onEnd(() => {
-        scheduleOnRN(handleSubmit);
-    });
-  
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-    backgroundColor: bgColor
-  }));
-
   return (
-    <GestureDetector gesture={tap}>
-      <Animated.View
-          className="h-32 rounded-lg p-3 overflow-hidden"
-          style={[animatedStyle, {width: cardWidth, marginRight: index % 2 === 0 ? 10 : 0}]}
+    <GestureWrapper className={`h-32 rounded-lg p-3 overflow-hidden w-[${cardWidth}px] ${index % 2 === 0 ? "mr-[10px]" : ""}`} backgroundColor={bgColor} onPress={handleSubmit}>
+      <Text
+        numberOfLines={2}
+        className="font-montserrat-medium text-lg text-white w-3/4"
       >
-        <Text
-          numberOfLines={2}
-          className="font-montserrat-medium text-lg text-white w-3/4"
-        >
-          {item.name}
-        </Text>
-        
-        <Ionicons
-          name={iconName}
-          size={80} // big enough to overflow
-          color="rgba(255,255,255,0.7)"
-          style={{
-            position: "absolute",
-            bottom: -15,
-            right: -15,
-          }}
-        />
-      </Animated.View>
-    </GestureDetector>
+        {item.name}
+      </Text>
+      
+      <Ionicons
+        name={iconName}
+        size={80} // big enough to overflow
+        color="rgba(255,255,255,0.7)"
+        style={{
+          position: "absolute",
+          bottom: -15,
+          right: -15,
+        }}
+      />
+    </GestureWrapper>
   );
 };
 

@@ -12,13 +12,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
 import { LOCALHOST } from "@/services/api";
 
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { GestureWrapper } from "@/app/(tabs)/home";
 
 type Comment = {
   name: string,
@@ -200,26 +194,6 @@ type CommentInputProps = {
 const CommentInput = ({ onChangeText, onComment, commentBody, user, colorScheme }: CommentInputProps) => {
 
     const textInputRef = useRef<TextInput>(null)
-    const scale = useSharedValue(1);
-    const opacity = useSharedValue(1);
-
-    const tap = Gesture.Tap()
-        .onBegin(() => {
-            scale.value = withTiming(0.97, { duration: 80 });
-            opacity.value = withTiming(0.7, { duration: 80 });
-        })
-        .onFinalize(() => {
-            scale.value = withTiming(1, { duration: 150 });
-            opacity.value = withTiming(1, { duration: 150 });
-        })
-        .onEnd(() => {
-            scheduleOnRN(onComment);
-        });
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-        opacity: user != null ? opacity.value : 0.5,
-    }));
 
     return (
         <View className="w-full px-2 flex flex-row justify-between items-center gap-2">
@@ -234,14 +208,9 @@ const CommentInput = ({ onChangeText, onComment, commentBody, user, colorScheme 
                 textAlign="left"
                 editable={user != null}
             />
-            <GestureDetector gesture={tap}>
-                <Animated.View
-                    className="w-10 h-10 rounded-full bg-primary flex items-center justify-center"
-                    style={animatedStyle}
-                >
-                    <Ionicons name="send-outline" size={18} color="white" />
-                </Animated.View>
-            </GestureDetector>
+            <GestureWrapper className="w-10 h-10 rounded-full bg-primary flex items-center justify-center" onPress={onComment}>
+                <Ionicons name="send-outline" size={18} color="white" />
+            </GestureWrapper>
         </View>
     )
 };

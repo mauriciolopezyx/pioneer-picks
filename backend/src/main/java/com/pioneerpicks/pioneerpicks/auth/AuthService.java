@@ -97,7 +97,7 @@ class AuthService {
 
         System.out.println("SESSION ID from request: " + request.getSession().getId());
 
-        LoginResponseDto loginResponse = new LoginResponseDto(true);
+        LoginResponseDto loginResponse = new LoginResponseDto(request.getSession().getId());
 
         return ResponseEntity.ok().body(loginResponse);
     }
@@ -129,7 +129,7 @@ class AuthService {
         }
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                input.email(),
+                user,
                 null,
                 user.getAuthorities()
         );
@@ -141,7 +141,7 @@ class AuthService {
         request.getSession(true); // make sure a session exists
         new HttpSessionSecurityContextRepository().saveContext(context, request, response);
 
-        LoginResponseDto loginResponse = new LoginResponseDto(true);
+        LoginResponseDto loginResponse = new LoginResponseDto(request.getSession().getId());
 
         return ResponseEntity.ok().body(loginResponse);
     }
@@ -267,7 +267,7 @@ class AuthService {
         userRepository.save(user);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                forgotPasswordResetDto.email(),
+                user,
                 null,
                 user.getAuthorities()
         );

@@ -36,7 +36,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean isProfessorFavoritedByUser(Long userId, UUID professorId);
 
     @Query("""
-    SELECT COUNT(p) > 0
+    SELECT COUNT(c) > 0
     FROM User u
     JOIN u.favoriteCourses c
     WHERE u.id = :userId AND c.id = :courseId

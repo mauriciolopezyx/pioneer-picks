@@ -2,12 +2,14 @@ package com.pioneerpicks.pioneerpicks.courses;
 
 import com.pioneerpicks.pioneerpicks.comments.CommentRepository;
 import com.pioneerpicks.pioneerpicks.courses.dto.FullCourseDto;
+import com.pioneerpicks.pioneerpicks.courses.dto.NewCourseDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorCommentCountDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorReviewCountDto;
 import com.pioneerpicks.pioneerpicks.reviews.ReviewRepository;
 import com.pioneerpicks.pioneerpicks.user.User;
 import com.pioneerpicks.pioneerpicks.user.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -64,4 +66,7 @@ public class CourseService {
         return ResponseEntity.ok().body(dto);
     }
 
+    public ResponseEntity<?> requestNewCourse(@Valid NewCourseDto newCourseDto) {
+
+    }
 }

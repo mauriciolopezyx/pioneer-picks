@@ -31,7 +31,7 @@ function ToastComponent({
   onPress,
 }: Props) {
   const isErrorType = type === 'error'
-  const backgroundColor = isErrorType ? 'red' : 'gray'
+  const backgroundColor = isErrorType ? 'red' : 'white'
 
   return (
     <Pressable onPress={onPress} style={styles.toastTouchable}>
@@ -40,7 +40,8 @@ function ToastComponent({
           <Text
             style={[
               {
-                color:'white',
+                color:'black',
+                fontFamily: "Montserrat_500Medium"
               },
               text1Style,
             ]}
@@ -53,6 +54,7 @@ function ToastComponent({
                 styles.text2,
                 {
                   color: 'rgba(255,255,255,0.68)',
+                  fontFamily: "Montserrat_400Regular"
                 },
                 text2Style,
               ]}

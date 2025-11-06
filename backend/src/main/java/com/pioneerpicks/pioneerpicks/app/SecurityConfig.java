@@ -42,12 +42,14 @@ class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
-//                .oauth2Login(oauth2 -> oauth2
-//                        .successHandler(oAuth2Handler)
-//                        .failureUrl("/login?error=oauth2_failed")
-//                )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
+                        .addLogoutHandler((request, response, auth) -> {
+                            System.out.println("Logout handler hit, session id: " + request.getSession(false));
+                        })
+                        .logoutSuccessHandler((request, response, auth) -> {
+                            System.out.println("Logout success");
+                        })
                         .invalidateHttpSession(true)
                         .deleteCookies("SESSION")
                 )

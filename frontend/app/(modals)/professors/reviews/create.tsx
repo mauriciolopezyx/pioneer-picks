@@ -13,13 +13,8 @@ import { LOCALHOST } from "@/services/api";
 import { ToastInstance } from "@/components/ToastWrapper";
 import MasterToast from "@/components/ToastWrapper"
 
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { Gesture, GestureDetector, TextInput } from "react-native-gesture-handler";
+import { TextInput } from "react-native-gesture-handler";
+import { GestureWrapper } from "@/app/(tabs)/home";
 
 type Form = {
     season: string
@@ -92,7 +87,8 @@ export default function SectionScreen() {
         },
         onSuccess: () => {
             console.log("successfully posted review!")
-            router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professorId, courseId: courseId} })
+            router.back()
+            //router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professorId, courseId: courseId} })
             MasterToast.show({
                 text1: "Successfully posted review!"
             })
@@ -164,19 +160,25 @@ export default function SectionScreen() {
                 <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 overflow-hidden">
                     <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Curved exams <Text className="font-montserrat text-red-600">*</Text></Text>
                     <View className="flex flex-row items-center justify-center">
-                       <FormToggleButton title={form.curve ? "Yes" : "No"} user={true} onPress={() => { setForm((prev) => ({...prev, ["curve"]: !prev.curve})) } } />
+                        <GestureWrapper className="px-4 py-2 flex items-center justify-center rounded-full" onPress={ () => { setForm((prev) => ({...prev, ["curve"]: !prev.curve})) }}>
+                            <Text className={"text-primary text-xl"}>{form.curve ? "Yes" : "No"}</Text>
+                        </GestureWrapper>
                     </View>
                 </View>
                 <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 overflow-hidden">
                     <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Graded attendance <Text className="font-montserrat text-red-600">*</Text></Text>
                     <View className="flex flex-row items-center justify-center">
-                       <FormToggleButton title={form.attendance ? "Yes" : "No"} user={true} onPress={() => { setForm((prev) => ({...prev, ["attendance"]: !prev.attendance})) } } />
+                        <GestureWrapper className="px-4 py-2 flex items-center justify-center rounded-full" onPress={() => { setForm((prev) => ({...prev, ["attendance"]: !prev.attendance})) }}>
+                            <Text className={"text-primary text-xl"}>{form.attendance ? "Yes" : "No"}</Text>
+                        </GestureWrapper>
                     </View>
                 </View>
                 <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 overflow-hidden">
                     <Text className="font-montserrat-bold font-bold text-2xl dark:text-white">Late work accepted <Text className="font-montserrat text-red-600">*</Text></Text>
                     <View className="flex flex-row items-center justify-center">
-                       <FormToggleButton title={form.late ? "Yes" : "No"} user={true} onPress={() => { setForm((prev) => ({...prev, ["late"]: !prev.late})) } } />
+                        <GestureWrapper className="px-4 py-2 flex items-center justify-center rounded-full" onPress={() => { setForm((prev) => ({...prev, ["late"]: !prev.late})) }}>
+                            <Text className={"text-primary text-xl"}>{form.late ? "Yes" : "No"}</Text>
+                        </GestureWrapper>
                     </View>
                 </View>
                 <View className="flex flex-col justify-start items-start mb-4 border-[1px] py-4 px-4 border-light-100 dark:border-light-200 overflow-hidden">
@@ -219,9 +221,14 @@ export default function SectionScreen() {
                 </View>
                 <View className="bg-transparent h-[65px]"></View>
             </ScrollView>
+            
             <View className="absolute w-[250px] bottom-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <FormToggleButton title="Post" user={user} onPress={onReview} className="flex flex-row gap-x-2 items-center justify-center bg-blue-600 w-full py-2 rounded-full"/>
+                <GestureWrapper className="flex flex-row gap-x-2 items-center justify-center bg-blue-600 w-full py-2 rounded-full" onPress={onReview}>
+                    <Text className="text-white text-xl font-montserrat-semibold">Post</Text>
+                    <Ionicons name="send-outline" size={12} color="white" />
+                </GestureWrapper>
             </View>
+
             <ToastInstance />
         </KeyboardAvoidingView>
     );
@@ -236,7 +243,7 @@ type FormActionButtonProps = {
     useIndex?: boolean
 }
 
-const FormActionButton = ({ field, title, showActionSheetWithOptions, options, onFormUpdate, useIndex }: FormActionButtonProps) => {
+export const FormActionButton = ({ field, title, showActionSheetWithOptions, options, onFormUpdate, useIndex }: FormActionButtonProps) => {
     const onPress = () => {
         const destructiveButtonIndex = -1
         const cancelButtonIndex = options.length - 1
@@ -255,44 +262,5 @@ const FormActionButton = ({ field, title, showActionSheetWithOptions, options, o
     }
     return (
         <Button title={title} color="#d50032" onPress={onPress} />
-    )
-}
-
-const FormToggleButton = ({title, user, onPress, className}: {title: string, user: any, onPress: () => void, className?: string}) => {
-    const scale = useSharedValue(1);
-    const opacity = useSharedValue(1);
-
-    const handleSubmit = () => {
-        onPress()
-    };
-
-    const tap = Gesture.Tap()
-        .onBegin(() => {
-            scale.value = withTiming(0.97, { duration: 80 });
-            opacity.value = withTiming(0.7, { duration: 80 });
-        })
-        .onFinalize(() => {
-            scale.value = withTiming(1, { duration: 150 });
-            opacity.value = withTiming(1, { duration: 150 });
-        })
-        .onEnd(() => {
-            scheduleOnRN(handleSubmit);
-        });
-    
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-        opacity: user ? opacity.value : 0.25,
-    }));
-    
-    return (
-        <GestureDetector gesture={tap}>
-            <Animated.View
-                className={className ? className : "px-4 py-2 flex items-center justify-center rounded-full"}
-                style={animatedStyle}
-            >
-                <Text className={className ? "text-white text-xl font-montserrat-semibold" : "text-primary text-xl"}>{title}</Text>
-                {className ? <Ionicons name="send-outline" size={12} color="white" /> : null}
-            </Animated.View>
-        </GestureDetector>
     )
 }

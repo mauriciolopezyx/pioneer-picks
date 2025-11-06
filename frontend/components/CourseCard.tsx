@@ -2,14 +2,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Text, View, useColorScheme } from "react-native";
 import { areas, revolvingColorPalette, subjectColorMappings, areaAbbreviations, findAreaParentKey, areaColorMappings } from "@/services/utils";
-
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { GestureWrapper } from "@/app/(tabs)/home";
 
 type Section = {
     sectionId: string,
@@ -47,34 +40,12 @@ const CourseCard = ({ course, subject }: { course: Course, subject: SubjectCours
   const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";
   const textColor = revolvingColorPalette[paletteKey]?.secondary ?? "text-white"
 
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
-
   const handleSubmit = () => {
     router.navigate({
         pathname: "/(tabs)/discover/courses/[id]",
         params: { id: course.id, subjectName: subject.name, subjectAbbreviation: subject.abbreviation },
     })
   };
-
-  const tap = Gesture.Tap()
-    .onBegin(() => {
-        scale.value = withTiming(0.97, { duration: 80 });
-        opacity.value = withTiming(0.7, { duration: 80 });
-    })
-    .onFinalize(() => {
-        scale.value = withTiming(1, { duration: 150 });
-        opacity.value = withTiming(1, { duration: 150 });
-    })
-    .onEnd(() => {
-        scheduleOnRN(handleSubmit);
-    });
-  
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-    backgroundColor: bgColor
-  }));
 
   const seen = new Set()
   const areaDisplays = course.areas.split(",").map((area) => {
@@ -102,29 +73,24 @@ const CourseCard = ({ course, subject }: { course: Course, subject: SubjectCours
   })
 
   return (
-    <GestureDetector gesture={tap}>
-      <Animated.View
-          className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-light-100"
-          style={animatedStyle}
-      >
-        <View className="flex flex-col items-start justify-center gap-y-[2px]">
-          <Text numberOfLines={1} className={`text-xl font-bold ${textColor}`}>
-              {`${subject.abbreviation} ${course.abbreviation}`}
-          </Text>
-          <Text className={`font-montserrat-semibold ${textColor} mb-[4px]`}>
-              {course.name}
-          </Text>
-          <View className="flex flex-row justify-start items-center gap-x-[5px]">
-              {areaDisplays}
-          </View>
+    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden" backgroundColor={bgColor} onPress={handleSubmit}>
+      <View className="flex flex-col items-start justify-center gap-y-[2px]">
+        <Text numberOfLines={1} className={`text-xl font-bold ${textColor}`}>
+          {`${subject.abbreviation} ${course.abbreviation}`}
+        </Text>
+        <Text className={`font-montserrat-semibold ${textColor} mb-[4px]`}>
+          {course.name}
+        </Text>
+        <View className="flex flex-row justify-start items-center gap-x-[5px]">
+          {areaDisplays}
         </View>
-        <View>
-          <Text className={`font-montserrat-bold text-4xl ${textColor}`}>
-              {course.units}
-          </Text>
-        </View>
-      </Animated.View>
-    </GestureDetector>
+      </View>
+      <View>
+        <Text className={`font-montserrat-bold text-4xl ${textColor}`}>
+          {course.units}
+        </Text>
+      </View>
+    </GestureWrapper>
   );
 };
 

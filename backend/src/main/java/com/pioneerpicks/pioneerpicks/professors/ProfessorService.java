@@ -3,9 +3,11 @@ package com.pioneerpicks.pioneerpicks.professors;
 import com.pioneerpicks.pioneerpicks.comments.CommentRepository;
 import com.pioneerpicks.pioneerpicks.favorites.dto.FavoriteCourseDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
+import com.pioneerpicks.pioneerpicks.professors.dto.NewProfessorDto;
 import com.pioneerpicks.pioneerpicks.reviews.ReviewRepository;
 import com.pioneerpicks.pioneerpicks.user.User;
 import com.pioneerpicks.pioneerpicks.user.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -59,6 +61,11 @@ public class ProfessorService {
 
         BasicProfessorDto dto = new BasicProfessorDto(professorId, professor.getName(), reviewCount, commentCount);
         return ResponseEntity.ok().body(dto);
+    }
+
+    public ResponseEntity<?> requestNewProfessor(@Valid NewProfessorDto newProfessorDto) {
+        // will need to reach out to the flask back end, using rest Template like we did in learn asl
+
     }
 
 }

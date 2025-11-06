@@ -1,6 +1,9 @@
 package com.pioneerpicks.pioneerpicks.courses;
 
+import com.pioneerpicks.pioneerpicks.courses.dto.NewCourseDto;
 import com.pioneerpicks.pioneerpicks.professors.ProfessorService;
+import com.pioneerpicks.pioneerpicks.professors.dto.NewProfessorDto;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +29,15 @@ public class CourseController {
         System.out.println("rec course information attempt");
         try {
             return courseService.getCourseInformation(id);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<?> requestNewCourse(@RequestBody @Valid NewCourseDto newCourseDto) {
+        try {
+            return courseService.requestNewCourse(newCourseDto);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

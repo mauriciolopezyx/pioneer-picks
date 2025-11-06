@@ -1,5 +1,7 @@
 package com.pioneerpicks.pioneerpicks.professors;
 
+import com.pioneerpicks.pioneerpicks.professors.dto.NewProfessorDto;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +39,15 @@ public class ProfessorController {
         System.out.println("rec professor course information attempt");
         try {
             return professorService.getProfessorCourseInformation(courseId, professorId);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<?> requestNewProfessor(@RequestBody @Valid NewProfessorDto newProfessorDto) {
+        try {
+            return professorService.requestNewProfessor(newProfessorDto);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

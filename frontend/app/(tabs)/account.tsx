@@ -68,6 +68,8 @@ const Account = () => {
         <Ionicons name="chevron-forward-outline" size={30} color="#d50032" />
       </GestureWrapper>
 
+      <Text className="align-bottom">version 1.0</Text>
+
     </SafeAreaView>
   )
 }

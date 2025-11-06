@@ -13,13 +13,7 @@ import {
     SafeAreaView
 } from 'react-native-safe-area-context';
 
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { GestureWrapper } from './(tabs)/home';
 
 type SearchResultProps = {
     id: string,
@@ -119,8 +113,6 @@ const search = () => {
 const SearchResult = ({result, colorScheme}: {result: SearchResultProps, colorScheme: string | null | undefined}) => {
 
     const router = useRouter()
-    const scale = useSharedValue(1);
-    const opacity = useSharedValue(1);
 
     const handleSubmit = async () => {
         await addRecentSearch({
@@ -149,37 +141,17 @@ const SearchResult = ({result, colorScheme}: {result: SearchResultProps, colorSc
         }
     }
 
-    const tap = Gesture.Tap()
-        .onBegin(() => {
-            scale.value = withTiming(0.97, { duration: 80 });
-            opacity.value = withTiming(0.7, { duration: 80 });
-        })
-        .onFinalize(() => {
-            scale.value = withTiming(1, { duration: 150 });
-            opacity.value = withTiming(1, { duration: 150 });
-        })
-        .onEnd(() => {
-            scheduleOnRN(handleSubmit)
-        });
-    
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-        opacity: opacity.value,
-    }));
-
     const paletteKey = subjectColorMappings[result.name.toLowerCase()] != null ? subjectColorMappings[result.name.toLowerCase()] : result.subject ? subjectColorMappings[result.subject.toLowerCase()] : -1
     const bgColor = paletteKey != -1 ? revolvingColorPalette[paletteKey].primary : "transparent"
 
     return (
-        <GestureDetector gesture={tap}>
-            <Animated.View className="flex flex-row justify-start items-center gap-x-3" style={animatedStyle}>
-                {bgColor != "transparent" ? <View className={`w-[50px] h-[50px] aspect-square`} style={{ backgroundColor: bgColor }}></View> : <Ionicons name="person" size={50} color={colorScheme === "dark" ? "#aaa" : "black"} />}
-                <View>
-                    <Text className="font-montserrat-semibold dark:text-white">{result.name}{result.abbreviation ? ` (${result.abbreviation})` : null}</Text>
-                    <Text className="font-montserrat dark:text-light-100 text-sm">{result.category === 1 ? "Subject" : result.category === 2 ? "Course" : "Professor"}</Text>
-                </View>
-            </Animated.View>
-        </GestureDetector>
+        <GestureWrapper className="flex flex-row justify-start items-center gap-x-3" onPress={handleSubmit}>
+            {bgColor != "transparent" ? <View className={`w-[50px] h-[50px] aspect-square`} style={{ backgroundColor: bgColor }}></View> : <Ionicons name="person" size={50} color={colorScheme === "dark" ? "#aaa" : "black"} />}
+            <View>
+                <Text className="font-montserrat-semibold dark:text-white">{result.name}{result.abbreviation ? ` (${result.abbreviation})` : null}</Text>
+                <Text className="font-montserrat dark:text-light-100 text-sm">{result.category === 1 ? "Subject" : result.category === 2 ? "Course" : "Professor"}</Text>
+            </View>
+        </GestureWrapper>
     )
 }
 
