@@ -1,13 +1,11 @@
 import { LOCALHOST } from "@/services/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import { useParsedLocalSearchParams } from "@/services/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import MasterToast from "@/components/ToastWrapper"
 
 import { View, Text, KeyboardAvoidingView, Platform, Pressable, TextInput, TouchableOpacity, useColorScheme } from 'react-native'
@@ -67,7 +65,11 @@ const ForgotPassword = () => {
             router.navigate({pathname: "/verify", params: {email: email, forgot: "true"}})
         },
         onError: (e: any) => {
-            console.error(e?.message ?? "failed to reset password")
+            //console.error(e?.message ?? "failed to reset password")
+            MasterToast.show({
+                text1: "Error requesting code",
+                text2: e?.message ?? "Failed to request"
+            })
         }
     })
 

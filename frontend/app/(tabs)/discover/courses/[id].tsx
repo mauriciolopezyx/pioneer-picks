@@ -142,8 +142,12 @@ const Course = () => {
             })
         },
         onError: (e: any) => {
-            console.error(e?.message ?? "Failed to toggle favorite")
+            //console.error(e?.message ?? "Failed to toggle favorite")
             setFavorited(prev => !prev) // reverts immediate change if failed
+            MasterToast.show({
+                text1: "Error favoriting",
+                text2: e?.message ?? "Failed to favorite"
+            })
         }
     })
 
@@ -220,22 +224,15 @@ const Course = () => {
                     <SearchBar
                         placeholder="Search"
                         onChangeText={onChangeQuery}
-                        disabled={true}
+                        disabled={false}
                     />
-
-                    {/* <GestureWrapper
-                        className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-700 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
-                        backgroundColor={colorScheme === "dark" ? "#d1d1d1" : "#d1d1d1"}
-                    >
-                        <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
-                        {(filter != filterOptions.length - 1 && query == "") ? <View className="absolute top-0 left-0 mt-[-10px] ml-[-10px] aspect-square bg-red-600 rounded-full flex items-center justify-center p-1">
-                            <Text className="text-white font-montserrat-semibold text-xs">{filter === 0 ? "A-Z" : ""}</Text>
-                        </View> : null}
-                    </GestureWrapper> */}
+                    <GestureWrapper onPress={() => { router.navigate({pathname: "/(modals)/professors/create", params: {courseId: courseId, subjectAbbreviation: subjectAbbreviation, courseAbbreviation: course.abbreviation}}) }}>
+                        <Ionicons name="add" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
+                    </GestureWrapper>
                 </View>
 
                 <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
-                <FlashList
+                { course.professors.length > 0 ? <FlashList
                     data={query != "" ? filteredProfessors : course.professors}
                     renderItem={(item: any) => (
                         <ProfessorCard professor={item.item} course={{id: courseId, abbreviation: course.abbreviation}} subject={{name: subjectName, abbreviation: subjectAbbreviation}} />
@@ -243,8 +240,8 @@ const Course = () => {
                     keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
                     numColumns={1}
                     ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-                    scrollEnabled={false}
-                />
+                    scrollEnabled={true}
+                /> : <Text className="font-montserrat dark:text-white">No professors found</Text> }
                 <View className="h-[50px]"></View>
             </ScrollView>
         </SafeAreaView>

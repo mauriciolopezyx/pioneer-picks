@@ -7,13 +7,18 @@ import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorCommentCountDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorReviewCountDto;
 import com.pioneerpicks.pioneerpicks.reviews.ReviewRepository;
+import com.pioneerpicks.pioneerpicks.subjects.Subject;
+import com.pioneerpicks.pioneerpicks.subjects.SubjectRepository;
 import com.pioneerpicks.pioneerpicks.user.User;
 import com.pioneerpicks.pioneerpicks.user.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -27,17 +32,29 @@ public class CourseService {
     private final ReviewRepository reviewRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final SubjectRepository subjectRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${discord.bot.url}")
+    private String discordBotUrl;
+
+    @Value("${discord.secret}")
+    private String discordSecret;
 
     public CourseService(
             CourseRepository courseRepository,
             ReviewRepository reviewRepository,
             CommentRepository commentRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            SubjectRepository subjectRepository,
+            RestTemplateBuilder builder
     ) {
         this.courseRepository = courseRepository;
         this.reviewRepository = reviewRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.subjectRepository = subjectRepository;
+        this.restTemplate = builder.build();
     }
 
     public ResponseEntity<?> getCourseInformation(UUID id) {
@@ -68,5 +85,25 @@ public class CourseService {
 
     public ResponseEntity<?> requestNewCourse(@Valid NewCourseDto newCourseDto) {
 
+        Subject subject = subjectRepository.findByNameContainingIgnoreCase(newCourseDto.subject()).orElseThrow(() -> new RuntimeException("Subject not found"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        Map<String, Object> payload = Map.of(
+                "secret", discordSecret,
+                "subjectName", newCourseDto.subject(),
+                "subjectId", subject.getId(),
+                "name", newCourseDto.name(),
+                "userId", user.getId()
+        );
+
+        try {
+            restTemplate.postForEntity(discordBotUrl + "/notify-course", payload, String.class);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", "Failed to notify Discord bot"));
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Request submitted for approval"));
     }
 }

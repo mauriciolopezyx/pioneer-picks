@@ -1,9 +1,12 @@
-import { StyleSheet, Text, ScrollView, View, ActivityIndicator, Linking, TouchableOpacity, Animated } from 'react-native'
+import { StyleSheet, Text, ScrollView, View, ActivityIndicator, Linking, TouchableOpacity, Animated, useColorScheme } from 'react-native'
 import { FlashList } from "@shopify/flash-list";
-import { useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams, usePathname } from 'expo-router'
 import React, { useLayoutEffect, useMemo, useState, useCallback } from 'react'
 import CourseCard from '@/components/CourseCard'
 import SearchBar from '@/components/SearchBar';
+import { GestureWrapper } from '../home';
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 import { useQuery } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
@@ -17,6 +20,8 @@ import {
 
 const Courses = () => {
 
+  const router = useRouter()
+  const colorScheme = useColorScheme()
   const {id} = useLocalSearchParams()
 
   const [query, setQuery] = useState("")
@@ -88,7 +93,7 @@ const Courses = () => {
   if (error) {
     return (
       <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
-        <Text>Failed to load professor: {error?.message}</Text>
+        <Text className="font-montserrat dark:text-white">Failed to load professor: {error?.message}</Text>
       </SafeAreaView>
     )
   }
@@ -96,7 +101,7 @@ const Courses = () => {
   if (!subject) {
     return (
       <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
-        <Text>Failed to load subject information (no data found)</Text>
+        <Text className="font-montserrat dark:text-white">Failed to load subject information (no data found)</Text>
       </SafeAreaView>
     )
   }
@@ -121,22 +126,15 @@ const Courses = () => {
           <SearchBar
             placeholder="Search"
             onChangeText={onChangeQuery}
-            disabled={true}
+            disabled={false}
           />
-
-          {/* <GestureWrapper
-            className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-700 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
-            backgroundColor={colorScheme === "dark" ? "#d1d1d1" : "#d1d1d1"}
-          >
-            <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
-              {(filter != filterOptions.length - 1 && query == "") ? <View className="absolute top-0 left-0 mt-[-10px] ml-[-10px] aspect-square bg-red-600 rounded-full flex items-center justify-center p-1">
-                <Text className="text-white font-montserrat-semibold text-xs">{filter === 0 ? "A-Z" : ""}</Text>
-              </View> : null}
-          </GestureWrapper> */}
+          <GestureWrapper onPress={() => { router.navigate({pathname: "/(modals)/courses/create"}) }}>
+            <Ionicons name="add" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
+          </GestureWrapper>
         </View>
 
         <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
-        <FlashList
+        {subject.courses.length > 0 ?<FlashList
             data={query != "" ? filteredCourses : subject.courses}
             renderItem={(item: any) => (
                 <CourseCard course={item.item} subject={{name: subject.name, abbreviation: subject.abbreviation}} />
@@ -144,8 +142,8 @@ const Courses = () => {
             keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
             numColumns={1}
             ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-            scrollEnabled={false}
-        />
+            scrollEnabled={true}
+        /> : <Text className="font-montserrat dark:text-white">No courses found</Text> }
         <View className="h-[50px]"></View>
       </ScrollView>
     </SafeAreaView>

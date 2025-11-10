@@ -1,6 +1,9 @@
 package com.pioneerpicks.pioneerpicks.professors;
 
 import com.pioneerpicks.pioneerpicks.comments.CommentRepository;
+import com.pioneerpicks.pioneerpicks.courses.Course;
+import com.pioneerpicks.pioneerpicks.courses.CourseRepository;
+import com.pioneerpicks.pioneerpicks.courses.dto.NewCourseDto;
 import com.pioneerpicks.pioneerpicks.favorites.dto.FavoriteCourseDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.NewProfessorDto;
@@ -8,10 +11,13 @@ import com.pioneerpicks.pioneerpicks.reviews.ReviewRepository;
 import com.pioneerpicks.pioneerpicks.user.User;
 import com.pioneerpicks.pioneerpicks.user.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -24,17 +30,29 @@ public class ProfessorService {
     private final ReviewRepository reviewRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${discord.bot.url}")
+    private String discordBotUrl;
+
+    @Value("${discord.secret}")
+    private String discordSecret;
 
     public ProfessorService(
             ProfessorRepository professorRepository,
             ReviewRepository reviewRepository,
             CommentRepository commentRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            CourseRepository courseRepository,
+            RestTemplateBuilder builder
     ) {
         this.professorRepository = professorRepository;
         this.reviewRepository = reviewRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.restTemplate = builder.build();
+        this.courseRepository = courseRepository;
     }
 
     public ResponseEntity<?> getProfessorCourses(UUID professorId) {
@@ -64,8 +82,26 @@ public class ProfessorService {
     }
 
     public ResponseEntity<?> requestNewProfessor(@Valid NewProfessorDto newProfessorDto) {
-        // will need to reach out to the flask back end, using rest Template like we did in learn asl
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
 
+        Course course = courseRepository.findById(newProfessorDto.courseId()).orElseThrow(() -> new RuntimeException("Course not found"));
+
+        Map<String, Object> payload = Map.of(
+                "secret", discordSecret,
+                "courseName", course.getName(),
+                "courseId", newProfessorDto.courseId(),
+                "name", newProfessorDto.name(),
+                "userId", user.getId()
+        );
+
+        try {
+            restTemplate.postForEntity(discordBotUrl + "/notify-professor", payload, String.class);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", "Failed to notify Discord bot"));
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Request submitted for approval"));
     }
 
 }

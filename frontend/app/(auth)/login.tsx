@@ -21,6 +21,7 @@ import * as SecureStore from "expo-secure-store";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useAuth } from "@/components/AuthProvider";
+import MasterToast from "@/components/ToastWrapper"
 
 const formSchema = z.object({
     email: z.string().min(22, {
@@ -88,7 +89,11 @@ export default function Login() {
       reset()
     },
     onError: (e: any) => {
-      console.error("Login error:", e.message)
+      //console.error("Login error:", e.message)
+      MasterToast.show({
+        text1: "Error logging in",
+        text2: e?.message ?? "Failed to login"
+      })
     }
   })
 

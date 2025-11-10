@@ -199,7 +199,7 @@ export const FavoriteProfessorCard = ({data}: {data: FavoriteProfessor}) => {
   return (
     <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden" backgroundColor="#d50032" onPress={onPress}>
       <View className="flex flex-col items-start justify-center gap-y-[2px]">
-        <Text numberOfLines={1} className="text-xl font-bold text-white">{data.name}</Text>
+        <Text numberOfLines={1} className="text-xl font-montserrat-bold text-white">{data.name}</Text>
       </View>
     </GestureWrapper>
   )

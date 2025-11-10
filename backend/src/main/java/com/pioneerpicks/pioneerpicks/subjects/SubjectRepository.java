@@ -12,7 +12,7 @@ public interface SubjectRepository extends JpaRepository<Subject, UUID> {
 
     List<Subject> findByNameContainingIgnoreCaseOrAbbreviationContainingIgnoreCase(String q1, String q2);
 
-    List<Subject> findByName(String query);
+    Optional<Subject> findByNameContainingIgnoreCase(String query);
     List<Subject> findByAbbreviation(String query);
 
 

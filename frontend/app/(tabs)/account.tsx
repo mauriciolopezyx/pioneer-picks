@@ -44,7 +44,11 @@ const Account = () => {
       router.navigate({pathname: "/login"})
     },
     onError: (e: any) => {
-      console.error(e?.message ?? "failed to log out")
+      //console.error(e?.message ?? "failed to log out")
+      MasterToast.show({
+        text1: "Error logging out",
+        text2: e?.message ?? "Failed to log out"
+      })
     }
   })
 
@@ -67,8 +71,8 @@ const Account = () => {
         <Text className="font-montserrat-medium text-xl text-primary">Log Out</Text>
         <Ionicons name="chevron-forward-outline" size={30} color="#d50032" />
       </GestureWrapper>
-
-      <Text className="align-bottom">version 1.0</Text>
+      
+      <Text className="align-bottom dark:text-white">version 1.0</Text>
 
     </SafeAreaView>
   )

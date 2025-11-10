@@ -8,6 +8,7 @@ import { LOCALHOST } from "@/services/api";
 import { revolvingColorPalette, subjectColorMappings } from "@/services/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { addRecentSearch, getRecentSearches, RecentSearch } from '@/services/recentSearches';
+import MasterToast from "@/components/ToastWrapper"
 
 import {
     SafeAreaView
@@ -69,7 +70,11 @@ const search = () => {
             return json?.results
         },
         onError: (e: any) => {
-            console.error(e?.message ?? "Failed to verify")
+            //console.error(e?.message ?? "Failed to verify")
+            MasterToast.show({
+                text1: "Error fetching search results",
+                text2: e?.message ?? "Failed to fetch"
+            })
         }
     })
 

@@ -60,7 +60,11 @@ export default function SectionScreen() {
             })
         },
         onError: (e: any) => {
-            console.error(e?.message ?? "Failed to verify")
+            //console.error(e?.message ?? "Failed to verify")
+            MasterToast.show({
+                text1: "Error posting comment",
+                text2: e?.message ?? "Failed to post"
+            })
         }
     })
 
@@ -99,7 +103,7 @@ export default function SectionScreen() {
             <View className="flex-1 dark:bg-gray-800">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
-                <Text>Failed to load comments: {error?.message}</Text>
+                <Text className="font-montserrat dark:text-white">Failed to load comments: {error?.message}</Text>
             </View>
         )
     }
@@ -109,7 +113,7 @@ export default function SectionScreen() {
             <View className="flex-1 dark:bg-gray-800">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
-                <Text>Failed to load comments (no data found)</Text>
+                <Text className="font-montserrat dark:text-white">Failed to load comments (no data found)</Text>
             </View>
         )
     }

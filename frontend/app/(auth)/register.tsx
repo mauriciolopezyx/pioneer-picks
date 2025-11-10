@@ -11,6 +11,7 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import MasterToast from "@/components/ToastWrapper"
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
@@ -82,7 +83,11 @@ export default function Register() {
             reset()
         },
         onError: (e: any) => {
-            console.error(e?.error ?? "Failed to register")
+            //console.error(e?.error ?? "Failed to register")
+            MasterToast.show({
+                text1: "Error registering",
+                text2: e?.message ?? "Failed to register"
+            })
         }
     })
 

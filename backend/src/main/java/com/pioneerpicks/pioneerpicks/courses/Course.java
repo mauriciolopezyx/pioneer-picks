@@ -19,10 +19,10 @@ public class Course {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String abbreviation;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer units;
 
     @Column(nullable = true)
@@ -40,6 +40,11 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private final List<Review> reviews = new ArrayList<>();
+
+    public Course(String name, Subject subject) {
+        this.name = name;
+        this.subject = subject;
+    }
 
     public Course() {}
 

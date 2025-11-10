@@ -47,15 +47,18 @@ const Create = () => {
             }
         },
         onSuccess: () => {
-            router.back()
-            //router.navigate({pathname: "/(modals)/professors/reviews/[id]", params: {id: professorId, courseId: courseId} })
             MasterToast.show({
                 text1: "Successfully requested professor!*",
                 text2: "*may take up to 24-48h for additions"
             })
+            router.back()
         },
         onError: (e: any) => {
-            console.error(e?.message ?? "Failed to verify")
+            //console.error(e?.message ?? "Failed to verify")
+            MasterToast.show({
+                text1: "Error requesting professor",
+                text2: e?.message ?? "Failed to request"
+            })
         }
     })
 
@@ -80,21 +83,26 @@ const Create = () => {
                             value={form.name}
                             onChangeText={(newText) => { setForm((prev) => ({...prev, ["name"]: newText})) }}
                             className="font-montserrat text-lg text-primary dark:text-white"
-                            placeholder=""
+                            placeholder="Enter professor name here..."
                             placeholderTextColor={"#999"}
                         />
                     </View>
                 </View>
+
+                { (form.name.length > 0) ? (
+                    <GestureWrapper className="flex flex-row gap-x-2 items-center justify-center w-full py-2 rounded-full" backgroundColor="#155dfc" onPress={onCreate}>
+                        <Text className="text-white text-xl font-montserrat-semibold">Post</Text>
+                        <Ionicons name="send-outline" size={12} color="white" />
+                    </GestureWrapper>
+                ) : (
+                    <View className="flex flex-row gap-x-2 items-center justify-center opacity-50 bg-blue-600 w-full py-2 rounded-full">
+                        <Text className="text-white text-xl font-montserrat-semibold">Post</Text>
+                        <Ionicons name="send-outline" size={12} color="white" />
+                    </View>
+                )}
+
                 <View className="bg-transparent h-[65px]"></View>
             </ScrollView>
-            
-            { (form.name.length > 0) ? <View className="absolute w-[250px] bottom-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <GestureWrapper className="flex flex-row gap-x-2 items-center justify-center bg-blue-600 w-full py-2 rounded-full" onPress={onCreate}>
-                    <Text className="text-white text-xl font-montserrat-semibold">Post</Text>
-                    <Ionicons name="send-outline" size={12} color="white" />
-                </GestureWrapper>
-            </View> : null }
-
             <ToastInstance />
         </KeyboardAvoidingView>   
     )

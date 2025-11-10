@@ -91,10 +91,14 @@ const ResetPassword = () => {
                 text1: "Successfully reset password!"
             })
             reset()
-            router.navigate({pathname: "/"})
+            router.replace({pathname: "/"})
         },
         onError: (e: any) => {
-            console.error(e?.message ?? "failed to reset password")
+            //console.error(e?.message ?? "failed to reset password")
+            MasterToast.show({
+                text1: "Error resetting password",
+                text2: e?.message ?? "Failed to reset"
+            })
         }
     })
 

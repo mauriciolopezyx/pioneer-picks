@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as SecureStore from "expo-secure-store";
+import MasterToast from "@/components/ToastWrapper"
 
 import { LOCALHOST } from "@/services/api";
 import { useAuth } from "@/components/AuthProvider";
@@ -88,7 +89,11 @@ export default function Verify() {
             router.navigate({pathname: redirectUrl, params: {token: (json?.token && forgotPassword) ? json.token : undefined, email: (json?.token && forgotPassword) ? email : undefined}})
         },
         onError: (e: any) => {
-            console.error(e?.message ?? "Failed to verify")
+            //console.error(e?.message ?? "Failed to verify")
+            MasterToast.show({
+                text1: "Error verifying code",
+                text2: e?.message ?? "Failed to verify"
+            })
         }
     })
 
@@ -115,7 +120,11 @@ export default function Verify() {
             console.log("successfully resent code!")
         },
         onError: (e: any) => {
-            console.error(e?.message ?? "Failed to resend code")
+            //console.error(e?.message ?? "Failed to resend code")
+            MasterToast.show({
+                text1: "Error resending code",
+                text2: e?.message ?? "Failed to resend"
+            })
         }
     })
 

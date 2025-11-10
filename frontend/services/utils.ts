@@ -53,7 +53,12 @@ export const subjectColorMappings: Record<string, number> = {
   "psychology": 18,
   "public health": 19,
   "statistics": 20,
-  "teacher education": 0
+  "teacher education": 0,
+  "accounting": 1,
+  "art": 2,
+  "business analytics": 3,
+  "communication": 4,
+  "special education": 5
 }
 
 export const areaColorMappings: Record<string, number> = {
@@ -257,7 +262,12 @@ export const subjectIconMappings: Record<string, keyof typeof Ionicons.glyphMap>
   English: "book-outline",
   Math: "calculator-outline",
   Physics: "flask-outline",
-  "Computer Science": "laptop-outline"
+  "Computer Science": "laptop-outline",
+  "accounting": "calculator",
+  "art": "brush",
+  "business analytics": "book",
+  "communication": "chatbubbles",
+  "special education": "people"
 };
 
 export function useParsedLocalSearchParams<TParsed>(parser: (raw: Record<string, string | undefined>) => TParsed): TParsed {

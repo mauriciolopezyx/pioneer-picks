@@ -71,7 +71,7 @@ export default function SectionScreen() {
             <View className="flex-1 dark:bg-gray-800">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
-                <Text>Failed to load reviews: {error?.message}</Text>
+                <Text className="font-montserrat dark:text-white">Failed to load reviews: {error?.message}</Text>
             </View>
         )
     }
@@ -81,7 +81,7 @@ export default function SectionScreen() {
             <View className="flex-1 dark:bg-gray-800">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
-                <Text>Failed to load reviews (no data found)</Text>
+                <Text className="font-montserrat dark:text-white">Failed to load reviews (no data found)</Text>
             </View>
         )
     }

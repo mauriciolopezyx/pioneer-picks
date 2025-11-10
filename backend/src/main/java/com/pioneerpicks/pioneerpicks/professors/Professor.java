@@ -33,6 +33,10 @@ public class Professor {
 
     public Professor() {}
 
+    public Professor(String name) {
+        this.name = name;
+    }
+
     public UUID getId() {
         return id;
     }

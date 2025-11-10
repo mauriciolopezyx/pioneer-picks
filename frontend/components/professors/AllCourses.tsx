@@ -66,8 +66,12 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
             })
         },
         onError: (e: any) => {
-            console.error(e?.message ?? "Failed to toggle favorite")
+            //console.error(e?.message ?? "Failed to toggle favorite")
             setFavorited(prev => !prev) // reverts immediate change if failed
+            MasterToast.show({
+                text1: "Error favoriting",
+                text2: e?.message ?? "Failed to favorite"
+            })
         }
     })
 
@@ -82,7 +86,7 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
 
     return (
         <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["top"]}>
-            <Text className="font-montserrat-bold text-4xl dark:text-white">{data.info.name}'s Courses</Text>
+            <Text className="font-montserrat-bold text-4xl dark:text-white mb-4">{data.info.name}'s Courses</Text>
 
             <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
                 <SearchBar

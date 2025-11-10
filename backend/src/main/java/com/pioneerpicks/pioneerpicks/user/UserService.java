@@ -24,7 +24,6 @@ public class UserService {
 
     public ResponseEntity<?> getUserInformation() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("PRINCIPAL CLASS AFTER SET: " + authentication.getPrincipal().getClass());
         User user = (User) authentication.getPrincipal();
 
         FullUserDto dto = new FullUserDto(user.getUsername(), user.getEmail(), user.getRole().toString());
