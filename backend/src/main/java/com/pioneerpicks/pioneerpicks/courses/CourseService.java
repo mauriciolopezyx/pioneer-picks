@@ -3,6 +3,8 @@ package com.pioneerpicks.pioneerpicks.courses;
 import com.pioneerpicks.pioneerpicks.comments.CommentRepository;
 import com.pioneerpicks.pioneerpicks.courses.dto.FullCourseDto;
 import com.pioneerpicks.pioneerpicks.courses.dto.NewCourseDto;
+import com.pioneerpicks.pioneerpicks.exception.InternalServerErrorException;
+import com.pioneerpicks.pioneerpicks.exception.NotFoundException;
 import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorCommentCountDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorReviewCountDto;
@@ -57,8 +59,8 @@ public class CourseService {
         this.restTemplate = builder.build();
     }
 
-    public ResponseEntity<?> getCourseInformation(UUID id) {
-        Course course = courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
+    public ResponseEntity<FullCourseDto> getCourseInformation(UUID id) {
+        Course course = courseRepository.findById(id).orElseThrow(() -> new NotFoundException("Course not found"));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -80,12 +82,11 @@ public class CourseService {
         boolean favorited = userRepository.isCourseFavoritedByUser(user.getId(), id);
 
         FullCourseDto dto = new FullCourseDto(id, course.getName(), course.getAbbreviation(), course.getUnits(), course.getAreas(), professorDtos, favorited);
-        return ResponseEntity.ok().body(dto);
+        return ResponseEntity.ok(dto);
     }
 
-    public ResponseEntity<?> requestNewCourse(@Valid NewCourseDto newCourseDto) {
-
-        Subject subject = subjectRepository.findByNameContainingIgnoreCase(newCourseDto.subject()).orElseThrow(() -> new RuntimeException("Subject not found"));
+    public ResponseEntity<Void> requestNewCourse(@Valid NewCourseDto newCourseDto) {
+        Subject subject = subjectRepository.findByNameContainingIgnoreCase(newCourseDto.subject()).orElseThrow(() -> new NotFoundException("Subject not found"));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -101,9 +102,9 @@ public class CourseService {
         try {
             restTemplate.postForEntity(discordBotUrl + "/notify-course", payload, String.class);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of("error", "Failed to notify Discord bot"));
+            throw new InternalServerErrorException("Failed to notify Discord bot");
         }
 
-        return ResponseEntity.ok(Map.of("message", "Request submitted for approval"));
+        return ResponseEntity.noContent().build();
     }
 }

@@ -2,6 +2,10 @@ package com.pioneerpicks.pioneerpicks.auth;
 
 import com.pioneerpicks.pioneerpicks.auth.dto.*;
 import com.pioneerpicks.pioneerpicks.email.EmailService;
+import com.pioneerpicks.pioneerpicks.exception.BadRequestException;
+import com.pioneerpicks.pioneerpicks.exception.ForbiddenException;
+import com.pioneerpicks.pioneerpicks.exception.NotFoundException;
+import com.pioneerpicks.pioneerpicks.exception.UnauthorizedException;
 import com.pioneerpicks.pioneerpicks.user.User;
 import com.pioneerpicks.pioneerpicks.user.UserRepository;
 import jakarta.mail.MessagingException;
@@ -43,18 +47,18 @@ class AuthService {
         this.emailService = emailService;
     }
 
-    public ResponseEntity<?> register(RegisterUserDto input) {
+    public ResponseEntity<Void> register(RegisterUserDto input) {
         System.out.println(input.email());
         if (!input.email().endsWith("@horizon.csueastbay.edu")) {
-            throw new RuntimeException("You must register with your CSUEB email address.");
+            throw new BadRequestException("You must register with your CSUEB email address.");
         }
         Optional<User> userFromEmail = userRepository.findByEmail(input.email());
         if (userFromEmail.isPresent()) {
-            throw new RuntimeException("An account with the given email already exists");
+            throw new BadRequestException("An account with the given email already exists");
         }
         Optional<User> userFromName = userRepository.findByUsername(input.username());
         if (userFromName.isPresent()) {
-            throw new RuntimeException("An account with the given username already exists");
+            throw new BadRequestException("An account with the given username already exists");
         }
 
         User user = new User(input.username(), input.email(), passwordEncoder.encode(input.password()));
@@ -63,22 +67,21 @@ class AuthService {
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         sendVerificationEmail(user);
         userRepository.save(user);
-        return ResponseEntity.ok(Map.of("email", user.getEmail()));
+
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> authenticate(
+    public ResponseEntity<LoginResponseDto> authenticate(
             LoginUserDto input,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        User user = userRepository.findByEmail(input.email())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(input.email()).orElseThrow(() -> new NotFoundException("User not found"));
         if (!user.isEnabled()) {
-            throw new RuntimeException("User is not verified - please verify to continue");
+            throw new UnauthorizedException("User is not verified - please verify to continue");
         }
-
         if (!user.hasPassword()) {
-            throw new RuntimeException("This account uses " + user.getProvider() + " login. Please login with " + user.getProvider() + " and then reset your password after.");
+            throw new UnauthorizedException("This account uses " + user.getProvider() + " login. Please login with " + user.getProvider() + " and then reset your password after.");
         }
 
         Authentication authentication = authenticationManager.authenticate(
@@ -99,25 +102,20 @@ class AuthService {
 
         LoginResponseDto loginResponse = new LoginResponseDto(request.getSession().getId());
 
-        return ResponseEntity.ok().body(loginResponse);
+        return ResponseEntity.ok(loginResponse);
     }
 
-    public ResponseEntity<?> verifyUser(
+    public ResponseEntity<LoginResponseDto> verifyUser(
             VerifyUserDto input,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        Optional<User> optionalUser = userRepository.findByEmail(input.email());
-        if (optionalUser.isEmpty()) {
-            throw new RuntimeException("User not found");
-        }
-
-        User user = optionalUser.get();
+        User user = userRepository.findByEmail(input.email()).orElseThrow(() -> new NotFoundException("User not found"));
         if (user.isEnabled()) {
-            throw new RuntimeException("Account already verified");
+            throw new BadRequestException("Account already verified");
         }
         if (user.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Verification code has expired");
+            throw new BadRequestException("Verification code has expired");
         }
         if (user.getVerificationCode().equals(input.verificationCode())) {
             user.setEnabled(true);
@@ -125,7 +123,7 @@ class AuthService {
             user.setVerificationCodeExpiresAt(null);
             userRepository.save(user);
         } else {
-            throw new RuntimeException("Invalid verification code");
+            throw new BadRequestException("Invalid verification code");
         }
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -143,24 +141,20 @@ class AuthService {
 
         LoginResponseDto loginResponse = new LoginResponseDto(request.getSession().getId());
 
-        return ResponseEntity.ok().body(loginResponse);
+        return ResponseEntity.ok(loginResponse);
     }
 
-    public ResponseEntity<?> resendVerificationCode(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-        if (optionalUser.isEmpty()) {
-            throw new RuntimeException("User not found");
-        }
-
-        User user = optionalUser.get();
+    public ResponseEntity<Void> resendVerificationCode(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
         if (user.isEnabled()) {
-            throw new RuntimeException("User is already verified");
+            throw new BadRequestException("User is already verified");
         }
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         sendVerificationEmail(user);
         userRepository.save(user);
-        return ResponseEntity.ok("Verification code resent");
+
+        return ResponseEntity.noContent().build();
     }
 
     public void sendVerificationEmail(User user) {
@@ -190,15 +184,11 @@ class AuthService {
         return String.valueOf(code);
     }
 
-    public ResponseEntity<?> forgotPasswordInitiate(String email) {
+    public ResponseEntity<Void> forgotPasswordInitiate(String email) {
         System.out.println("starting forgot password process...");
-        Optional<User> userFromEmail = userRepository.findByEmail(email);
-        if (userFromEmail.isEmpty()) {
-            throw new RuntimeException("An account with the given email does not exist");
-        }
-        User user = userFromEmail.get();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("An account with the given email does not exist"));
         if (!user.isEnabled()) {
-            throw new RuntimeException("Email is not verified");
+            throw new UnauthorizedException("Email is not verified");
         }
 
         // TODO: checking live sessions, and declining if any valid session present
@@ -207,25 +197,21 @@ class AuthService {
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         sendVerificationEmail(user);
         userRepository.save(user);
-        return ResponseEntity.ok("Verification code resent");
+
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> forgotPasswordCodeValidate(VerifyUserDto input) {
+    public ResponseEntity<Map<Object, Object>> forgotPasswordCodeValidate(VerifyUserDto input) {
         System.out.println("Validating forgot password code.. received " + input.verificationCode());
-        Optional<User> optionalUser = userRepository.findByEmail(input.email());
-        if (optionalUser.isEmpty()) {
-            throw new RuntimeException("An account with the given email does not exist");
-        }
-
-        User user = optionalUser.get();
+        User user = userRepository.findByEmail(input.email()).orElseThrow(() -> new NotFoundException("An account with the given email does not exist"));
         if (!user.isEnabled()) {
-            throw new RuntimeException("Email is not verified");
+            throw new UnauthorizedException("Email is not verified");
         }
         if (user.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Verification code has expired");
+            throw new BadRequestException("Verification code has expired");
         }
         if (!user.getVerificationCode().equals(input.verificationCode())) {
-            throw new RuntimeException("Invalid verification code");
+            throw new BadRequestException("Invalid verification code");
         }
         user.setVerificationCode(null);
         user.setVerificationCodeExpiresAt(null);
@@ -236,29 +222,25 @@ class AuthService {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok().body(Map.of("token", generatedForgotToken));
+        return ResponseEntity.ok(Map.of("token", generatedForgotToken));
     }
 
-    public ResponseEntity<?> forgotPasswordFullValidate(
+    public ResponseEntity<Void> forgotPasswordFullValidate(
             ForgotPasswordResetDto forgotPasswordResetDto,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
         System.out.println("Attempting to reset password from forgot password process...");
 
-        Optional<User> optionalUser = userRepository.findByEmail(forgotPasswordResetDto.email());
-        if (optionalUser.isEmpty()) {
-            throw new RuntimeException("An account with the given email does not exist");
-        }
-        User user = optionalUser.get();
+        User user = userRepository.findByEmail(forgotPasswordResetDto.email()).orElseThrow(() -> new NotFoundException("An account with the given email does not exist"));
         if (!user.isEnabled()) {
-            throw new RuntimeException("Email is not verified");
+            throw new UnauthorizedException("Email is not verified");
         }
         if (user.getForgotPasswordTokenExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Your session has expired, please refresh and try again");
+            throw new BadRequestException("Your session has expired, please refresh and try again");
         }
         if (!user.getForgotPasswordToken().equals(forgotPasswordResetDto.forgotToken())) {
-            throw new RuntimeException("Your session has expired, please refresh and try again");
+            throw new BadRequestException("Your session has expired, please refresh and try again");
         }
         user.setForgotPasswordToken(null);
         user.setForgotPasswordTokenExpiresAt(null);
@@ -279,11 +261,7 @@ class AuthService {
         request.getSession(true); // make sure a session exists
         new HttpSessionSecurityContextRepository().saveContext(context, request, response);
 
-        // not going to return the LoginResponse, it's kind of redundant in the first place at the moment (also, User Reset Password returns a string too)
-
-        return ResponseEntity.ok("Successfully reset your password! You are now logged in");
+        return ResponseEntity.noContent().build();
     }
-
-
 
 }

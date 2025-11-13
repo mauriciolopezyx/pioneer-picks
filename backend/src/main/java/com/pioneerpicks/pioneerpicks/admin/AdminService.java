@@ -4,6 +4,8 @@ import com.pioneerpicks.pioneerpicks.courses.Course;
 import com.pioneerpicks.pioneerpicks.courses.CourseRepository;
 import com.pioneerpicks.pioneerpicks.courses.dto.NewCourseAdminDto;
 import com.pioneerpicks.pioneerpicks.courses.dto.NewCourseDto;
+import com.pioneerpicks.pioneerpicks.exception.ForbiddenException;
+import com.pioneerpicks.pioneerpicks.exception.NotFoundException;
 import com.pioneerpicks.pioneerpicks.professors.Professor;
 import com.pioneerpicks.pioneerpicks.professors.ProfessorRepository;
 import com.pioneerpicks.pioneerpicks.professors.dto.NewProfessorDto;
@@ -17,7 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
-public class AdminService {
+class AdminService {
 
     private final CourseRepository courseRepository;
     private final SubjectRepository subjectRepository;
@@ -40,25 +42,26 @@ public class AdminService {
     // We CAN hit approve simply but those fields will be empty until we manually update them
     // another issue is users will definitely not use 100% proper grammar, but the point of the approval is to just know what courses users want
 
-    public ResponseEntity<?> approveCourse(String apiKey, NewCourseAdminDto newCourseAdminDto) {
+    public ResponseEntity<Void> approveCourse(String apiKey, NewCourseAdminDto newCourseAdminDto) {
         if (!apiKey.equals(adminKey)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new ForbiddenException("Incorrect admin key");
         }
 
         System.out.println("Proposed course name on approve course receive: " + newCourseAdminDto.name());
-        Subject subject = subjectRepository.findById(newCourseAdminDto.subjectId()).orElseThrow(() -> new RuntimeException("Subject not found"));
+
+        Subject subject = subjectRepository.findById(newCourseAdminDto.subjectId()).orElseThrow(() -> new NotFoundException("Subject not found"));
         Course course = new Course(newCourseAdminDto.name(), subject);
 
         courseRepository.save(course);
 
-        return ResponseEntity.ok(Map.of("status", "approved"));
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> approveProfessor(String apiKey, NewProfessorDto newProfessorDto) {
+    public ResponseEntity<Void> approveProfessor(String apiKey, NewProfessorDto newProfessorDto) {
         if (!apiKey.equals(adminKey)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new ForbiddenException("Incorrect admin key");
         }
-        Course course = courseRepository.findById(newProfessorDto.courseId()).orElseThrow(() -> new RuntimeException(("Course not found")));
+        Course course = courseRepository.findById(newProfessorDto.courseId()).orElseThrow(() -> new NotFoundException(("Course not found")));
         Professor professor = new Professor(newProfessorDto.name());
 
         System.out.println("Proposed professor name on approve professor receive: " + newProfessorDto.name());
@@ -70,6 +73,6 @@ public class AdminService {
 
         courseRepository.save(course);
 
-        return ResponseEntity.ok(Map.of("status", "approved"));
+        return ResponseEntity.noContent().build();
     }
 }

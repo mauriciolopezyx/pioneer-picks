@@ -4,6 +4,8 @@ import com.pioneerpicks.pioneerpicks.comments.CommentRepository;
 import com.pioneerpicks.pioneerpicks.courses.Course;
 import com.pioneerpicks.pioneerpicks.courses.CourseRepository;
 import com.pioneerpicks.pioneerpicks.courses.dto.NewCourseDto;
+import com.pioneerpicks.pioneerpicks.exception.InternalServerErrorException;
+import com.pioneerpicks.pioneerpicks.exception.NotFoundException;
 import com.pioneerpicks.pioneerpicks.favorites.dto.FavoriteCourseDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.NewProfessorDto;
@@ -55,8 +57,8 @@ public class ProfessorService {
         this.courseRepository = courseRepository;
     }
 
-    public ResponseEntity<?> getProfessorCourses(UUID professorId) {
-        Professor professor = professorRepository.findProfessorWithCoursesAndSubjects(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
+    public ResponseEntity<Map<Object, Object>> getProfessorCourses(UUID professorId) {
+        Professor professor = professorRepository.findProfessorWithCoursesAndSubjects(professorId).orElseThrow(() -> new NotFoundException("Professor not found"));
 
         // FavoriteCourseDto basically gives us all information that we want for a specific course (from all courses of a professor), so I'm using that
         List<FavoriteCourseDto> courses = professor.getCourses().stream()
@@ -68,24 +70,24 @@ public class ProfessorService {
 
         boolean favorited = userRepository.isProfessorFavoritedByUser(user.getId(), professorId);
 
-        return ResponseEntity.ok().body(Map.of("courses", courses, "favorited", favorited, "info", Map.of("name", professor.getName())));
+        return ResponseEntity.ok(Map.of("courses", courses, "favorited", favorited, "info", Map.of("name", professor.getName())));
     }
 
-    public ResponseEntity<?> getProfessorCourseInformation(UUID courseId, UUID professorId) {
-        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
+    public ResponseEntity<BasicProfessorDto> getProfessorCourseInformation(UUID courseId, UUID professorId) {
+        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new NotFoundException("Professor not found"));
 
         long reviewCount = reviewRepository.countByProfessorAndCourse(professorId, courseId);
         long commentCount = commentRepository.countByProfessorAndCourse(professorId, courseId);
 
         BasicProfessorDto dto = new BasicProfessorDto(professorId, professor.getName(), reviewCount, commentCount);
-        return ResponseEntity.ok().body(dto);
+        return ResponseEntity.ok(dto);
     }
 
-    public ResponseEntity<?> requestNewProfessor(@Valid NewProfessorDto newProfessorDto) {
+    public ResponseEntity<Void> requestNewProfessor(@Valid NewProfessorDto newProfessorDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        Course course = courseRepository.findById(newProfessorDto.courseId()).orElseThrow(() -> new RuntimeException("Course not found"));
+        Course course = courseRepository.findById(newProfessorDto.courseId()).orElseThrow(() -> new NotFoundException("Course not found"));
 
         Map<String, Object> payload = Map.of(
                 "secret", discordSecret,
@@ -98,10 +100,10 @@ public class ProfessorService {
         try {
             restTemplate.postForEntity(discordBotUrl + "/notify-professor", payload, String.class);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of("error", "Failed to notify Discord bot"));
+            throw new InternalServerErrorException("Failed to notify Discord bot");
         }
 
-        return ResponseEntity.ok(Map.of("message", "Request submitted for approval"));
+        return ResponseEntity.noContent().build();
     }
 
 }

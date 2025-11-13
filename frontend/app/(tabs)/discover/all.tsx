@@ -78,9 +78,9 @@ const discover = () => {
   // }, [data])
 
   const filteredSubjects = useMemo(() => {
-    if (!data?.subjects) return []
+    if (!data) return []
     const q = query.replace(/\s+/g, '').toLowerCase()
-    return [...data.subjects]
+    return [...data]
       .filter(item =>
         item.name.replace(/\s+/g, '').toLowerCase().includes(q)
       )
@@ -141,7 +141,7 @@ const discover = () => {
 
         <FlashList
           //data={query != "" ? filteredSubjects : filter === 0 ? sortedSubjects : data.subjects}
-          data={query != "" ? filteredSubjects : data.subjects}
+          data={query != "" ? filteredSubjects : data}
           renderItem={(item: any) => (
             <DiscoverCard {...item} />
           )}

@@ -1,17 +1,16 @@
 package com.pioneerpicks.pioneerpicks.user;
 
+import com.pioneerpicks.pioneerpicks.user.dto.FullUserDto;
 import com.pioneerpicks.pioneerpicks.user.dto.ResetPasswordDto;
+import com.pioneerpicks.pioneerpicks.exception.BadRequestException;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/user")
 @RestController
-public class UserController {
+class UserController {
 
     private final UserService userService;
 
@@ -20,29 +19,20 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getUserInformation() {
+    public ResponseEntity<FullUserDto> getUserInformation() {
         return userService.getUserInformation();
     }
 
     @PostMapping("/me/password")
-    public ResponseEntity<?> resetPassword(
+    public ResponseEntity<Void> resetPassword(
             @RequestBody @Valid ResetPasswordDto resetPasswordDto,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation failed");
+            throw new BadRequestException("Reset password validation failed");
         }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-
-        try {
-            userService.resetPassword(currentUser, resetPasswordDto);
-            return ResponseEntity.ok("Password updated successfully");
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return userService.resetPassword(resetPasswordDto);
     }
 
 }

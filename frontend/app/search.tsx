@@ -67,7 +67,7 @@ const search = () => {
                 throw new Error(payload)
             }
             const json = await response.json()
-            return json?.results
+            return json
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "Failed to verify")

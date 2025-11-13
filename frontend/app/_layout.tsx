@@ -29,6 +29,14 @@ export default function RootLayout() {
                 options={{ presentation: "modal" }}
               />
               <Stack.Screen
+                name="(modals)/professors/create"
+                options={{ presentation: "modal" }}
+              />
+              <Stack.Screen
+                name="(modals)/areas"
+                options={{ presentation: "modal" }}
+              />
+              <Stack.Screen
                 name="search"
                 options={{
                   presentation: "card",

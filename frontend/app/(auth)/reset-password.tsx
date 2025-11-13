@@ -14,9 +14,7 @@ import { View, Text, KeyboardAvoidingView, Platform, Pressable, TextInput, Touch
 import React, { useState } from 'react'
 
 const formSchema = z.object({
-    old: z.string().min(5, {
-        message: "Current password is required"
-    }).optional(),
+    old: z.string().optional(),
     new: z.string().min(5, {
         message: "New password is required"
     }),
@@ -103,6 +101,7 @@ const ResetPassword = () => {
     })
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        console.log("att reset?")
         resetPassword(values)
     }
 
@@ -121,15 +120,7 @@ const ResetPassword = () => {
                     </Text>
                 </View>
 
-                {isError ? (
-                <View className="flex items-center justify-center mb-8">
-                    <Text className="font-montserrat-medium text-red-600 dark:text-red-400 text-sm" style={{textAlign: "center"}}>
-                    Error resetting password: {error?.message}
-                    </Text>
-                </View>
-                ) : null}
-
-                <View className="mb-6">
+                { (!token && !email) ? <View className="mb-6">
                     <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Current Password
                     </Text>
@@ -171,7 +162,7 @@ const ResetPassword = () => {
                             {errors.old.message}
                         </Text>
                     ) : null}
-                </View>
+                </View> : null }
 
                 <View className="mb-6">
                     <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">

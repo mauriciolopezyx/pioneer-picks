@@ -4,6 +4,7 @@ import com.pioneerpicks.pioneerpicks.comments.dto.FullCommentDto;
 import com.pioneerpicks.pioneerpicks.comments.dto.PostCommentDto;
 import com.pioneerpicks.pioneerpicks.courses.Course;
 import com.pioneerpicks.pioneerpicks.courses.CourseRepository;
+import com.pioneerpicks.pioneerpicks.exception.NotFoundException;
 import com.pioneerpicks.pioneerpicks.professors.Professor;
 import com.pioneerpicks.pioneerpicks.professors.ProfessorRepository;
 import com.pioneerpicks.pioneerpicks.user.User;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class CommentService {
+class CommentService {
 
     private final CommentRepository commentRepository;
     private final ProfessorRepository professorRepository;
@@ -33,9 +34,9 @@ public class CommentService {
         this.courseRepository = courseRepository;
     }
 
-    public ResponseEntity<?> postCourseProfessorComment(UUID courseId, UUID professorId, PostCommentDto postCommentDto) {
-        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
+    public ResponseEntity<Void> postCourseProfessorComment(UUID courseId, UUID professorId, PostCommentDto postCommentDto) {
+        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new NotFoundException("Professor not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new NotFoundException("Course not found"));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -43,12 +44,12 @@ public class CommentService {
         Comment comment = new Comment(professor, course, user, LocalDate.now(), postCommentDto.body());
         commentRepository.save(comment);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> getComments(UUID courseId, UUID professorId) {
-        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
+    public ResponseEntity<List<FullCommentDto>> getComments(UUID courseId, UUID professorId) {
+        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new NotFoundException("Professor not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new NotFoundException("Course not found"));
 
         List<Comment> comments = commentRepository.findCommentsWithUserAndCourse(professorId, courseId);
 
@@ -56,7 +57,7 @@ public class CommentService {
                 .map(comment -> new FullCommentDto(comment.getId(), comment.getUser().getUsername(), comment.getDate(), comment.getBody()))
                 .toList();
 
-        return ResponseEntity.ok().body(dtos);
+        return ResponseEntity.ok(dtos);
     }
 
 }

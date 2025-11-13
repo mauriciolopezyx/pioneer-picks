@@ -90,7 +90,7 @@ const Course = () => {
     )
 
     const seen = new Set()
-    const areaDisplays = course ? course.areas.split(",").map((area: string) => {
+    const areaDisplays = (course && course.areas) ? course.areas.split(",").map((area: string) => {
         if (seen.has(area)) return null
         if (areaAbbreviations[area] && seen.has(areaAbbreviations[area])) return null
 
@@ -103,16 +103,16 @@ const Course = () => {
             seen.add(areaAbbreviations[area])
             return (
                 <View key={areaAbbreviations[area]} className="rounded-full px-4 py-1" style={ { backgroundColor: bgAreaColor } }>
-                <Text className={`font-montserrat-medium text-sm ${textAreaColor}`}>{areaAbbreviations[area]}</Text>
+                    <Text className={`font-montserrat-medium text-sm ${textAreaColor}`}>{areaAbbreviations[area]}</Text>
                 </View>
             )
         }
         return (
             <View key={area} className="rounded-full px-4 py-1" style={ { backgroundColor: bgAreaColor } }>
-            <Text className={`font-montserrat-medium text-sm ${textAreaColor}`}>{area}</Text>
+                <Text className={`font-montserrat-medium text-sm ${textAreaColor}`}>{area}</Text>
             </View>
         )
-    }) : null
+    }) : []
 
     ///////////////////////
 
@@ -138,7 +138,7 @@ const Course = () => {
         onSuccess: () => {
             console.log("successfully toggled favorite")
             MasterToast.show({
-                text1: "Successfully toggled favorite! (change text later)"
+                text1: "Successfully toggled favorite!"
             })
         },
         onError: (e: any) => {
@@ -198,7 +198,7 @@ const Course = () => {
                 <Text className="font-montserrat-extrabold text-3xl mb-2 dark:text-white">{course.name}</Text>
 
                 <Text className="font-montserrat mb-2 dark:text-white">Also known as <Text className="font-montserrat-semibold text-xl">{`${subjectAbbreviation} ${course.abbreviation}`}</Text></Text>
-                <Text className="font-montserrat mb-4 dark:text-white"><Text className="font-montserrat-semibold text-xl">{course.units}</Text> units</Text>
+                <Text className="font-montserrat mb-4 dark:text-white"><Text className="font-montserrat-semibold text-xl">{course.units ?? "Unknown"}</Text> units</Text>
 
                 <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
                     <Text className="font-montserrat-bold text-2xl dark:text-white">Areas</Text>
@@ -216,7 +216,7 @@ const Course = () => {
                     </View> 
                 </View>
 
-                <View className="flex flex-row gap-2 w-full mb-4">
+                <View className="flex flex-row flex-wrap gap-2 w-full mb-4">
                     {areaDisplays}
                 </View>
 
@@ -226,7 +226,7 @@ const Course = () => {
                         onChangeText={onChangeQuery}
                         disabled={false}
                     />
-                    <GestureWrapper onPress={() => { router.navigate({pathname: "/(modals)/professors/create", params: {courseId: courseId, subjectAbbreviation: subjectAbbreviation, courseAbbreviation: course.abbreviation}}) }}>
+                    <GestureWrapper className="rounded-full" onPress={() => { router.navigate({pathname: "/(modals)/professors/create", params: {courseId: courseId, subjectAbbreviation: subjectAbbreviation, courseAbbreviation: course.abbreviation}}) }} backgroundColor="#d50032">
                         <Ionicons name="add" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
                     </GestureWrapper>
                 </View>

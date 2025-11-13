@@ -1,10 +1,13 @@
 package com.pioneerpicks.pioneerpicks.courses;
 
+import com.pioneerpicks.pioneerpicks.courses.dto.FullCourseDto;
 import com.pioneerpicks.pioneerpicks.courses.dto.NewCourseDto;
+import com.pioneerpicks.pioneerpicks.exception.BadRequestException;
 import com.pioneerpicks.pioneerpicks.professors.ProfessorService;
 import com.pioneerpicks.pioneerpicks.professors.dto.NewProfessorDto;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -12,7 +15,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/courses")
-public class CourseController {
+class CourseController {
 
     private final CourseService courseService;
 
@@ -23,24 +26,22 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCourseInformation(
+    public ResponseEntity<FullCourseDto> getCourseInformation(
             @PathVariable UUID id
     ) {
         System.out.println("rec course information attempt");
-        try {
-            return courseService.getCourseInformation(id);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return courseService.getCourseInformation(id);
     }
 
     @PostMapping
-    public ResponseEntity<?> requestNewCourse(@RequestBody @Valid NewCourseDto newCourseDto) {
-        try {
-            return courseService.requestNewCourse(newCourseDto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    public ResponseEntity<Void> requestNewCourse(
+            @RequestBody @Valid NewCourseDto newCourseDto,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("New course request validation failed");
         }
+        return courseService.requestNewCourse(newCourseDto);
     }
 
 }

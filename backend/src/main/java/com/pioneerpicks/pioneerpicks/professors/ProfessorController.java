@@ -1,8 +1,11 @@
 package com.pioneerpicks.pioneerpicks.professors;
 
+import com.pioneerpicks.pioneerpicks.exception.BadRequestException;
+import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.NewProfessorDto;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -10,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/professors")
-public class ProfessorController {
+class ProfessorController {
 
     private final ProfessorService professorService;
 
@@ -21,36 +24,30 @@ public class ProfessorController {
     }
 
     @GetMapping("/{professorId}/courses")
-    public ResponseEntity<?> getProfessorCourseInformation(
+    public ResponseEntity<Map<Object, Object>> getProfessorCourseInformation(
             @PathVariable UUID professorId
     ) {
-        try {
-            return professorService.getProfessorCourses(professorId);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return professorService.getProfessorCourses(professorId);
     }
 
     @GetMapping("/{courseId}/{professorId}")
-    public ResponseEntity<?> getProfessorCourseInformation(
+    public ResponseEntity<BasicProfessorDto> getProfessorCourseInformation(
             @PathVariable UUID courseId,
             @PathVariable UUID professorId
     ) {
         System.out.println("rec professor course information attempt");
-        try {
-            return professorService.getProfessorCourseInformation(courseId, professorId);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return professorService.getProfessorCourseInformation(courseId, professorId);
     }
 
     @PostMapping
-    public ResponseEntity<?> requestNewProfessor(@RequestBody @Valid NewProfessorDto newProfessorDto) {
-        try {
-            return professorService.requestNewProfessor(newProfessorDto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    public ResponseEntity<Void> requestNewProfessor(
+            @RequestBody @Valid NewProfessorDto newProfessorDto,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("New professor request validation failed");
         }
+        return professorService.requestNewProfessor(newProfessorDto);
     }
 
 }

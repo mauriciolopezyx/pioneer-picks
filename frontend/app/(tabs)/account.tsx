@@ -1,4 +1,4 @@
-import { Text, useColorScheme } from 'react-native'
+import { Text, useColorScheme, View } from 'react-native'
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/components/AuthProvider';
 import { GestureWrapper } from './home';
@@ -55,24 +55,28 @@ const Account = () => {
   if (!user) return
 
   return (
-    <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["left", "right"]}>
+    <SafeAreaView className="flex-1 dark:bg-gray-800 px-5 justify-between flex-col pb-5" edges={["left", "right"]}>
+      <View>
+        <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white mt-5">Name</Text>
+        <Text className="font-montserrat mb-4 dark:text-white">{user.username}</Text>
+        <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Email</Text>
+        <Text className="font-montserrat mb-4 dark:text-white">{user.email}</Text>
 
-      <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white mt-5">Name</Text>
-      <Text className="font-montserrat mb-4 dark:text-white">{user.username}</Text>
-      <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Email</Text>
-      <Text className="font-montserrat mb-4 dark:text-white">{user.email}</Text>
+        <GestureWrapper className="flex flex-row justify-between items-center py-4" onPress={ () => { router.navigate({pathname: "/(auth)/reset-password"}) }} >
+          <Text className="font-montserrat-semibold text-xl dark:text-white">Reset Password</Text>
+          <Ionicons name="chevron-forward-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
+        </GestureWrapper>
 
-      <GestureWrapper className="flex flex-row justify-between items-center py-4" onPress={ () => { router.navigate({pathname: "/(auth)/reset-password"}) }} >
-        <Text className="font-montserrat-medium text-xl dark:text-white">Reset Password</Text>
-        <Ionicons name="chevron-forward-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
-      </GestureWrapper>
-
-      <GestureWrapper className="flex flex-row justify-between items-center py-4" onPress={ () => { logout() }} >
-        <Text className="font-montserrat-medium text-xl text-primary">Log Out</Text>
-        <Ionicons name="chevron-forward-outline" size={30} color="#d50032" />
-      </GestureWrapper>
-      
-      <Text className="align-bottom dark:text-white">version 1.0</Text>
+        <GestureWrapper className="flex flex-row justify-between items-center py-4" onPress={ () => { logout() }} >
+          <Text className="font-montserrat-semibold text-xl text-primary">Log Out</Text>
+          <Ionicons name="chevron-forward-outline" size={30} color="#d50032" />
+        </GestureWrapper>
+      </View> 
+        
+      <View>
+        <Text className="font-montserrat dark:text-light-100 italic" style={{textAlign: "right"}}>Version 1.0</Text>
+        <Text className="font-montserrat text-xs dark:text-light-200 italic" style={{textAlign: "right"}}>Made by CSUEB students</Text>
+      </View>
 
     </SafeAreaView>
   )

@@ -35,6 +35,9 @@ export default function SectionScreen() {
     const {isPending:commentPending, isError, error:commentError, mutate:onComment} = useMutation({
         mutationFn: async () => {
             console.log("attempting to post comment with body:", commentBody)
+            if (commentBody.trim() === "") {
+                throw new Error("Cannot have empty comment body!")
+            }
             const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`http://${LOCALHOST}:8080/comments/${courseId}/${professorId}`, {
                 method: "POST",
@@ -212,7 +215,7 @@ const CommentInput = ({ onChangeText, onComment, commentBody, user, colorScheme 
                 textAlign="left"
                 editable={user != null}
             />
-            <GestureWrapper className="w-10 h-10 rounded-full bg-primary flex items-center justify-center" onPress={onComment}>
+            <GestureWrapper className="w-10 h-10 rounded-full flex items-center justify-center" backgroundColor="#d50032" onPress={onComment}>
                 <Ionicons name="send-outline" size={18} color="white" />
             </GestureWrapper>
         </View>

@@ -76,22 +76,22 @@ const Home = () => {
       >
         <View className="flex flex-row justify-between items-center mt-5">
           <Text className="font-montserrat-bold text-2xl dark:text-white">Favorite Courses</Text>
-          { (favorites && favorites.courses.length > 5) ? <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-lg" onPress={() => { router.navigate({pathname: "/(tabs)/home/[category]", params: {category: "course"}}) }} backgroundColor="#767576">
+          { (favorites && favorites.courses.length > 3) ? <GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-lg" onPress={() => { router.navigate({pathname: "/(tabs)/home/[category]", params: {category: "course"}}) }} backgroundColor="#767576">
             <Ionicons name="expand-outline" size={25} color="white" />
           </GestureWrapper> : null }
         </View>
         <View className="my-4">
-          <FavoriteSection loading={loading} error={error} data={favorites ? favorites.courses.slice(0, 5) : null} ItemComponent={FavoriteCourseCard} />
+          <FavoriteSection loading={loading} error={error} data={favorites ? favorites.courses.slice(0, 3) : null} ItemComponent={FavoriteCourseCard} />
         </View>
 
         <View className="flex flex-row justify-between items-center">
           <Text className="font-montserrat-bold text-2xl dark:text-white">Favorite Professors</Text>
-          { (favorites && favorites.professors.length > 5) ?<GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-lg" onPress={() => { router.navigate({pathname: "/(tabs)/home/[category]", params: {category: "professor"}}) }} backgroundColor="#767576">
+          { (favorites && favorites.professors.length > 3) ?<GestureWrapper className="flex flex-row justify-center items-center p-3 rounded-lg" onPress={() => { router.navigate({pathname: "/(tabs)/home/[category]", params: {category: "professor"}}) }} backgroundColor="#767576">
             <Ionicons name="expand-outline" size={25} color="white" />
           </GestureWrapper> : null }
         </View>
         <View className="my-4">
-          <FavoriteSection loading={loading} error={error} data={favorites ? favorites.professors.slice(0, 5) : null} ItemComponent={FavoriteProfessorCard} />
+          <FavoriteSection loading={loading} error={error} data={favorites ? favorites.professors.slice(0, 3) : null} ItemComponent={FavoriteProfessorCard} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -161,7 +161,7 @@ export const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
   }
 
   return (
-    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-light-100 max-w-[175px] h-[90px]" backgroundColor={bgColor} onPress={onPress}>
+    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden bg-light-100 max-w-[175px] min-h-[90px] max-h-[90px]" backgroundColor={bgColor} onPress={onPress}>
       <View className="flex flex-col items-start justify-center gap-y-[2px]">
         <Text numberOfLines={1} className={`text-xl font-bold ${textColor}`}>
           {`${data.subjectAbbreviation} ${data.abbreviation}`}
@@ -197,7 +197,7 @@ export const FavoriteProfessorCard = ({data}: {data: FavoriteProfessor}) => {
   }
 
   return (
-    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden" backgroundColor="#d50032" onPress={onPress}>
+    <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden max-w-[175px]" backgroundColor="#d50032" onPress={onPress}>
       <View className="flex flex-col items-start justify-center gap-y-[2px]">
         <Text numberOfLines={1} className="text-xl font-montserrat-bold text-white">{data.name}</Text>
       </View>

@@ -86,7 +86,7 @@ export default function Verify() {
         },
         onSuccess: async (json) => {
             await refetch()
-            router.navigate({pathname: redirectUrl, params: {token: (json?.token && forgotPassword) ? json.token : undefined, email: (json?.token && forgotPassword) ? email : undefined}})
+            router.replace({pathname: redirectUrl, params: {token: (json?.token && forgotPassword) ? json.token : undefined, email: (json?.token && forgotPassword) ? email : undefined}})
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "Failed to verify")
@@ -158,14 +158,6 @@ export default function Verify() {
                         selectTextOnFocus
                         textContentType="oneTimeCode"
                     />
-                    
-                    {isError || isResendError ? (
-                        <View className="mt-2 mb-6">
-                            <Text className="font-montserrat-semibold text-red-500 text-sm font-semibold text-center">
-                                {isError ? error?.message : resendError?.message}
-                            </Text>
-                        </View>
-                    ) : null}
 
                     <TouchableOpacity
                         className={`w-full py-4 rounded-lg mb-4 ${

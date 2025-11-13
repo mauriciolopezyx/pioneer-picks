@@ -47,6 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 throw new Error(payload)
             }
             const json = await response.json()
+            console.log("rec authenticated json:", json)
             return json
         },
         refetchOnWindowFocus: true,

@@ -1,14 +1,17 @@
 package com.pioneerpicks.pioneerpicks.subjects;
 
+import com.pioneerpicks.pioneerpicks.subjects.dto.FullSubjectDto;
+import com.pioneerpicks.pioneerpicks.subjects.dto.SubjectDiscoverDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/subjects")
-public class SubjectController {
+class SubjectController {
 
     private final SubjectService subjectService;
 
@@ -19,20 +22,16 @@ public class SubjectController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllSubjects() {
+    public ResponseEntity<List<SubjectDiscoverDto>> getAllSubjects() {
         return subjectService.getAllSubjects();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getSubjectInformation(
+    public ResponseEntity<FullSubjectDto> getSubjectInformation(
             @PathVariable UUID id
     ) {
         System.out.println("rec subject information attempt");
-        try {
-            return subjectService.getSubjectInformation(id);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return subjectService.getSubjectInformation(id);
     }
 
 }

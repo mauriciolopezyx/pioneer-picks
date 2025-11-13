@@ -52,8 +52,8 @@ export default function SectionScreen() {
             return json
         },
         refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 60 * 24,
-        gcTime: 1000 * 60 * 60 * 48
+        staleTime: 1000 * 60,
+        gcTime: 1000 * 60 * 5
     })
     
     if (loading) {
@@ -115,7 +115,7 @@ export default function SectionScreen() {
             <View className="absolute bottom-[30px] right-[30px]">
                 <GestureWrapper
                     className="w-[75px] h-[75px] px-1 flex items-center justify-center rounded-full"
-                    backgroundColor={colorScheme === "dark" ? "#767576" : "#000"}
+                    backgroundColor={colorScheme === "dark" ? "#d50032" : "#000"}
                     onPress={() => { router.navigate({pathname: "/(modals)/professors/reviews/create", params: {professorId: professorId, courseId: courseId}}) }}
                 >
                     <Ionicons name={user ? "add-outline" : "close-outline"} size={35} color="white" />
@@ -134,7 +134,7 @@ const Review = ({ review }: ReviewItemProps) => {
         <View className="flex flex-col border-l-[1px] border-dark-100 dark:border-light-200 p-3 gap-4">
             <View>
                 <Text className="font-montserrat-semibold text-md dark:text-white">{review.name}</Text>
-                <Text className="font-montserrat-medium text-sm text-light-200 dark:text-light-100">{`${review.date}; ${review.semester}`}</Text>
+                <Text className="font-montserrat-medium text-sm text-light-200 dark:text-light-100">{`${review.date}; Took in ${review.semester}`}</Text>
             </View>
             <View className="flex flex-row flex-wrap gap-2">
                 <View className={`flex flex-row gap-1 justify-center items-center px-3 py-1 rounded-full ${review.location === 0 ? "bg-blue-600" : "bg-green-600"}`}>

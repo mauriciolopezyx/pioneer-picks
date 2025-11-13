@@ -1,14 +1,17 @@
 package com.pioneerpicks.pioneerpicks.favorites;
 
+import com.pioneerpicks.pioneerpicks.favorites.dto.FavoriteCourseDto;
+import com.pioneerpicks.pioneerpicks.favorites.dto.FavoriteProfessorDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/favorites")
-public class FavoriteController {
+class FavoriteController {
 
     private final FavoriteService favoriteService;
 
@@ -19,62 +22,46 @@ public class FavoriteController {
     }
 
     @GetMapping("/courses")
-    public ResponseEntity<?> getCourseFavorites() {
+    public ResponseEntity<List<FavoriteCourseDto>> getCourseFavorites() {
         return favoriteService.getCourseFavorites();
     }
 
     @GetMapping("/professors")
-    public ResponseEntity<?> getProfessorFavorites() {
+    public ResponseEntity<List<FavoriteProfessorDto>> getProfessorFavorites() {
         return favoriteService.getProfessorFavorites();
     }
 
     @GetMapping
-    public ResponseEntity<?> getUserFavorites() {
+    public ResponseEntity<Map<Object, Object>> getUserFavorites() {
         return favoriteService.getFavorites();
     }
 
     @PostMapping("/course/{courseId}")
-    public ResponseEntity<?> addCourseToFavorites(
+    public ResponseEntity<Void> addCourseToFavorites(
             @PathVariable UUID courseId
     ) {
-        try {
-            return favoriteService.addCourseToFavorites(courseId);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return favoriteService.addCourseToFavorites(courseId);
     }
 
     @PostMapping("/professor/{professorId}")
-    public ResponseEntity<?> addProfessorToFavorites(
+    public ResponseEntity<Void> addProfessorToFavorites(
             @PathVariable UUID professorId
     ) {
-        try {
-            return favoriteService.addProfessorToFavorites(professorId);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return favoriteService.addProfessorToFavorites(professorId);
     }
 
     @DeleteMapping("/course/{courseId}")
-    public ResponseEntity<?> removeCourseFromFavorites(
+    public ResponseEntity<Void> removeCourseFromFavorites(
             @PathVariable UUID courseId
     ) {
-        try {
-            return favoriteService.removeCourseFromFavorites(courseId);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return favoriteService.removeCourseFromFavorites(courseId);
     }
 
     @DeleteMapping("/professor/{professorId}")
-    public ResponseEntity<?> removeProfessorFromFavorites(
+    public ResponseEntity<Void> removeProfessorFromFavorites(
             @PathVariable UUID professorId
     ) {
-        try {
-            return favoriteService.removeProfessorFromFavorites(professorId);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return favoriteService.removeProfessorFromFavorites(professorId);
     }
 
 }

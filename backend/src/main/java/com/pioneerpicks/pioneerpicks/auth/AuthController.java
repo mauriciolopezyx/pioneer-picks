@@ -1,6 +1,7 @@
 package com.pioneerpicks.pioneerpicks.auth;
 
 import com.pioneerpicks.pioneerpicks.auth.dto.*;
+import com.pioneerpicks.pioneerpicks.exception.BadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -23,142 +24,96 @@ class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(
+    public ResponseEntity<Void> register(
             @RequestBody @Valid RegisterUserDto registerUserDto,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation failed");
+            throw new BadRequestException("Register validation failed");
         }
         System.out.println("Received register attempt with " + registerUserDto.email() + " and password " + registerUserDto.password());
-        try {
-            return authService.register(registerUserDto);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return authService.register(registerUserDto);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(
+    public ResponseEntity<LoginResponseDto> authenticate(
             @RequestBody @Valid LoginUserDto loginUserDto,
             HttpServletRequest request,
             HttpServletResponse response,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation failed");
+            throw new BadRequestException("Login validation failed");
         }
         System.out.println("Received login request " + System.currentTimeMillis());
-        try {
-            return authService.authenticate(loginUserDto, request, response);
-        } catch (RuntimeException e) {
-            System.out.println("Login attempt failed~");
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        // Create a cookie that expires immediately to clear it
-        return ResponseEntity.badRequest().body("fix this later");
+        return authService.authenticate(loginUserDto, request, response);
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<?> verifyUser(
+    public ResponseEntity<LoginResponseDto> verifyUser(
             @RequestBody @Valid VerifyUserDto verifyUserDto,
             HttpServletRequest request,
             HttpServletResponse response,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation failed");
+            throw new BadRequestException("Verify validation failed");
         }
-        System.out.println("received verify");
-        try {
-            return authService.verifyUser(verifyUserDto, request, response);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return authService.verifyUser(verifyUserDto, request, response);
     }
 
     @PostMapping("/resend")
-    public ResponseEntity<?> resendVerificationCode(
+    public ResponseEntity<Void> resendVerificationCode(
             @RequestBody @Valid ForgotPasswordDto forgotPasswordDto,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation failed");
+            throw new BadRequestException("Resend code validation failed");
         }
-        try {
-            authService.resendVerificationCode(forgotPasswordDto.email());
-            return ResponseEntity.ok("Verification code resent");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return authService.resendVerificationCode(forgotPasswordDto.email());
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(
+    public ResponseEntity<Void> forgotPassword(
             @RequestBody @Valid ForgotPasswordDto forgotPasswordDto,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation failed");
+            throw new BadRequestException("Forgot password validation failed");
         }
-        try {
-            return authService.forgotPasswordInitiate(forgotPasswordDto.email());
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return authService.forgotPasswordInitiate(forgotPasswordDto.email());
     }
     @PostMapping("/forgot-password/code")
-    public ResponseEntity<?> forgotPasswordCodeValidate(
+    public ResponseEntity<Map<Object, Object>> forgotPasswordCodeValidate(
             @RequestBody @Valid VerifyUserDto verifyUserDto,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation failed");
+            throw new BadRequestException("Forgot password verify validation failed");
         }
-        try {
-            return authService.forgotPasswordCodeValidate(verifyUserDto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return authService.forgotPasswordCodeValidate(verifyUserDto);
     }
     @PostMapping("/forgot-password/code/resend")
-    public ResponseEntity<?> forgotPasswordCodeResend(
+    public ResponseEntity<Void> forgotPasswordCodeResend(
             @RequestBody @Valid ForgotPasswordDto forgotPasswordDto,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation failed");
+            throw new BadRequestException("Forgot password resend code validation failed");
         }
-        try {
-            return authService.resendVerificationCode(forgotPasswordDto.email());
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return authService.resendVerificationCode(forgotPasswordDto.email());
     }
     @PostMapping("/forgot-password/reset")
-    public ResponseEntity<?> forgotPasswordReset(
+    public ResponseEntity<Void> forgotPasswordReset(
             @RequestBody @Valid ForgotPasswordResetDto forgotPasswordResetDto,
             HttpServletRequest request,
             HttpServletResponse response,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation failed");
+            throw new BadRequestException("Forgot password full-reset validation failed");
         }
-        try {
-            return authService.forgotPasswordFullValidate(forgotPasswordResetDto, request, response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return authService.forgotPasswordFullValidate(forgotPasswordResetDto, request, response);
     }
-
-
 
 }

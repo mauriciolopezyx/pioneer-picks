@@ -1,17 +1,21 @@
 package com.pioneerpicks.pioneerpicks.comments;
 
+import com.pioneerpicks.pioneerpicks.comments.dto.FullCommentDto;
 import com.pioneerpicks.pioneerpicks.comments.dto.PostCommentDto;
 import com.pioneerpicks.pioneerpicks.courses.CourseService;
+import com.pioneerpicks.pioneerpicks.exception.BadRequestException;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/comments")
-public class CommentController {
+class CommentController {
 
     private final CommentService commentService;
 
@@ -22,30 +26,26 @@ public class CommentController {
     }
 
     @PostMapping("/{courseId}/{professorId}")
-    public ResponseEntity<?> postCourseProfessorComment(
+    public ResponseEntity<Void> postCourseProfessorComment(
             @PathVariable UUID courseId,
             @PathVariable UUID professorId,
-            @RequestBody @Valid PostCommentDto postCommentDto
-            ) {
-        System.out.println("rec POST course professor comments attempt");
-        try {
-            return commentService.postCourseProfessorComment(courseId, professorId, postCommentDto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            @RequestBody @Valid PostCommentDto postCommentDto,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("POST comment validation failed");
         }
+        System.out.println("rec POST course professor comments attempt");
+        return commentService.postCourseProfessorComment(courseId, professorId, postCommentDto);
     }
 
     @GetMapping("/{courseId}/{professorId}")
-    public ResponseEntity<?> getComments(
+    public ResponseEntity<List<FullCommentDto>> getComments(
             @PathVariable UUID courseId,
             @PathVariable UUID professorId
     ) {
         System.out.println("rec course professor comments attempt");
-        try {
-            return commentService.getComments(courseId, professorId);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return commentService.getComments(courseId, professorId);
     }
 
 }

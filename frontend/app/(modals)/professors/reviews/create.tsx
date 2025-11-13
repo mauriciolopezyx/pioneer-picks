@@ -104,6 +104,8 @@ export default function SectionScreen() {
 
     const { showActionSheetWithOptions } = useActionSheet()
 
+    const readyToPost = form.positive.trim().length > 0 && form.negative.trim().length > 0
+
     return (
         <KeyboardAvoidingView
             className="relative flex-1 dark:bg-gray-800"
@@ -226,12 +228,12 @@ export default function SectionScreen() {
                 <View className="bg-transparent h-[65px]"></View>
             </ScrollView>
             
-            <View className="absolute w-[250px] bottom-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <GestureWrapper className="flex flex-row gap-x-2 items-center justify-center bg-blue-600 w-full py-2 rounded-full" onPress={onReview}>
+            {readyToPost ? <View className="absolute w-[250px] bottom-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <GestureWrapper className="flex flex-row gap-x-2 items-center justify-center bg-blue-600 w-full py-2 rounded-full" backgroundColor="#155dfc" onPress={onReview}>
                     <Text className="text-white text-xl font-montserrat-semibold">Post</Text>
                     <Ionicons name="send-outline" size={12} color="white" />
                 </GestureWrapper>
-            </View>
+            </View> : null}
 
             <ToastInstance />
         </KeyboardAvoidingView>

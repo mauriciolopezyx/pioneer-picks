@@ -47,10 +47,10 @@ const Create = () => {
             }
         },
         onSuccess: () => {
-            MasterToast.show({
-                text1: "Successfully requested professor!*",
-                text2: "*may take up to 24-48h for additions"
-            })
+            // MasterToast.show({
+            //     text1: "Successfully requested professor!*",
+            //     text2: "*may take up to 24-48h for additions"
+            // })
             router.back()
         },
         onError: (e: any) => {
@@ -71,7 +71,7 @@ const Create = () => {
             <ScrollView className="flex-1 px-5 pt-5">
                 <Text className="font-montserrat-bold text-2xl mb-4 mx-auto dark:text-white">Add Professor</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
-                <Text className="font-montserrat-medium text-lg mb-4 mx-auto dark:text-white">Request a course to be added to a professor (will also add them if they aren't added already), requires manual approval</Text>
+                <Text className="font-montserrat-medium text-lg mb-8 mx-auto dark:text-white">Request a course to be added to a professor (will also add the professor if they aren't added already), requires manual approval. Please allow 24-48 hours for additions</Text>
                 <View className="flex flex-row justify-between items-center mb-4 border-[1px] rounded-full py-2 px-4 border-light-100 dark:border-light-200 overflow-hidden">
                     <Text className="font-montserrat-bold text-2xl dark:text-white">Course <Text className="font-montserrat text-red-600">*</Text></Text>
                     <Text className="font-montserrat text-xl text-primary">{`${subjectAbbreviation} ${courseAbbreviation}`}</Text>
@@ -89,14 +89,14 @@ const Create = () => {
                     </View>
                 </View>
 
-                { (form.name.length > 0) ? (
+                { (form.name.trim().length > 0) ? (
                     <GestureWrapper className="flex flex-row gap-x-2 items-center justify-center w-full py-2 rounded-full" backgroundColor="#155dfc" onPress={onCreate}>
-                        <Text className="text-white text-xl font-montserrat-semibold">Post</Text>
+                        <Text className="text-white text-xl font-montserrat-semibold">Request</Text>
                         <Ionicons name="send-outline" size={12} color="white" />
                     </GestureWrapper>
                 ) : (
                     <View className="flex flex-row gap-x-2 items-center justify-center opacity-50 bg-blue-600 w-full py-2 rounded-full">
-                        <Text className="text-white text-xl font-montserrat-semibold">Post</Text>
+                        <Text className="text-white text-xl font-montserrat-semibold">Request</Text>
                         <Ionicons name="send-outline" size={12} color="white" />
                     </View>
                 )}

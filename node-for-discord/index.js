@@ -245,7 +245,7 @@ app.post("/notify-professor", async (req, res) => {
     const embed = new EmbedBuilder()
       .setTitle("👨‍🏫 New Professor Submission")
       .setDescription(
-        `**Professor Name:** ${professorName}\n**Course Name:** ${courseName}\n**Course ID:** ${courseId}\n**Requested by:** <@${userId}>`
+        `**Professor Name:** ${professorName}\n**Course Name:** ${courseName}\n**Course ID:** ${courseId}\nRequsted by user ID ${userId}`
       )
       .setColor(0x1abc9c)
       .setTimestamp();

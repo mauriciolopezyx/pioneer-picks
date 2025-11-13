@@ -2,6 +2,8 @@ package com.pioneerpicks.pioneerpicks.user;
 
 import com.pioneerpicks.pioneerpicks.user.dto.FullUserDto;
 import com.pioneerpicks.pioneerpicks.user.dto.ResetPasswordDto;
+import com.pioneerpicks.pioneerpicks.exception.BadRequestException;
+import com.pioneerpicks.pioneerpicks.exception.UnauthorizedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -22,26 +24,31 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ResponseEntity<?> getUserInformation() {
+    public ResponseEntity<FullUserDto> getUserInformation() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
         FullUserDto dto = new FullUserDto(user.getUsername(), user.getEmail(), user.getRole().toString());
-        return ResponseEntity.ok().body(dto);
+        return ResponseEntity.ok(dto);
     }
 
-    public void resetPassword(User currentUser, ResetPasswordDto input) {
+    public ResponseEntity<Void> resetPassword(ResetPasswordDto input) {
         System.out.println("Received reset password request");
 
-        if (currentUser.hasPassword() && input.oldPassword() == null) {
-            throw new RuntimeException("Expected old password in addition to new password");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        if (user.hasPassword() && input.oldPassword() == null) {
+            throw new BadRequestException("Expected old password in addition to new password");
         }
-        if (currentUser.hasPassword() && !passwordEncoder.matches(input.oldPassword(), currentUser.getPassword())) {
-            throw new RuntimeException("Current password is incorrect");
+        if (user.hasPassword() && !passwordEncoder.matches(input.oldPassword(), user.getPassword())) {
+            throw new UnauthorizedException("Current password is incorrect");
         }
 
-        currentUser.setPassword(passwordEncoder.encode(input.newPassword()));
-        userRepository.save(currentUser);
+        user.setPassword(passwordEncoder.encode(input.newPassword()));
+        userRepository.save(user);
+
+        return ResponseEntity.noContent().build(); // 204 status code
     }
 
 }

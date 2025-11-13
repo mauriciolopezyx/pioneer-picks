@@ -62,7 +62,7 @@ const ForgotPassword = () => {
                 text1: "Successfully sent email code!"
             })
             reset()
-            router.navigate({pathname: "/verify", params: {email: email, forgot: "true"}})
+            router.replace({pathname: "/verify", params: {email: email, forgot: "true"}})
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "failed to reset password")
@@ -91,14 +91,6 @@ const ForgotPassword = () => {
                         Enter your email to receive a verification code:
                     </Text>
                 </View>
-
-                {isError ? (
-                <View className="flex items-center justify-center mb-8">
-                    <Text className="font-montserrat-medium text-red-600 dark:text-red-400 text-sm" style={{textAlign: "center"}}>
-                    Error sending verification code: {error?.message}
-                    </Text>
-                </View>
-                ) : null}
 
                 <View className="mb-6">
                     <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">

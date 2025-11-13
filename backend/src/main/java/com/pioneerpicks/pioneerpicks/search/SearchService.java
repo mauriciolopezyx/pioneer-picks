@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class SearchService {
+class SearchService {
 
     private final SubjectRepository subjectRepository;
     private final CourseRepository courseRepository;
@@ -30,9 +30,10 @@ public class SearchService {
         this.professorRepository = professorRepository;
     }
 
-    // maybe just send categories of results (professor/course/subject)
-    public ResponseEntity<?> getSearchResults(String query) {
+    // TODO: maybe just send categories of results (professor/course/subject)
+    public ResponseEntity<List<SearchResultDto>> getSearchResults(String query) {
         List<SearchResultDto> results = new ArrayList<>();
+
         subjectRepository.findByNameContainingIgnoreCaseOrAbbreviationContainingIgnoreCase(query, query)
                 .forEach(subject -> results.add(new SearchResultDto(subject.getId(), subject.getName(), Optional.ofNullable(subject.getAbbreviation()), Optional.empty(), 1)));
         courseRepository.findByNameContainingIgnoreCaseOrAbbreviationContainingIgnoreCase(query, query)
@@ -48,10 +49,9 @@ public class SearchService {
                             2
                     ));
                 });
-
         professorRepository.findByNameContainingIgnoreCase(query).forEach(subject -> results.add(new SearchResultDto(subject.getId(), subject.getName(), Optional.empty(), Optional.empty(), 3)));
 
-        return ResponseEntity.ok().body(Map.of("results", results));
+        return ResponseEntity.ok(results);
     }
 
 }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/admin")
 @RestController
-public class AdminController {
+class AdminController {
 
     private final AdminService adminService;
 
@@ -19,29 +19,19 @@ public class AdminController {
     }
 
     @PostMapping("/approve-course")
-    public ResponseEntity<?> approveCourse(
+    public ResponseEntity<Void> approveCourse(
             @RequestHeader("x-api-key") String apiKey,
             @RequestBody NewCourseAdminDto newCourseAdminDto
     ) {
-        try {
-            return adminService.approveCourse(apiKey, newCourseAdminDto);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return adminService.approveCourse(apiKey, newCourseAdminDto);
     }
 
     @PostMapping("/approve-professor")
-    public ResponseEntity<?> approveProfessor(
+    public ResponseEntity<Void> approveProfessor(
             @RequestHeader("x-api-key") String apiKey,
             @RequestBody NewProfessorDto newProfessorDto
     ) {
-        try {
-            return adminService.approveProfessor(apiKey, newProfessorDto);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return adminService.approveProfessor(apiKey, newProfessorDto);
     }
 
 }

@@ -53,7 +53,7 @@ function ToastComponent({
               style={[
                 styles.text2,
                 {
-                  color: 'rgba(255,255,255,0.68)',
+                  color: '#333',
                   fontFamily: "Montserrat_400Regular"
                 },
                 text2Style,

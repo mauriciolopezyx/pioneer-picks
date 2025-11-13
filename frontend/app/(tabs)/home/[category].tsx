@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator } from 'react-native'
+import { View, Text, ActivityIndicator, ScrollView } from 'react-native'
 import { useLocalSearchParams } from "expo-router"
 import React from 'react'
 import { FlashList } from '@shopify/flash-list';
@@ -64,8 +64,17 @@ const Category = () => {
 
     return (
       <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["left", "right"]}>
-        {category === "course" ? <FavoriteSection data={favorites} ItemComponent={FavoriteCourseCard} /> : null}
-        {category === "professor" ? <FavoriteSection data={favorites} ItemComponent={FavoriteProfessorCard} /> : null}
+        <ScrollView
+          className="flex-1 px-5"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+              minHeight: "100%", paddingBottom: 10
+          }}
+        >
+          <Text className="font-montserrat-bold text-2xl dark:text-white my-5">Favorite {category === "course" ? "Courses" : "Professors"}</Text>
+          {category === "course" ? <FavoriteSection data={favorites} ItemComponent={FavoriteCourseCard} /> : null}
+          {category === "professor" ? <FavoriteSection data={favorites} ItemComponent={FavoriteProfessorCard} /> : null}
+        </ScrollView>
       </SafeAreaView>
     )
 }
@@ -82,10 +91,11 @@ export const FavoriteSection = <T,>({data, ItemComponent}: SectionProps<T>) => {
       renderItem={(item: any) => (
           <ItemComponent data={item.item} />
       )}
-      numColumns={3}
+      numColumns={2}
       keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
       showsVerticalScrollIndicator={false}
       ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+      scrollEnabled={true}
     />
   )
 }

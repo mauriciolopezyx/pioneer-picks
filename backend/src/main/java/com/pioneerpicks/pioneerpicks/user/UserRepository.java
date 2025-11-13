@@ -44,6 +44,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean isCourseFavoritedByUser(Long userId, UUID courseId);
 
     Optional<User> findByEmail(String email);
-    Optional<User> findByVerificationCode(String verificationCode);
     Optional<User> findByUsername(String username);
 }

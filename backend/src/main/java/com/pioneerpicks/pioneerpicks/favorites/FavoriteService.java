@@ -2,6 +2,7 @@ package com.pioneerpicks.pioneerpicks.favorites;
 
 import com.pioneerpicks.pioneerpicks.courses.Course;
 import com.pioneerpicks.pioneerpicks.courses.CourseRepository;
+import com.pioneerpicks.pioneerpicks.exception.NotFoundException;
 import com.pioneerpicks.pioneerpicks.favorites.dto.FavoriteCourseDto;
 import com.pioneerpicks.pioneerpicks.favorites.dto.FavoriteProfessorDto;
 import com.pioneerpicks.pioneerpicks.professors.Professor;
@@ -18,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class FavoriteService {
+class FavoriteService {
 
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
@@ -34,11 +35,11 @@ public class FavoriteService {
         this.professorRepository = professorRepository;
     }
 
-    public ResponseEntity<?> addCourseToFavorites(UUID courseId) {
+    public ResponseEntity<Void> addCourseToFavorites(UUID courseId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new NotFoundException("Course not found"));
 
         User userWithFavorites = userRepository.findUserWithFavoriteCoursesAndSubjects(user.getId()).orElseThrow(); // should never throw
 
@@ -47,10 +48,10 @@ public class FavoriteService {
             userRepository.save(userWithFavorites);
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> removeCourseFromFavorites(UUID courseId) {
+    public ResponseEntity<Void> removeCourseFromFavorites(UUID courseId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
@@ -59,14 +60,14 @@ public class FavoriteService {
         userWithFavorites.getFavoriteCourses().removeIf(c -> c.getId().equals(courseId));
         userRepository.save(userWithFavorites);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> addProfessorToFavorites(UUID professorId) {
+    public ResponseEntity<Void> addProfessorToFavorites(UUID professorId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor not found"));
+        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new NotFoundException("Professor not found"));
         User userWithFavorites = userRepository.findUserWithFavoriteProfessors(user.getId()).orElseThrow(); // should never throw
 
         if (!userWithFavorites.getFavoriteProfessors().contains(professor)) {
@@ -74,10 +75,10 @@ public class FavoriteService {
             userRepository.save(userWithFavorites);
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> removeProfessorFromFavorites(UUID professorId) {
+    public ResponseEntity<Void> removeProfessorFromFavorites(UUID professorId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
@@ -86,10 +87,10 @@ public class FavoriteService {
         userWithFavorites.getFavoriteProfessors().removeIf(p -> p.getId().equals(professorId));
         userRepository.save(userWithFavorites);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> getCourseFavorites() {
+    public ResponseEntity<List<FavoriteCourseDto>> getCourseFavorites() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
@@ -99,10 +100,10 @@ public class FavoriteService {
                 .map(course -> new FavoriteCourseDto(course.getId(), course.getName(), course.getSubject().getName(), course.getAbbreviation(), course.getSubject().getAbbreviation()))
                 .toList();
 
-        return ResponseEntity.ok().body(courses);
+        return ResponseEntity.ok(courses);
     }
 
-    public ResponseEntity<?> getProfessorFavorites() {
+    public ResponseEntity<List<FavoriteProfessorDto>> getProfessorFavorites() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
@@ -112,10 +113,10 @@ public class FavoriteService {
                 .map(professor -> new FavoriteProfessorDto(professor.getId(), professor.getName()))
                 .toList();
 
-        return ResponseEntity.ok().body(professors);
+        return ResponseEntity.ok(professors);
     }
 
-    public ResponseEntity<?> getFavorites() {
+    public ResponseEntity<Map<Object, Object>> getFavorites() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
@@ -130,7 +131,7 @@ public class FavoriteService {
                 .map(professor -> new FavoriteProfessorDto(professor.getId(), professor.getName()))
                 .toList();
 
-        return ResponseEntity.ok().body(Map.of("professors", professors, "courses", courses));
+        return ResponseEntity.ok(Map.of("professors", professors, "courses", courses));
     }
 
 

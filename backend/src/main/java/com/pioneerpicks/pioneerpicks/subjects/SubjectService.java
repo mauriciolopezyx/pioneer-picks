@@ -1,6 +1,7 @@
 package com.pioneerpicks.pioneerpicks.subjects;
 
 import com.pioneerpicks.pioneerpicks.courses.dto.BasicCourseDto;
+import com.pioneerpicks.pioneerpicks.exception.NotFoundException;
 import com.pioneerpicks.pioneerpicks.subjects.dto.SubjectDiscoverDto;
 import com.pioneerpicks.pioneerpicks.subjects.dto.FullSubjectDto;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class SubjectService {
+class SubjectService {
 
     private final SubjectRepository subjectRepository;
 
@@ -22,22 +23,22 @@ public class SubjectService {
         this.subjectRepository = subjectRepository;
     }
 
-    public ResponseEntity<?> getAllSubjects() {
+    public ResponseEntity<List<SubjectDiscoverDto>> getAllSubjects() {
         List<SubjectDiscoverDto> subjectDtos = subjectRepository.findAll().stream()
                 .map(subject -> new SubjectDiscoverDto(subject.getId(), subject.getName(), subject.getAbbreviation(), subject.getDescription()))
                 .toList();
-        return ResponseEntity.ok().body(Map.of("subjects", subjectDtos));
+        return ResponseEntity.ok(subjectDtos);
     }
 
-    public ResponseEntity<?> getSubjectInformation(UUID id) {
-        Subject subject = subjectRepository.findById(id).orElseThrow(() -> new RuntimeException("Subject not found"));
+    public ResponseEntity<FullSubjectDto> getSubjectInformation(UUID id) {
+        Subject subject = subjectRepository.findById(id).orElseThrow(() -> new NotFoundException("Subject not found"));
         System.out.println("received subject id query:" + id);
 
-        List<BasicCourseDto> courseDtos = subject.getCourses().stream()
+        List<BasicCourseDto> courses = subject.getCourses().stream()
                 .map(course -> new BasicCourseDto(course.getId(), course.getName(), course.getAbbreviation(), course.getUnits(), course.getAreas()))
                 .toList();
-        FullSubjectDto dto = new FullSubjectDto(id, subject.getName(), subject.getAbbreviation(), subject.getDescription(), courseDtos);
-        return ResponseEntity.ok().body(dto);
+        FullSubjectDto dto = new FullSubjectDto(id, subject.getName(), subject.getAbbreviation(), subject.getDescription(), courses);
+        return ResponseEntity.ok(dto);
     }
 
 }

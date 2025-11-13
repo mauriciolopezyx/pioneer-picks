@@ -79,7 +79,7 @@ export default function Register() {
             return data.email
         },
         onSuccess: (email: string) => {
-            router.navigate({pathname: "/verify", params: {email: email, forgot: "false"}})
+            router.replace({pathname: "/verify", params: {email: email, forgot: "false"}})
             reset()
         },
         onError: (e: any) => {
@@ -113,14 +113,6 @@ export default function Register() {
                     Register
                     </Text>
                 </View>
-
-                {isError ? (
-                    <View className="flex items-center justify-center mb-8">
-                        <Text className="font-montserrat-medium text-red-600 dark:text-red-400 text-sm" style={{textAlign: "center"}}>
-                            Error registering: {error?.error}
-                        </Text>
-                    </View>
-                ) : null}
 
                 <View className="mb-4">
                     <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">

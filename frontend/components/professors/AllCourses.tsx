@@ -62,7 +62,7 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
         onSuccess: () => {
             console.log("successfully toggled favorite")
             MasterToast.show({
-                text1: "Successfully toggled favorite! (change text later)"
+                text1: "Successfully toggled favorite!"
             })
         },
         onError: (e: any) => {
@@ -92,23 +92,13 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
                 <SearchBar
                     placeholder="Search"
                     onChangeText={onChangeQuery}
-                    disabled={true}
+                    disabled={false}
                 />
-
-                {/* <GestureWrapper
-                    className={`relative flex justify-center items-center border-[1px] border-black dark:border-[#aaa] rounded-lg p-[5px] bg-light-100 dark:bg-gray-700 ${(filter != filterOptions.length - 1 && query == "") && "border-red-600 dark:border-red-600"}`}
-                    backgroundColor={colorScheme === "dark" ? "#d1d1d1" : "#d1d1d1"}
-                >
-                    <Ionicons name="filter-outline" size={25} color={colorScheme === "dark" ? "#aaa" : "black"} />
-                    {(filter != filterOptions.length - 1 && query == "") ? <View className="absolute top-0 left-0 mt-[-10px] ml-[-10px] aspect-square bg-red-600 rounded-full flex items-center justify-center p-1">
-                        <Text className="text-white font-montserrat-semibold text-xs">{filter === 0 ? "A-Z" : ""}</Text>
-                    </View> : null}
-                </GestureWrapper> */}
             </View>
 
             {favoriteLoading ? <ActivityIndicator size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} /> : 
             favoriteError ? <Ionicons name="alert-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} /> : (
-                <GestureWrapper className="flex flex-row justify-between items-center py-4" onPress={toggleFavorite} >
+                <GestureWrapper className="flex flex-row justify-between items-center mb-4 w-[30px]" onPress={toggleFavorite} >
                     <Ionicons name={`bookmark${favorited ? "" : "-outline"}`} size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
                 </GestureWrapper>
             )}
