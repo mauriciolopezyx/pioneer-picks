@@ -92,7 +92,7 @@ export default function Verify() {
             //console.error(e?.message ?? "Failed to verify")
             MasterToast.show({
                 text1: "Error verifying code",
-                text2: e?.message ?? "Failed to verify"
+                text2: JSON.parse(e.message)?.message ?? "Failed to verify"
             })
         }
     })
@@ -123,7 +123,7 @@ export default function Verify() {
             //console.error(e?.message ?? "Failed to resend code")
             MasterToast.show({
                 text1: "Error resending code",
-                text2: e?.message ?? "Failed to resend"
+                text2: JSON.parse(e.message)?.message ?? "Failed to resend"
             })
         }
     })

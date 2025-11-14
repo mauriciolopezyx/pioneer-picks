@@ -86,7 +86,7 @@ export default function Register() {
             //console.error(e?.error ?? "Failed to register")
             MasterToast.show({
                 text1: "Error registering",
-                text2: e?.message ?? "Failed to register"
+                text2: JSON.parse(e.message)?.message ?? "Failed to register"
             })
         }
     })
@@ -261,7 +261,7 @@ export default function Register() {
                     <Text className="font-montserrat text-gray-600 dark:text-gray-400 text-sm">
                     Already have an account?{" "}
                     </Text>
-                    <Link href="/login" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Login</Link>
+                    <Link replace href="/login" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Login</Link>
                 </View>
                 </View>
                 </ScrollView>

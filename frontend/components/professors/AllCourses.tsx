@@ -70,7 +70,7 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
             setFavorited(prev => !prev) // reverts immediate change if failed
             MasterToast.show({
                 text1: "Error favoriting",
-                text2: e?.message ?? "Failed to favorite"
+                text2: JSON.parse(e.message)?.message ?? "Failed to favorite"
             })
         }
     })

@@ -129,7 +129,7 @@ const Courses = () => {
             disabled={false}
           />
           <GestureWrapper className="rounded-full" onPress={() => { router.navigate({pathname: "/(modals)/courses/create"}) }} backgroundColor="#d50032">
-            <Ionicons name="add" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
+            <Ionicons name="add" size={30} color="white" />
           </GestureWrapper>
         </View>
 

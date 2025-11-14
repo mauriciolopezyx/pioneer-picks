@@ -68,7 +68,7 @@ const ForgotPassword = () => {
             //console.error(e?.message ?? "failed to reset password")
             MasterToast.show({
                 text1: "Error requesting code",
-                text2: e?.message ?? "Failed to request"
+                text2: JSON.parse(e.message)?.message ?? "Failed to request"
             })
         }
     })
@@ -85,7 +85,7 @@ const ForgotPassword = () => {
             >
                 <View className="mb-6">
                     <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-6">
-                        Reset Password
+                        Forgot Password
                     </Text>
                     <Text className="font-montserrat text-md mx-auto text-gray-900 dark:text-white mb-2" style={{textAlign: "center"}}>
                         Enter your email to receive a verification code:

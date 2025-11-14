@@ -115,7 +115,7 @@ export default function SectionScreen() {
             <View className="absolute bottom-[30px] right-[30px]">
                 <GestureWrapper
                     className="w-[75px] h-[75px] px-1 flex items-center justify-center rounded-full"
-                    backgroundColor={colorScheme === "dark" ? "#d50032" : "#000"}
+                    backgroundColor="#d50032"
                     onPress={() => { router.navigate({pathname: "/(modals)/professors/reviews/create", params: {professorId: professorId, courseId: courseId}}) }}
                 >
                     <Ionicons name={user ? "add-outline" : "close-outline"} size={35} color="white" />

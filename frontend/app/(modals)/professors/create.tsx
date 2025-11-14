@@ -57,7 +57,7 @@ const Create = () => {
             //console.error(e?.message ?? "Failed to verify")
             MasterToast.show({
                 text1: "Error requesting professor",
-                text2: e?.message ?? "Failed to request"
+                text2: JSON.parse(e.message)?.message ?? "Failed to request"
             })
         }
     })

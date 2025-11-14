@@ -59,8 +59,6 @@ const Home = () => {
     gcTime: 1000 * 60 * 5,
     refetchOnWindowFocus: true
   })
-
-  console.log("refetching")
   
   return (
     <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["left", "right"]}>

@@ -97,7 +97,7 @@ export default function SectionScreen() {
             //console.error(e?.message ?? "Failed to verify")
             MasterToast.show({
                 text1: "Error posting review",
-                text2: e?.message ?? "Failed to post"
+                text2: JSON.parse(e.message)?.message ?? "Failed to post"
             })
         }
     })

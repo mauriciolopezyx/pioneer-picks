@@ -46,7 +46,7 @@ const _layout = () => {
                 minWidth: 70
             },
             headerStyle: {
-                backgroundColor: "#000"
+                backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
             },
             headerTitleStyle: {
                 color: "#fff",
@@ -70,7 +70,7 @@ const _layout = () => {
                     headerTitle: "Home",
                     headerTitleStyle: {
                         fontFamily: "Montserrat_700Bold",
-                        color: "#fff",
+                        color: colorScheme === "dark" ? "#fff" : "#000",
                         fontSize: 28
                     }
                 }}
@@ -90,7 +90,7 @@ const _layout = () => {
                     headerTitle: "Discover",
                     headerTitleStyle: {
                         fontFamily: "Montserrat_700Bold",
-                        color: "#fff",
+                        color: colorScheme === "dark" ? "#fff" : "#000",
                         fontSize: 28
                     }
                 }}
@@ -110,7 +110,7 @@ const _layout = () => {
                     headerTitle: "Account",
                     headerTitleStyle: {
                         fontFamily: "Montserrat_700Bold",
-                        color: "#fff",
+                        color: colorScheme === "dark" ? "#fff" : "#000",
                         fontSize: 28
                     }
                 }}

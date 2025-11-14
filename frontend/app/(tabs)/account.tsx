@@ -41,13 +41,13 @@ const Account = () => {
       MasterToast.show({
         text1: "Successfully logged out!"
       })
-      router.navigate({pathname: "/login"})
+      router.dismissTo({pathname: "/login"})
     },
     onError: (e: any) => {
       //console.error(e?.message ?? "failed to log out")
       MasterToast.show({
         text1: "Error logging out",
-        text2: e?.message ?? "Failed to log out"
+        text2: JSON.parse(e.message)?.message ?? "Failed to log out"
       })
     }
   })

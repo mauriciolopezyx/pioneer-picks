@@ -92,7 +92,7 @@ export default function Login() {
       //console.error("Login error:", e.message)
       MasterToast.show({
         text1: "Error logging in",
-        text2: e?.message ?? "Failed to login"
+        text2: JSON.parse(e.message)?.message ?? "Failed to login"
       })
     }
   })
@@ -236,7 +236,7 @@ export default function Login() {
                 <Text className="font-montserrat text-gray-600 dark:text-gray-400 text-sm">
                 Don&apos;t have an account?{" "}
                 </Text>
-                <Link href="/register" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Register</Link>
+                <Link replace href="/register" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Register</Link>
             </View>
           </View>
         </ScrollView>

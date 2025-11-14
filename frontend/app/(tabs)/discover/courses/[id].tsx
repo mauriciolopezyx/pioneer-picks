@@ -146,7 +146,7 @@ const Course = () => {
             setFavorited(prev => !prev) // reverts immediate change if failed
             MasterToast.show({
                 text1: "Error favoriting",
-                text2: e?.message ?? "Failed to favorite"
+                text2: JSON.parse(e.message)?.message ?? "Failed to favorite"
             })
         }
     })
@@ -227,7 +227,7 @@ const Course = () => {
                         disabled={false}
                     />
                     <GestureWrapper className="rounded-full" onPress={() => { router.navigate({pathname: "/(modals)/professors/create", params: {courseId: courseId, subjectAbbreviation: subjectAbbreviation, courseAbbreviation: course.abbreviation}}) }} backgroundColor="#d50032">
-                        <Ionicons name="add" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
+                        <Ionicons name="add" size={30} color="white" />
                     </GestureWrapper>
                 </View>
 

@@ -73,7 +73,7 @@ const search = () => {
             //console.error(e?.message ?? "Failed to verify")
             MasterToast.show({
                 text1: "Error fetching search results",
-                text2: e?.message ?? "Failed to fetch"
+                text2: JSON.parse(e.message)?.message ?? "Failed to fetch"
             })
         }
     })

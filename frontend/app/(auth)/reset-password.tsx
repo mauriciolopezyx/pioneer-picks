@@ -9,6 +9,7 @@ import { useParsedLocalSearchParams } from "@/services/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import MasterToast from "@/components/ToastWrapper"
+import { useAuth } from "@/components/AuthProvider";
 
 import { View, Text, KeyboardAvoidingView, Platform, Pressable, TextInput, TouchableOpacity, useColorScheme } from 'react-native'
 import React, { useState } from 'react'
@@ -41,6 +42,7 @@ const ResetPassword = () => {
     const { token, email } = params
 
     const router = useRouter()
+    const { refetch:refetchAuth } = useAuth()
     const colorScheme = useColorScheme()
     const isDark = colorScheme === "dark"
 
@@ -83,19 +85,22 @@ const ResetPassword = () => {
                 throw new Error(payload)
             }
         },
-        onSuccess: () => {
+        onSuccess: async () => {
             console.log("reset password successfully!")
             MasterToast.show({
                 text1: "Successfully reset password!"
             })
             reset()
+            if (token) {
+                await refetchAuth()
+            }
             router.replace({pathname: "/"})
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "failed to reset password")
             MasterToast.show({
                 text1: "Error resetting password",
-                text2: e?.message ?? "Failed to reset"
+                text2: JSON.parse(e.message)?.message ?? "Failed to reset"
             })
         }
     })
