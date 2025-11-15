@@ -26,12 +26,12 @@ jobs:
         working-directory: backend
         run: |
           docker build -t pioneerpicks-springboot .
-          docker tag pioneerpicks-springboot:latest ${{ steps.login-ecr.outputs.registry }}/pioneerpicks-springboot:latest
-          docker push ${{ steps.login-ecr.outputs.registry }}/pioneerpicks-springboot:latest
+          docker tag pioneerpicks-springboot:latest 908519937043.dkr.ecr.us-west-1.amazonaws.com/pioneerpicks-springboot/pioneerpicks-springboot:latest
+          docker push 908519937043.dkr.ecr.us-west-1.amazonaws.com/pioneerpicks-springboot/pioneerpicks-springboot:latest
 
       - name: Build & Push Node container
         working-directory: node-for-discord
         run: |
           docker build -t pioneerpicks-node .
-          docker tag pioneerpicks-node:latest ${{ steps.login-ecr.outputs.registry }}/pioneerpicks-node:latest
-          docker push ${{ steps.login-ecr.outputs.registry }}/pioneerpicks-node:latest
+          docker tag pioneerpicks-node:latest 908519937043.dkr.ecr.us-west-1.amazonaws.com/pioneerpicks-node/pioneerpicks-node:latest
+          docker push 908519937043.dkr.ecr.us-west-1.amazonaws.com/pioneerpicks-node/pioneerpicks-node:latest
