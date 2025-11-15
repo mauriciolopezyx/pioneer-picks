@@ -1,4 +1,4 @@
-import { Text, ScrollView, View, ActivityIndicator, Animated as RNAnimated, useColorScheme } from 'react-native'
+import { Text, ScrollView, View, ActivityIndicator, Animated as RNAnimated, useColorScheme, Pressable } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { FlashList } from "@shopify/flash-list";
 import { useState, useEffect, useLayoutEffect, useMemo, useCallback } from "react";
@@ -35,6 +35,8 @@ const Course = () => {
     const onChangeQuery = useCallback((text: string) => {
         setQuery(text)
     }, [])
+
+    console.log(courseId, subjectName, subjectAbbreviation)
 
     useEffect(() => {
         if (subjectName) {
@@ -75,12 +77,12 @@ const Course = () => {
         const listenerId = scrollY.addListener(({ value }) => {
         const opacity = Math.min(value / 30, 1)
         navigation.setOptions({
-            headerTintColor: `rgba(213, 0, 50, ${1 - opacity})`
-        })
+                headerTintColor: `rgba(213, 0, 50, ${1 - opacity})`
+            })
         })
 
         return () => {
-        scrollY.removeListener(listenerId)
+            scrollY.removeListener(listenerId)
         }
     }, [])
 
@@ -102,15 +104,15 @@ const Course = () => {
         if (areaAbbreviations[area]) {
             seen.add(areaAbbreviations[area])
             return (
-                <View key={areaAbbreviations[area]} className="rounded-full px-4 py-1" style={ { backgroundColor: bgAreaColor } }>
+                <GestureWrapper key={areaAbbreviations[area]} className="rounded-full px-4 py-1" backgroundColor={bgAreaColor} onPress={() => { router.navigate({pathname: "/(tabs)/discover/courses/areas/[area]", params: {area: area}}) }}>
                     <Text className={`font-montserrat-medium text-sm ${textAreaColor}`}>{areaAbbreviations[area]}</Text>
-                </View>
+                </GestureWrapper>
             )
         }
         return (
-            <View key={area} className="rounded-full px-4 py-1" style={ { backgroundColor: bgAreaColor } }>
+            <GestureWrapper key={area} className="rounded-full px-4 py-1" backgroundColor={bgAreaColor} onPress={() => { router.navigate({pathname: "/(tabs)/discover/courses/areas/[area]", params: {area: area}}) }}>
                 <Text className={`font-montserrat-medium text-sm ${textAreaColor}`}>{area}</Text>
-            </View>
+            </GestureWrapper>
         )
     }) : []
 

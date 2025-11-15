@@ -13,7 +13,23 @@ import java.util.UUID;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, UUID> {
-    List<Course> findByNameContainingIgnoreCaseOrAbbreviationContainingIgnoreCase(String q1, String q2);
+
+    @Query("""
+    SELECT c
+    FROM Course c
+    WHERE LOWER(c.areas) LIKE LOWER(CONCAT('%', :q, '%'))
+    """)
+    List<Course> findCoursesByArea(@Param("q") String q);
+
+    @Query("""
+    SELECT DISTINCT c
+    FROM Course c
+    JOIN FETCH c.subject s
+    WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :q, '%'))
+       OR LOWER(c.abbreviation) LIKE LOWER(CONCAT('%', :q, '%'))
+    """)
+    List<Course> findCoursesWithSubject(@Param("q") String q);
+
     List<Course> findBySubjectId(UUID subjectId);
 
 }

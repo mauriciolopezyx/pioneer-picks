@@ -31,14 +31,14 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     WHERE r.professor.id = :professorId
     AND r.course.id = :courseId
     """)
-    List<Review> findReviewsWithUserAndCourse(UUID professorId, UUID courseId);
+    List<Review> findReviewsWithUserAndCourse(@Param("professorId") UUID professorId, @Param("courseId") UUID courseId);
 
     @Query("""
     SELECT DISTINCT r
     FROM Review r
     WHERE r.user.id = :userId
     """)
-    Optional<Review> findByUserId(Long userId);
+    Optional<Review> findByUserId(@Param("userId") Long userId);
 
     @Query("SELECT COUNT(r) FROM Review r WHERE r.professor.id = :professorId AND r.course.id = :courseId")
     long countByProfessorAndCourse(@Param("professorId") UUID professorId, @Param("courseId") UUID courseId);

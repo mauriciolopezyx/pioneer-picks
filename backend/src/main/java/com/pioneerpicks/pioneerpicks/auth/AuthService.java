@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -84,25 +85,29 @@ class AuthService {
             throw new UnauthorizedException("This account uses " + user.getProvider() + " login. Please login with " + user.getProvider() + " and then reset your password after.");
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        input.email(),
-                        input.password()
-                )
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            input.email(),
+                            input.password()
+                    )
+            );
 
-        // v NEW setup with Redis session caching
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
-        request.getSession(true); // make sure a session exists
-        new HttpSessionSecurityContextRepository().saveContext(context, request, response);
+            // v NEW setup with Redis session caching
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authentication);
+            SecurityContextHolder.setContext(context);
+            request.getSession(true); // make sure a session exists
+            new HttpSessionSecurityContextRepository().saveContext(context, request, response);
 
-        System.out.println("SESSION ID from request: " + request.getSession().getId());
+            System.out.println("SESSION ID from request: " + request.getSession().getId());
 
-        LoginResponseDto loginResponse = new LoginResponseDto(request.getSession().getId());
+            LoginResponseDto loginResponse = new LoginResponseDto(request.getSession().getId());
 
-        return ResponseEntity.ok(loginResponse);
+            return ResponseEntity.ok(loginResponse);
+        } catch (AuthenticationException e) {
+            throw new UnauthorizedException("Wrong email or password, please try again");
+        }
     }
 
     public ResponseEntity<LoginResponseDto> verifyUser(

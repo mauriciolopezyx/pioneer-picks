@@ -2,15 +2,15 @@ package com.pioneerpicks.pioneerpicks.search;
 
 import com.pioneerpicks.pioneerpicks.courses.CourseRepository;
 import com.pioneerpicks.pioneerpicks.professors.ProfessorRepository;
-import com.pioneerpicks.pioneerpicks.search.dto.SearchResultDto;
+import com.pioneerpicks.pioneerpicks.search.dto.CourseSearchResultDto;
+import com.pioneerpicks.pioneerpicks.search.dto.ProfessorSearchResultDto;
+import com.pioneerpicks.pioneerpicks.search.dto.SubjectSearchResultDto;
 import com.pioneerpicks.pioneerpicks.subjects.SubjectRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 class SearchService {
@@ -30,28 +30,20 @@ class SearchService {
         this.professorRepository = professorRepository;
     }
 
-    // TODO: maybe just send categories of results (professor/course/subject)
-    public ResponseEntity<List<SearchResultDto>> getSearchResults(String query) {
-        List<SearchResultDto> results = new ArrayList<>();
+    public ResponseEntity<Map<Object, Object>> getSearchResults(String query) {
+        List<SubjectSearchResultDto> subjects = subjectRepository.findByNameContainingIgnoreCaseOrAbbreviationContainingIgnoreCase(query, query).stream()
+                .map(subject -> new SubjectSearchResultDto(subject.getId(), subject.getName(), subject.getAbbreviation()))
+                .toList();
 
-        subjectRepository.findByNameContainingIgnoreCaseOrAbbreviationContainingIgnoreCase(query, query)
-                .forEach(subject -> results.add(new SearchResultDto(subject.getId(), subject.getName(), Optional.ofNullable(subject.getAbbreviation()), Optional.empty(), 1)));
-        courseRepository.findByNameContainingIgnoreCaseOrAbbreviationContainingIgnoreCase(query, query)
-                .forEach(course -> {
-                    String subjectName = course.getSubject() != null
-                            ? course.getSubject().getName()
-                            : null;
-                    results.add(new SearchResultDto(
-                            course.getId(),
-                            course.getName(),
-                            Optional.ofNullable(course.getAbbreviation()),
-                            Optional.ofNullable(subjectName),
-                            2
-                    ));
-                });
-        professorRepository.findByNameContainingIgnoreCase(query).forEach(subject -> results.add(new SearchResultDto(subject.getId(), subject.getName(), Optional.empty(), Optional.empty(), 3)));
+        List<CourseSearchResultDto> courses = courseRepository.findCoursesWithSubject(query).stream()
+                .map(course -> new CourseSearchResultDto( course.getId(), course.getName(), course.getAbbreviation(), course.getSubject().getName(), course.getSubject().getAbbreviation()))
+                .toList();
 
-        return ResponseEntity.ok(results);
+        List<ProfessorSearchResultDto> professors = professorRepository.findByNameContainingIgnoreCase(query).stream()
+                .map(professor -> new ProfessorSearchResultDto(professor.getId(), professor.getName()))
+                .toList();
+
+        return ResponseEntity.ok(Map.of("subjects", subjects, "courses", courses, "professors", professors));
     }
 
 }

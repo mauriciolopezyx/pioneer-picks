@@ -2,6 +2,7 @@ package com.pioneerpicks.pioneerpicks.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -17,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     LEFT JOIN FETCH c.subject
     WHERE u.id = :userId
     """)
-    Optional<User> findUserWithFavoriteCoursesAndSubjects(Long userId);
+    Optional<User> findUserWithFavoriteCoursesAndSubjects(@Param("userId") Long userId);
 
     @Query("""
     SELECT DISTINCT u
@@ -25,7 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     LEFT JOIN FETCH u.favoriteProfessors p
     WHERE u.id = :userId
     """)
-    Optional<User> findUserWithFavoriteProfessors(Long userId);
+    Optional<User> findUserWithFavoriteProfessors(@Param("userId") Long userId);
 
     @Query("""
     SELECT COUNT(p) > 0
@@ -33,7 +34,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     JOIN u.favoriteProfessors p
     WHERE u.id = :userId AND p.id = :professorId
     """)
-    boolean isProfessorFavoritedByUser(Long userId, UUID professorId);
+    boolean isProfessorFavoritedByUser(@Param("userId") Long userId, @Param("professorId") UUID professorId);
 
     @Query("""
     SELECT COUNT(c) > 0
@@ -41,7 +42,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     JOIN u.favoriteCourses c
     WHERE u.id = :userId AND c.id = :courseId
     """)
-    boolean isCourseFavoritedByUser(Long userId, UUID courseId);
+    boolean isCourseFavoritedByUser(@Param("userId") Long userId, @Param("courseId") UUID courseId);
 
     Optional<User> findByEmail(String email);
     Optional<User> findByUsername(String username);

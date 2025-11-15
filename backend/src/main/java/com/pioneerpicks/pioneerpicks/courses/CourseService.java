@@ -5,6 +5,7 @@ import com.pioneerpicks.pioneerpicks.courses.dto.FullCourseDto;
 import com.pioneerpicks.pioneerpicks.courses.dto.NewCourseDto;
 import com.pioneerpicks.pioneerpicks.exception.InternalServerErrorException;
 import com.pioneerpicks.pioneerpicks.exception.NotFoundException;
+import com.pioneerpicks.pioneerpicks.favorites.dto.FavoriteCourseDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.BasicProfessorDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorCommentCountDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorReviewCountDto;
@@ -37,6 +38,8 @@ public class CourseService {
     private final SubjectRepository subjectRepository;
     private final RestTemplate restTemplate;
 
+    // TODO: use ConfigurationProperties as a class and inject it via constructor
+
     @Value("${discord.bot.url}")
     private String discordBotUrl;
 
@@ -57,6 +60,16 @@ public class CourseService {
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
         this.restTemplate = builder.build();
+    }
+
+    public ResponseEntity<List<FavoriteCourseDto>> getCoursesByArea(String q) {
+        List<Course> matchingCourses = courseRepository.findCoursesByArea(q);
+
+        List<FavoriteCourseDto> courses = matchingCourses.stream()
+                .map(course -> new FavoriteCourseDto(course.getId(), course.getName(), course.getSubject().getName(), course.getAbbreviation(), course.getSubject().getAbbreviation()))
+                .toList();
+
+        return ResponseEntity.ok(courses);
     }
 
     public ResponseEntity<FullCourseDto> getCourseInformation(UUID id) {

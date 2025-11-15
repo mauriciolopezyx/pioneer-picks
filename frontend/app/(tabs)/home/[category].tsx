@@ -15,68 +15,68 @@ import {
 
 const Category = () => {
 
-    const { category }: { category: string } = useLocalSearchParams()
+  const { category }: { category: string } = useLocalSearchParams()
 
-    const endpoint = category === "course" ? "/favorites/courses" : "/favorites/professors"
+  const endpoint = category === "course" ? "/favorites/courses" : "/favorites/professors"
 
-    const { isLoading:loading, isSuccess:success, error, data:favorites } = useQuery({
-        queryKey: ["specific-favorite-course-professors", category],
-        queryFn: async () => {
-            const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080${endpoint}`, {
-              method: "GET",
-              ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-            })
-            if (!response.ok) {
-              const payload = await response.text()
-              throw new Error(payload)
-            }
-            const json = await response.json()
-            return json
-        },
-        gcTime: 1000 * 60 * 5
-      }
-    )
-
-    if (loading) {
-      return (
-        <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800">
-          <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
-        </View>
-      )
+  const { isLoading:loading, isSuccess:success, error, data:favorites } = useQuery({
+      queryKey: ["specific-favorite-course-professors", category],
+      queryFn: async () => {
+          const sessionId = await SecureStore.getItemAsync("session");
+          const response = await fetch(`http://${LOCALHOST}:8080${endpoint}`, {
+            method: "GET",
+            ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+          })
+          if (!response.ok) {
+            const payload = await response.text()
+            throw new Error(payload)
+          }
+          const json = await response.json()
+          return json
+      },
+      gcTime: 1000 * 60 * 5
     }
-  
-    if (error) {
-      return (
-        <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800">
-          <Text className="font-montserrat dark:text-white">Failed to load favorites: {error?.message}</Text>
-        </View>
-      )
-    }
-  
-    if (!favorites || (favorites && favorites.length == 0)) {
-      return (
-        <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800">
-          <Text className="font-montserrat dark:text-white">No favorites found</Text>
-        </View>
-      )
-    }
+  )
 
+  if (loading) {
     return (
-      <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["left", "right"]}>
-        <ScrollView
-          className="flex-1 px-5"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-              minHeight: "100%", paddingBottom: 10
-          }}
-        >
-          <Text className="font-montserrat-bold text-2xl dark:text-white my-5">Favorite {category === "course" ? "Courses" : "Professors"}</Text>
-          {category === "course" ? <FavoriteSection data={favorites} ItemComponent={FavoriteCourseCard} /> : null}
-          {category === "professor" ? <FavoriteSection data={favorites} ItemComponent={FavoriteProfessorCard} /> : null}
-        </ScrollView>
-      </SafeAreaView>
+      <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800">
+        <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+      </View>
     )
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800">
+        <Text className="font-montserrat dark:text-white">Failed to load favorites: {error?.message}</Text>
+      </View>
+    )
+  }
+
+  if (!favorites || (favorites && favorites.length == 0)) {
+    return (
+      <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800">
+        <Text className="font-montserrat dark:text-white">No favorites found</Text>
+      </View>
+    )
+  }
+
+  return (
+    <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["left", "right"]}>
+      <ScrollView
+        className="flex-1 px-5"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+            minHeight: "100%", paddingBottom: 10
+        }}
+      >
+        <Text className="font-montserrat-bold text-2xl dark:text-white my-5">Favorite {category === "course" ? "Courses" : "Professors"}</Text>
+        {category === "course" ? <FavoriteSection data={favorites} ItemComponent={FavoriteCourseCard} /> : null}
+        {category === "professor" ? <FavoriteSection data={favorites} ItemComponent={FavoriteProfessorCard} /> : null}
+      </ScrollView>
+    </SafeAreaView>
+  )
 }
 
 export type SectionProps<T> = {

@@ -4,12 +4,13 @@ const STORAGE_KEY = "recent_searches";
 const MAX_ITEMS = 10;
 
 export type RecentSearch = {
-  id: string;
-  name: string;
-  category: number;
-  subject?: string;
-  abbreviation?: string;
-};
+  id: string,
+  name: string,
+  category: number,
+  subject?: string,
+  abbreviation?: string,
+  subjectAbbreviation?: string
+}
 
 export async function addRecentSearch(search: RecentSearch) {
   try {

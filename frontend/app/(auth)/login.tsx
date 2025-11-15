@@ -90,6 +90,7 @@ export default function Login() {
     },
     onError: (e: any) => {
       //console.error("Login error:", e.message)
+      console.log("yoohoo:", e.message)
       MasterToast.show({
         text1: "Error logging in",
         text2: JSON.parse(e.message)?.message ?? "Failed to login"
