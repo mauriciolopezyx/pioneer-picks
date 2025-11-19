@@ -47,7 +47,7 @@ const ResetPassword = () => {
     const isDark = colorScheme === "dark"
 
     const conditionalTitle = (!token && !email) ? "Enter your current and newly chosen password:" : "Create your new password below:"
-    const endpoint = token ? `http://${LOCALHOST}:8080/auth/forgot-password/reset` : `http://${LOCALHOST}:8080/user/me/password`
+    const endpoint = token ? `${LOCALHOST}/auth/forgot-password/reset` : `${LOCALHOST}/user/me/password`
 
     const {
         control,

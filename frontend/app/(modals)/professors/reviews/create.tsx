@@ -66,7 +66,7 @@ export default function SectionScreen() {
                 throw new Error(`The following fields are required: ${extra1} ${extra2}`)
             }
             const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080/reviews/${courseId}/${professorId}`, {
+            const response = await fetch(`${LOCALHOST}/reviews/${courseId}/${professorId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

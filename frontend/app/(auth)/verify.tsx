@@ -46,8 +46,8 @@ export default function Verify() {
     const forgotPassword = forgot === "true"
     const { refetch } = useAuth()
 
-    const verifyEndpoint = forgotPassword ? `http://${LOCALHOST}:8080/auth/forgot-password/code` : `http://${LOCALHOST}:8080/auth/verify`
-    const resendEndpoint = forgotPassword ? `http://${LOCALHOST}:8080/auth/forgot-password/code/resend` : `http://${LOCALHOST}:8080/auth/resend`
+    const verifyEndpoint = forgotPassword ? `${LOCALHOST}/auth/forgot-password/code` : `${LOCALHOST}/auth/verify`
+    const resendEndpoint = forgotPassword ? `${LOCALHOST}/auth/forgot-password/code/resend` : `${LOCALHOST}/auth/resend`
     const redirectUrl = forgotPassword ? "/(auth)/reset-password" : "/"
 
     const {isPending:loading, isError, error, mutate:confirmMutate} = useMutation({

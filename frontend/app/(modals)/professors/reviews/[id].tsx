@@ -40,7 +40,7 @@ export default function SectionScreen() {
         queryKey: ["specific-course-professor-reviews", professorId, courseId],
         queryFn: async () => {
             const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080/reviews/${courseId}/${professorId}`, {
+            const response = await fetch(`${LOCALHOST}/reviews/${courseId}/${professorId}`, {
                 method: "GET",
                 ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
             })

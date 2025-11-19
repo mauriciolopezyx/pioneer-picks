@@ -34,7 +34,7 @@ const Courses = () => {
     queryKey: ["specific-subject", id],
     queryFn: async () => {
       const sessionId = await SecureStore.getItemAsync("session");
-      const response = await fetch(`http://${LOCALHOST}:8080/subjects/${id}`, {
+      const response = await fetch(`${LOCALHOST}/subjects/${id}`, {
           method: "GET",
           ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
       })

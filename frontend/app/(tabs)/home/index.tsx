@@ -45,7 +45,7 @@ const Home = () => {
     queryKey: ["favorite-course-professors"],
     queryFn: async () => {
         const sessionId = await SecureStore.getItemAsync("session");
-        const response = await fetch(`http://${LOCALHOST}:8080/favorites`, {
+        const response = await fetch(`${LOCALHOST}/favorites`, {
           method: "GET",
           ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
         })

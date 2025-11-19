@@ -50,7 +50,7 @@ const Course = () => {
         queryKey: ["specific-course", courseId],
         queryFn: async () => {
             const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080/courses/${courseId}`, {
+            const response = await fetch(`${LOCALHOST}/courses/${courseId}`, {
                 method: "GET",
                 ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
             })
@@ -122,7 +122,7 @@ const Course = () => {
         mutationFn: async () => {
             console.log("attempting to toggle favorite course when favorited status is:", favorited)
             const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080/favorites/course/${courseId}`, {
+            const response = await fetch(`${LOCALHOST}/favorites/course/${courseId}`, {
                 method: favorited ? "DELETE" : "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -22,7 +22,7 @@ const CoursesByArea = () => {
       queryKey: ["specific-courses-by-area", area],
       queryFn: async () => {
         const sessionId = await SecureStore.getItemAsync("session");
-        const response = await fetch(`http://${LOCALHOST}:8080/courses?q=${area}`, {
+        const response = await fetch(`${LOCALHOST}/courses?q=${area}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json"

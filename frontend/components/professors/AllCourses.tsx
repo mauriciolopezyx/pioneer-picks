@@ -44,7 +44,7 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
         mutationFn: async () => {
             console.log("attempting to toggle favorite professor when favorited status is:", favorited)
             const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080/favorites/professor/${params.professorId}`, {
+            const response = await fetch(`${LOCALHOST}/favorites/professor/${params.professorId}`, {
                 method: favorited ? "DELETE" : "POST",
                 headers: {
                     "Content-Type": "application/json"

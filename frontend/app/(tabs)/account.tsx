@@ -23,7 +23,7 @@ const Account = () => {
     mutationFn: async () => {
       console.log("Attempting to log out")
       const sessionId = await SecureStore.getItemAsync("session");
-      const response = await fetch(`http://${LOCALHOST}:8080/logout`, {
+      const response = await fetch(`${LOCALHOST}/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

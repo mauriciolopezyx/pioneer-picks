@@ -60,7 +60,7 @@ export default function Register() {
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting with:")
             console.log(data)
-            const response = await fetch(`http://${LOCALHOST}:8080/auth/register`, {
+            const response = await fetch(`${LOCALHOST}/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

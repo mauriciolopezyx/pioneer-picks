@@ -79,7 +79,7 @@ const search = () => {
             if (query.trim() === "") {
                 throw new Error("Query cannot be empty")
             }
-            const response = await fetch(`http://${LOCALHOST}:8080/search?q=${query}`, {
+            const response = await fetch(`${LOCALHOST}/search?q=${query}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
@@ -111,8 +111,6 @@ const search = () => {
         clearRecentSearches()
         getRecentSearches().then(setRecentSearches)
     }
-
-    console.log(searchResults)
 
     return (
         <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["top"]}>

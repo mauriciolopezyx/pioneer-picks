@@ -40,7 +40,7 @@ const ForgotPassword = () => {
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting forgot password email")
             const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080/auth/forgot-password`, {
+            const response = await fetch(`${LOCALHOST}/auth/forgot-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

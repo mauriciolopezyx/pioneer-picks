@@ -39,7 +39,7 @@ export default function SectionScreen() {
                 throw new Error("Cannot have empty comment body!")
             }
             const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080/comments/${courseId}/${professorId}`, {
+            const response = await fetch(`${LOCALHOST}/comments/${courseId}/${professorId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -75,7 +75,7 @@ export default function SectionScreen() {
         queryKey: ["specific-course-professor-comments", professorId, courseId],
         queryFn: async () => {
             const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080/comments/${courseId}/${professorId}`, {
+            const response = await fetch(`${LOCALHOST}/comments/${courseId}/${professorId}`, {
                 method: "GET",
                 ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
             })

@@ -60,7 +60,7 @@ export default function Login() {
     mutationFn: async (data: z.infer<typeof formSchema>) => {
       console.log("submitting login attempt")
 
-      const response = await fetch(`http://${LOCALHOST}:8080/auth/login`, {
+      const response = await fetch(`${LOCALHOST}/auth/login`, {
           method: "POST",
           headers: {
               "Content-Type": "application/json"

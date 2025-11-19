@@ -33,7 +33,7 @@ const Create = () => {
                 throw new Error(`The following fields are required: Professor Name`)
             }
             const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`http://${LOCALHOST}:8080/professors`, {
+            const response = await fetch(`${LOCALHOST}/professors`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
