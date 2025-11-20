@@ -22,10 +22,11 @@ const Category = () => {
   const { isLoading:loading, isSuccess:success, error, data:favorites } = useQuery({
       queryKey: ["specific-favorite-course-professors", category],
       queryFn: async () => {
-          const sessionId = await SecureStore.getItemAsync("session");
+          //const sessionId = await SecureStore.getItemAsync("session");
           const response = await fetch(`${LOCALHOST}${endpoint}`, {
             method: "GET",
-            ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+            credentials: "include"
+            //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
           })
           if (!response.ok) {
             const payload = await response.text()

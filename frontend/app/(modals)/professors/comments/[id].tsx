@@ -38,13 +38,14 @@ export default function SectionScreen() {
             if (commentBody.trim() === "") {
                 throw new Error("Cannot have empty comment body!")
             }
-            const sessionId = await SecureStore.getItemAsync("session");
+            //const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`${LOCALHOST}/comments/${courseId}/${professorId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+                credentials: "include",
+                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
                 body: JSON.stringify({
                     body: commentBody
                 })
@@ -74,10 +75,11 @@ export default function SectionScreen() {
     const { isLoading:loading, isSuccess:success, error, data:comments, refetch:refetchComments } = useQuery({
         queryKey: ["specific-course-professor-comments", professorId, courseId],
         queryFn: async () => {
-            const sessionId = await SecureStore.getItemAsync("session");
+            //const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`${LOCALHOST}/comments/${courseId}/${professorId}`, {
                 method: "GET",
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+                credentials: "include"
+                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
             })
             if (!response.ok) {
                 const payload = await response.text()

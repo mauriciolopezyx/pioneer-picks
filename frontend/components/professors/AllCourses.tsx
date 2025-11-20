@@ -43,13 +43,14 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
     const {isPending:favoriteLoading, isError, error:favoriteError, mutate:toggleFavorite} = useMutation({
         mutationFn: async () => {
             console.log("attempting to toggle favorite professor when favorited status is:", favorited)
-            const sessionId = await SecureStore.getItemAsync("session");
+            //const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`${LOCALHOST}/favorites/professor/${params.professorId}`, {
                 method: favorited ? "DELETE" : "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {})
+                credentials: "include"
+                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {})
             })
             if (!response.ok) {
                 const payload = await response.text()

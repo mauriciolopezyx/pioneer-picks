@@ -36,11 +36,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { isLoading:loading, data:user, refetch } = useQuery({
         queryKey: ["authenticated-heartbeat"],
         queryFn: async () => {
-            const sessionId = await SecureStore.getItemAsync("session");
-            console.log("Session id is:", sessionId)
+            //const sessionId = await SecureStore.getItemAsync("session");
+            //console.log("Session id is:", sessionId)
             const response = await fetch(`${LOCALHOST}/user`, {
                 method: "GET",
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                //...(sessionId ? { "Cookie": `SESSION=${sessionId}` } : {})
             })
             if (!response.ok) {
                 const payload = await response.text()

@@ -66,13 +66,14 @@ const ResetPassword = () => {
     const {isPending:loading, isError, error, mutate:resetPassword} = useMutation({
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting reset password *Attempt*")
-            const sessionId = await SecureStore.getItemAsync("session");
+            //const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(endpoint, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+                credentials: "include",
+                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
                 body: JSON.stringify({
                     ...( (!token && !email) && {oldPassword: data.old}),
                     ...(token && {forgotToken: token}),

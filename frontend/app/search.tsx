@@ -81,6 +81,7 @@ const search = () => {
             }
             const response = await fetch(`${LOCALHOST}/search?q=${query}`, {
                 method: "GET",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },

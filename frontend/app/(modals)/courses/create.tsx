@@ -50,13 +50,14 @@ const Create = () => {
                 const extra2 = form.name.trim() === "" ? "Course Name" : ""
                 throw new Error(`The following fields are required: ${extra1} ${extra2}`)
             }
-            const sessionId = await SecureStore.getItemAsync("session");
+            //const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`${LOCALHOST}/courses`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
                 body: JSON.stringify(form)
             })
             if (!response.ok) {
@@ -73,6 +74,7 @@ const Create = () => {
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "Failed to verify")
+            console.log(e)
             MasterToast.show({
                 text1: "Error requesting course",
                 text2: JSON.parse(e.message)?.message ?? "Failed to request"

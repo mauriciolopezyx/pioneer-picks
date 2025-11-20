@@ -39,13 +39,13 @@ const ForgotPassword = () => {
     const {isPending:loading, isError, error, mutate} = useMutation({
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting forgot password email")
-            const sessionId = await SecureStore.getItemAsync("session");
+            //const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`${LOCALHOST}/auth/forgot-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
                 body: JSON.stringify({
                     email: data.email
                 })

@@ -22,13 +22,13 @@ const Account = () => {
   const {mutate:logout} = useMutation({
     mutationFn: async () => {
       console.log("Attempting to log out")
-      const sessionId = await SecureStore.getItemAsync("session");
+      //const sessionId = await SecureStore.getItemAsync("session");
       const response = await fetch(`${LOCALHOST}/logout`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Cookie: `SESSION=${sessionId}`
+          "Content-Type": "application/json"
         },
+        credentials: "include"
       })
       if (!response.ok) {
         const payload = await response.text()

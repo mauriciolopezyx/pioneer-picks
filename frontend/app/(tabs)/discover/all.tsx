@@ -31,10 +31,11 @@ const discover = () => {
   const { isLoading:loading, isSuccess:success, error, data } = useQuery({
     queryKey: ["all-subjects"],
     queryFn: async () => {
-      const sessionId = await SecureStore.getItemAsync("session");
+      //const sessionId = await SecureStore.getItemAsync("session");
       const response = await fetch(`${LOCALHOST}/subjects`, {
           method: "GET",
-          ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+          credentials: "include"
+          //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
       })
       if (!response.ok) {
           const payload = await response.text()

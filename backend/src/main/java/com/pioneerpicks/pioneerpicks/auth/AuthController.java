@@ -36,7 +36,7 @@ class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> authenticate(
+    public ResponseEntity<Void> authenticate(
             @RequestBody @Valid LoginUserDto loginUserDto,
             HttpServletRequest request,
             HttpServletResponse response,
@@ -50,7 +50,7 @@ class AuthController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<LoginResponseDto> verifyUser(
+    public ResponseEntity<Void> verifyUser(
             @RequestBody @Valid VerifyUserDto verifyUserDto,
             HttpServletRequest request,
             HttpServletResponse response,

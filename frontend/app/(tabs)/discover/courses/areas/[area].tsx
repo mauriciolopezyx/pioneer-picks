@@ -21,13 +21,14 @@ const CoursesByArea = () => {
   const { isLoading:loading, error, data:courses } = useQuery({
       queryKey: ["specific-courses-by-area", area],
       queryFn: async () => {
-        const sessionId = await SecureStore.getItemAsync("session");
+        //const sessionId = await SecureStore.getItemAsync("session");
         const response = await fetch(`${LOCALHOST}/courses?q=${area}`, {
           method: "GET",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json"
           },
-          ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+          //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
         })
         if (!response.ok) {
           const payload = await response.text()

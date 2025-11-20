@@ -65,13 +65,14 @@ export default function SectionScreen() {
                 const extra2 = form.negative.trim() === "" ? "What to look out for?" : ""
                 throw new Error(`The following fields are required: ${extra1} ${extra2}`)
             }
-            const sessionId = await SecureStore.getItemAsync("session");
+            //const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`${LOCALHOST}/reviews/${courseId}/${professorId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+                credentials: "include",
+                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
                 body: JSON.stringify({
                    ...form,
                    ["season"]: undefined,

@@ -11,6 +11,7 @@ import com.pioneerpicks.pioneerpicks.user.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -72,7 +74,7 @@ class AuthService {
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<LoginResponseDto> authenticate(
+    public ResponseEntity<Void> authenticate(
             LoginUserDto input,
             HttpServletRequest request,
             HttpServletResponse response
@@ -97,20 +99,18 @@ class AuthService {
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authentication);
             SecurityContextHolder.setContext(context);
-            request.getSession(true); // make sure a session exists
-            new HttpSessionSecurityContextRepository().saveContext(context, request, response);
+            HttpSession session = request.getSession(true); // creates session if missing
+            SecurityContextRepository repo = new HttpSessionSecurityContextRepository();
+            repo.saveContext(context, request, response);
 
-            System.out.println("SESSION ID from request: " + request.getSession().getId());
-
-            LoginResponseDto loginResponse = new LoginResponseDto(request.getSession().getId());
-
-            return ResponseEntity.ok(loginResponse);
+            // needs to be build() specifically
+            return ResponseEntity.noContent().build();
         } catch (AuthenticationException e) {
             throw new UnauthorizedException("Wrong email or password, please try again");
         }
     }
 
-    public ResponseEntity<LoginResponseDto> verifyUser(
+    public ResponseEntity<Void> verifyUser(
             VerifyUserDto input,
             HttpServletRequest request,
             HttpServletResponse response
@@ -141,12 +141,12 @@ class AuthService {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
-        request.getSession(true); // make sure a session exists
-        new HttpSessionSecurityContextRepository().saveContext(context, request, response);
+        HttpSession session = request.getSession(true); // creates session if missing
+        SecurityContextRepository repo = new HttpSessionSecurityContextRepository();
+        repo.saveContext(context, request, response);
 
-        LoginResponseDto loginResponse = new LoginResponseDto(request.getSession().getId());
-
-        return ResponseEntity.ok(loginResponse);
+        // needs to be build() specifically
+        return ResponseEntity.noContent().build();
     }
 
     public ResponseEntity<Void> resendVerificationCode(String email) {
@@ -263,9 +263,11 @@ class AuthService {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
-        request.getSession(true); // make sure a session exists
-        new HttpSessionSecurityContextRepository().saveContext(context, request, response);
+        HttpSession session = request.getSession(true); // creates session if missing
+        SecurityContextRepository repo = new HttpSessionSecurityContextRepository();
+        repo.saveContext(context, request, response);
 
+        // needs to be build() specifically
         return ResponseEntity.noContent().build();
     }
 

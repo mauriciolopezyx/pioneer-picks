@@ -72,16 +72,15 @@ export default function Login() {
           const payload = await response.text()
           throw new Error(payload)
       }
+      // const json = await response.json()
 
-      const json = await response.json()
+      // if (json.sessionId) {
+      //   console.log("Saving session:", json.sessionId)
+      //   await SecureStore.setItemAsync("session", json.sessionId)
+      // }
 
-      if (json.sessionId) {
-        console.log("Saving session:", json.sessionId)
-        await SecureStore.setItemAsync("session", json.sessionId)
-      }
-
-      console.log("login json response:")
-      console.log(json)
+      // console.log("login json response:")
+      // console.log(json)
     },
     onSuccess: async () => {
       await refetchAuth()

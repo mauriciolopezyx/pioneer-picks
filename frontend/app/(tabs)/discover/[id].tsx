@@ -33,10 +33,11 @@ const Courses = () => {
   const { isLoading:loading, isSuccess:success, error, data:subject } = useQuery({
     queryKey: ["specific-subject", id],
     queryFn: async () => {
-      const sessionId = await SecureStore.getItemAsync("session");
+      //const sessionId = await SecureStore.getItemAsync("session");
       const response = await fetch(`${LOCALHOST}/subjects/${id}`, {
           method: "GET",
-          ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+          credentials: "include"
+          //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
       })
       if (!response.ok) {
           const payload = await response.text()

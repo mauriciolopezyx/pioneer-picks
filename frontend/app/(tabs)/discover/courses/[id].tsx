@@ -49,10 +49,11 @@ const Course = () => {
     const { isLoading:loading, isSuccess:success, error, data:course } = useQuery({
         queryKey: ["specific-course", courseId],
         queryFn: async () => {
-            const sessionId = await SecureStore.getItemAsync("session");
+            //const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`${LOCALHOST}/courses/${courseId}`, {
                 method: "GET",
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+                credentials: "include"
+                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
             })
             if (!response.ok) {
                 const payload = await response.text()
@@ -121,13 +122,14 @@ const Course = () => {
     const {isPending:favoriteLoading, isError, error:favoriteError, mutate:toggleFavorite} = useMutation({
         mutationFn: async () => {
             console.log("attempting to toggle favorite course when favorited status is:", favorited)
-            const sessionId = await SecureStore.getItemAsync("session");
+            //const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`${LOCALHOST}/favorites/course/${courseId}`, {
                 method: favorited ? "DELETE" : "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {})
+                credentials: "include"
+                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {})
             })
             if (!response.ok) {
                 const payload = await response.text()

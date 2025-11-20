@@ -64,7 +64,6 @@ export default function Verify() {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                credentials: "include",
                 body: JSON.stringify({
                     email: email,
                     verificationCode: code
@@ -74,15 +73,19 @@ export default function Verify() {
                 const payload = await response.text()
                 throw new Error(payload)
             }
+            
+            const contentType = response.headers.get("content-type")
+            if (contentType && contentType.includes('application/json')) {
+                const json = await response.json()
 
-            const json = await response.json()
+                // if (json.sessionId) {
+                //     console.log("Saving session:", json.sessionId)
+                //     await SecureStore.setItemAsync("session", json.sessionId)
+                // }
 
-            if (json.sessionId) {
-                console.log("Saving session:", json.sessionId)
-                await SecureStore.setItemAsync("session", json.sessionId)
+                return json
             }
-
-            return json
+            return {}
         },
         onSuccess: async (json) => {
             await refetch()
@@ -105,7 +108,6 @@ export default function Verify() {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                credentials: "include",
                 body: JSON.stringify({
                     email: email
                 })

@@ -39,10 +39,11 @@ export default function SectionScreen() {
     const { isLoading:loading, isSuccess:success, error, data:reviews } = useQuery({
         queryKey: ["specific-course-professor-reviews", professorId, courseId],
         queryFn: async () => {
-            const sessionId = await SecureStore.getItemAsync("session");
+            //const sessionId = await SecureStore.getItemAsync("session");
             const response = await fetch(`${LOCALHOST}/reviews/${courseId}/${professorId}`, {
                 method: "GET",
-                ...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
+                credentials: "include"
+                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
             })
             if (!response.ok) {
                 const payload = await response.text()
