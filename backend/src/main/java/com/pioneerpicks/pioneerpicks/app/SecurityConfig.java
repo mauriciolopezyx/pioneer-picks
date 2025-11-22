@@ -64,6 +64,7 @@ class SecurityConfig {
         configuration.setAllowedOrigins(List.of("https://pioneerpicks.net", "http://localhost:8080", "http://localhost:5173", "http://localhost:3000", "expo://*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Set-Cookie"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -263,11 +263,11 @@ export const subjectIconMappings: Record<string, keyof typeof Ionicons.glyphMap>
   Math: "calculator-outline",
   Physics: "flask-outline",
   "Computer Science": "laptop-outline",
-  "accounting": "calculator",
-  "art": "brush",
-  "business analytics": "book",
-  "communication": "chatbubbles",
-  "special education": "people"
+  "Accounting": "calculator",
+  "Art": "brush",
+  "Business Analytics": "book",
+  "Communication": "chatbubbles",
+  "Special Education": "people",
 };
 
 export function useParsedLocalSearchParams<TParsed>(parser: (raw: Record<string, string | undefined>) => TParsed): TParsed {

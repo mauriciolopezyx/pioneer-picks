@@ -75,7 +75,7 @@ const Account = () => {
         
       <View>
         <Text className="font-montserrat dark:text-light-100 italic" style={{textAlign: "right"}}>Version 1.0</Text>
-        <Text className="font-montserrat text-xs dark:text-light-200 italic" style={{textAlign: "right"}}>Made by CSUEB students</Text>
+        {/* <Text className="font-montserrat text-xs dark:text-light-200 italic" style={{textAlign: "right"}}>Made by CSUEB students</Text> */}
       </View>
 
     </SafeAreaView>
