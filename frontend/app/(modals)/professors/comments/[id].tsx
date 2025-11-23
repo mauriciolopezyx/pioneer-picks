@@ -9,8 +9,8 @@ import { ToastInstance } from "@/components/ToastWrapper";
 import MasterToast from "@/components/ToastWrapper"
 
 import { useQuery, useMutation } from "@tanstack/react-query";
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from "@/services/api";
+import axios from "axios";
 
 import { GestureWrapper } from "@/app/(tabs)/home";
 
@@ -38,21 +38,15 @@ export default function SectionScreen() {
             if (commentBody.trim() === "") {
                 throw new Error("Cannot have empty comment body!")
             }
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}/comments/${courseId}/${professorId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-                body: JSON.stringify({
-                    body: commentBody
-                })
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.post(`/comments/${courseId}/${professorId}`, {body: commentBody})
+                return true
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
         },
         onSuccess: () => {
@@ -67,7 +61,7 @@ export default function SectionScreen() {
             //console.error(e?.message ?? "Failed to verify")
             MasterToast.show({
                 text1: "Error posting comment",
-                text2: JSON.parse(e.message)?.message ?? "Failed to post"
+                text2: e?.message ?? "Failed to post"
             })
         }
     })
@@ -75,18 +69,16 @@ export default function SectionScreen() {
     const { isLoading:loading, isSuccess:success, error, data:comments, refetch:refetchComments } = useQuery({
         queryKey: ["specific-course-professor-comments", professorId, courseId],
         queryFn: async () => {
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}/comments/${courseId}/${professorId}`, {
-                method: "GET",
-                credentials: "include"
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.get(`/comments/${courseId}/${professorId}`)
+                return response.data
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
-            const json = await response.json()
-            return json
         },
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60,
@@ -218,7 +210,7 @@ const CommentInput = ({ onChangeText, onComment, commentBody, user, colorScheme 
                 editable={user != null}
             />
             <GestureWrapper className="w-10 h-10 rounded-full flex items-center justify-center" backgroundColor="#d50032" onPress={onComment}>
-                <Ionicons name="send-outline" size={18} color="white" />
+                <Ionicons name="send" size={18} color="white" />
             </GestureWrapper>
         </View>
     )

@@ -10,8 +10,8 @@ import { GestureWrapper } from '../../home';
 import SearchBar from '@/components/SearchBar';
 
 import { useQuery, useMutation } from '@tanstack/react-query'
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from '@/services/api';
+import axios from 'axios';
 
 import MasterToast from "@/components/ToastWrapper"
 
@@ -49,19 +49,17 @@ const Course = () => {
     const { isLoading:loading, isSuccess:success, error, data:course } = useQuery({
         queryKey: ["specific-course", courseId],
         queryFn: async () => {
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}/courses/${courseId}`, {
-                method: "GET",
-                credentials: "include"
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.get(`/courses/${courseId}`)
+                setFavorited(response.data.favorited)
+                return response.data
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                const customMessage = error.response.data.message
+                throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
-            const json = await response.json()
-            setFavorited(json.favorited)
-            return json
         },
         refetchOnWindowFocus: true
     })
@@ -122,18 +120,28 @@ const Course = () => {
     const {isPending:favoriteLoading, isError, error:favoriteError, mutate:toggleFavorite} = useMutation({
         mutationFn: async () => {
             console.log("attempting to toggle favorite course when favorited status is:", favorited)
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}/favorites/course/${courseId}`, {
-                method: favorited ? "DELETE" : "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include"
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {})
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            if (favorited) {
+                try {
+                    const response = await api.delete(`/favorites/course/${courseId}`)
+                    return true
+                } catch (error) {
+                    if (axios.isAxiosError(error) && error.response) {
+                        const customMessage = error.response.data.message
+                        throw new Error(customMessage || 'An error occurred')
+                    }
+                    throw error
+                }
+            }
+
+            try {
+                const response = await api.post(`/favorites/course/${courseId}`)
+                return true
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
         },
         onMutate: () => {
@@ -150,7 +158,7 @@ const Course = () => {
             setFavorited(prev => !prev) // reverts immediate change if failed
             MasterToast.show({
                 text1: "Error favoriting",
-                text2: JSON.parse(e.message)?.message ?? "Failed to favorite"
+                text2: e?.message ?? "Failed to favorite"
             })
         }
     })
@@ -182,7 +190,7 @@ const Course = () => {
 
     if (!course) {
         return (
-            <SafeAreaView className="flex-1 dark:bg-gray-800">
+            <SafeAreaView className="flex-1 dark:bg-gray-800 items-center justify-center px-5">
                 <Text className="font-montserrat dark:text-white">Failed to load course information (no data found)</Text>
             </SafeAreaView>
         )

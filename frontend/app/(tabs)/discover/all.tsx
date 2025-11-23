@@ -6,9 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { useState, useCallback, useMemo } from "react"
 import { useQuery } from '@tanstack/react-query'
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
-import { GestureWrapper } from '../home';
+import api from '@/services/api';
+import axios from 'axios';
 
 import {
     SafeAreaView
@@ -31,18 +30,16 @@ const discover = () => {
   const { isLoading:loading, isSuccess:success, error, data } = useQuery({
     queryKey: ["all-subjects"],
     queryFn: async () => {
-      //const sessionId = await SecureStore.getItemAsync("session");
-      const response = await fetch(`${LOCALHOST}/subjects`, {
-          method: "GET",
-          credentials: "include"
-          //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-      })
-      if (!response.ok) {
-          const payload = await response.text()
-          throw new Error(payload)
+      try {
+        const response = await api.get(`/subjects`)
+        return response.data
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          const customMessage = error.response.data.message
+          throw new Error(customMessage || 'An error occurred')
+        }
+        throw error
       }
-      const json = await response.json()
-      return json
     },
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 60 * 24,

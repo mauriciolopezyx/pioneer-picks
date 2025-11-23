@@ -8,9 +8,9 @@ import { FormActionButton } from "../professors/reviews/create";
 import React, { useState, useMemo } from 'react'
 import { subjectIconMappings } from "@/services/utils";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from "@/services/api";
 import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
 type Form = {
     subject: string,
@@ -50,26 +50,22 @@ const Create = () => {
                 const extra2 = form.name.trim() === "" ? "Course Name" : ""
                 throw new Error(`The following fields are required: ${extra1} ${extra2}`)
             }
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}/courses`, {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-                body: JSON.stringify(form)
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.post(`/courses`, form)
+                return true
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
         },
         onSuccess: () => {
-            // MasterToast.show({
-            //     text1: "Successfully requested course!*",
-            //     text2: "*may take up to 24-48h for additions"
-            // })
+            MasterToast.show({
+                text1: "Successfully requested course!*",
+                text2: "*may take up to 24-48h for additions"
+            })
             router.back()
         },
         onError: (e: any) => {
@@ -77,7 +73,7 @@ const Create = () => {
             console.log(e)
             MasterToast.show({
                 text1: "Error requesting course",
-                text2: JSON.parse(e.message)?.message ?? "Failed to request"
+                text2: e?.message ?? "Failed to request"
             })
         }
     })
@@ -120,12 +116,12 @@ const Create = () => {
                 { (form.subject != "Choose..." && form.name.trim().length > 0) ? (
                     <GestureWrapper className="flex flex-row gap-x-2 items-center justify-center w-full py-2 rounded-full" backgroundColor="#155dfc" onPress={onCreate}>
                         <Text className="text-white text-xl font-montserrat-semibold">Request</Text>
-                        <Ionicons name="send-outline" size={12} color="white" />
+                        <Ionicons name="send" size={12} color="white" />
                     </GestureWrapper>
                 ) : (
                     <View className="flex flex-row gap-x-2 items-center justify-center opacity-50 bg-blue-600 w-full py-2 rounded-full">
                         <Text className="text-white text-xl font-montserrat-semibold">Request</Text>
-                        <Ionicons name="send-outline" size={12} color="white" />
+                        <Ionicons name="send" size={12} color="white" />
                     </View>
                 ) }
 

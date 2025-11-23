@@ -9,8 +9,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 import { useQuery } from '@tanstack/react-query'
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from '@/services/api';
+import axios from 'axios';
 
 import { useNavigation } from '@react-navigation/native'
 
@@ -33,18 +33,16 @@ const Courses = () => {
   const { isLoading:loading, isSuccess:success, error, data:subject } = useQuery({
     queryKey: ["specific-subject", id],
     queryFn: async () => {
-      //const sessionId = await SecureStore.getItemAsync("session");
-      const response = await fetch(`${LOCALHOST}/subjects/${id}`, {
-          method: "GET",
-          credentials: "include"
-          //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-      })
-      if (!response.ok) {
-          const payload = await response.text()
-          throw new Error(payload)
+      try {
+        const response = await api.get(`/subjects/${id}`)
+        return response.data
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          const customMessage = error.response.data.message
+          throw new Error(customMessage || 'An error occurred')
+        }
+        throw error
       }
-      const json = await response.json()
-      return json
     },
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 60 * 24,
@@ -93,15 +91,15 @@ const Courses = () => {
 
   if (error) {
     return (
-      <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
-        <Text className="font-montserrat dark:text-white">Failed to load professor: {error?.message}</Text>
+      <SafeAreaView className="flex-1 dark:bg-gray-800 items-center justify-center px-5" edges={['left', 'right']}>
+        <Text className="font-montserrat dark:text-white">Failed to load subject information: {error?.message}</Text>
       </SafeAreaView>
     )
   }
 
   if (!subject) {
     return (
-      <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
+      <SafeAreaView className="flex-1 dark:bg-gray-800 items-center justify-center px-5" edges={['left', 'right']}>
         <Text className="font-montserrat dark:text-white">Failed to load subject information (no data found)</Text>
       </SafeAreaView>
     )

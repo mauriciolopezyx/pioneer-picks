@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import React, { useState, useEffect,useCallback } from 'react'
 import SearchBar from '@/components/SearchBar';
 import { useMutation } from "@tanstack/react-query"
-import { LOCALHOST } from "@/services/api";
+import api from '@/services/api';
+import axios from 'axios';
 import { revolvingColorPalette, subjectColorMappings } from "@/services/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { addRecentSearch, clearRecentSearches, getRecentSearches, RecentSearch } from '@/services/recentSearches';
@@ -79,31 +80,28 @@ const search = () => {
             if (query.trim() === "") {
                 throw new Error("Query cannot be empty")
             }
-            const response = await fetch(`${LOCALHOST}/search?q=${query}`, {
-                method: "GET",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.get(`/search?q=${query}`)
+                return (
+                    [
+                        ...response.data.subjects.map((s: any) => ({ category: 1, data: s })),
+                        ...response.data.courses.map((c: any) => ({ category: 2, data: c })),
+                        ...response.data.professors.map((p: any) => ({ category: 3, data: p }))
+                    ]
+                )
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
-            const json = await response.json()
-            return (
-                [
-                    ...json.subjects.map((s: any) => ({ category: 1, data: s })),
-                    ...json.courses.map((c: any) => ({ category: 2, data: c })),
-                    ...json.professors.map((p: any) => ({ category: 3, data: p }))
-                ]
-            )
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "Failed to verify")
             MasterToast.show({
                 text1: "Error fetching search results",
-                text2: JSON.parse(e.message)?.message ?? "Failed to fetch"
+                text2: e?.message ?? "Failed to fetch"
             })
         }
     })

@@ -1,8 +1,8 @@
-import { LOCALHOST } from "@/services/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
+import axios from "axios";
+import api from "@/services/api";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -39,22 +39,16 @@ const ForgotPassword = () => {
     const {isPending:loading, isError, error, mutate} = useMutation({
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting forgot password email")
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}/auth/forgot-password`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-                body: JSON.stringify({
-                    email: data.email
-                })
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.post(`/auth/forgot-password`, {email: data.email})
+                return response.data.email
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
-            return data.email
         },
         onSuccess: (email: string) => {
             console.log("sent forgot password code to email successfully!")
@@ -68,7 +62,7 @@ const ForgotPassword = () => {
             //console.error(e?.message ?? "failed to reset password")
             MasterToast.show({
                 text1: "Error requesting code",
-                text2: JSON.parse(e.message)?.message ?? "Failed to request"
+                text2: e?.message ?? "Failed to request"
             })
         }
     })

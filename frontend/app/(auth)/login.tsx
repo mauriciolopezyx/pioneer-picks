@@ -13,11 +13,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
-import { LOCALHOST } from "@/services/api";
+import api from "@/services/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
+import axios from "axios";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useAuth } from "@/components/AuthProvider";
@@ -59,30 +59,19 @@ export default function Login() {
   const {isPending:loading, isError, error, mutate:login} = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
       console.log("submitting login attempt")
-
-      const response = await fetch(`${LOCALHOST}/auth/login`, {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json"
-          },
-          credentials: "include",
-          body: JSON.stringify(data)
-      })
-      if (!response.ok) {
-          const payload = await response.text()
-          throw new Error(payload)
+      try {
+        const response = await api.post('/auth/login', data)
+        return response.data
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          const customMessage = error.response.data.message
+          throw new Error(customMessage || 'An error occurred')
+        }
+        throw error
       }
-      // const json = await response.json()
-
-      // if (json.sessionId) {
-      //   console.log("Saving session:", json.sessionId)
-      //   await SecureStore.setItemAsync("session", json.sessionId)
-      // }
-
-      // console.log("login json response:")
-      // console.log(json)
     },
     onSuccess: async () => {
+      console.log("on Login success")
       await refetchAuth()
       router.replace({pathname: "/"})
       reset()
@@ -92,7 +81,7 @@ export default function Login() {
       console.log("yoohoo:", e.message)
       MasterToast.show({
         text1: "Error logging in",
-        text2: JSON.parse(e.message)?.message ?? "Failed to login"
+        text2: e?.message ?? "Failed to login"
       })
     }
   })

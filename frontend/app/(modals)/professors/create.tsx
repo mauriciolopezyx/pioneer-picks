@@ -5,9 +5,9 @@ import { useRouter, useLocalSearchParams } from "expo-router"
 import { ToastInstance } from "@/components/ToastWrapper";
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation } from "@tanstack/react-query";
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from "@/services/api";
 import MasterToast from "@/components/ToastWrapper"
+import axios from "axios";
 
 type Form = {
     courseId: string,
@@ -15,8 +15,6 @@ type Form = {
 }
 
 const Create = () => {
-
-    // they'll come from (tabs)/discover/courses/[id].tsx, where we'll have + button to add a professor
     
     const { courseId, subjectAbbreviation, courseAbbreviation }: {courseId: string, subjectAbbreviation: string, courseAbbreviation: string} = useLocalSearchParams()
     const router = useRouter()
@@ -32,33 +30,29 @@ const Create = () => {
             if (form.name.trim() === "") {
                 throw new Error(`The following fields are required: Professor Name`)
             }
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}/professors`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-                body: JSON.stringify(form)
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.post(`/professors`, form)
+                return true
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
         },
         onSuccess: () => {
-            // MasterToast.show({
-            //     text1: "Successfully requested professor!*",
-            //     text2: "*may take up to 24-48h for additions"
-            // })
+            MasterToast.show({
+                text1: "Successfully requested professor!*",
+                text2: "*may take up to 24-48h for additions"
+            })
             router.back()
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "Failed to verify")
             MasterToast.show({
                 text1: "Error requesting professor",
-                text2: JSON.parse(e.message)?.message ?? "Failed to request"
+                text2: e?.message ?? "Failed to request"
             })
         }
     })
@@ -93,12 +87,12 @@ const Create = () => {
                 { (form.name.trim().length > 0) ? (
                     <GestureWrapper className="flex flex-row gap-x-2 items-center justify-center w-full py-2 rounded-full" backgroundColor="#155dfc" onPress={onCreate}>
                         <Text className="text-white text-xl font-montserrat-semibold">Request</Text>
-                        <Ionicons name="send-outline" size={12} color="white" />
+                        <Ionicons name="send" size={12} color="white" />
                     </GestureWrapper>
                 ) : (
                     <View className="flex flex-row gap-x-2 items-center justify-center opacity-50 bg-blue-600 w-full py-2 rounded-full">
                         <Text className="text-white text-xl font-montserrat-semibold">Request</Text>
-                        <Ionicons name="send-outline" size={12} color="white" />
+                        <Ionicons name="send" size={12} color="white" />
                     </View>
                 )}
 

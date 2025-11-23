@@ -4,8 +4,8 @@ import React from 'react'
 import { FlashList } from '@shopify/flash-list';
 
 import { useQuery } from '@tanstack/react-query'
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from '@/services/api';
+import axios from 'axios';
 
 import { FavoriteCourseCard, FavoriteProfessorCard } from '.';
 
@@ -22,18 +22,16 @@ const Category = () => {
   const { isLoading:loading, isSuccess:success, error, data:favorites } = useQuery({
       queryKey: ["specific-favorite-course-professors", category],
       queryFn: async () => {
-          //const sessionId = await SecureStore.getItemAsync("session");
-          const response = await fetch(`${LOCALHOST}${endpoint}`, {
-            method: "GET",
-            credentials: "include"
-            //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-          })
-          if (!response.ok) {
-            const payload = await response.text()
-            throw new Error(payload)
+        try {
+          const response = await api.get(endpoint)
+          return response.data
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response) {
+            const customMessage = error.response.data.message
+            throw new Error(customMessage || 'An error occurred')
           }
-          const json = await response.json()
-          return json
+          throw error
+        }
       },
       gcTime: 1000 * 60 * 5
     }
@@ -49,7 +47,7 @@ const Category = () => {
 
   if (error) {
     return (
-      <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800">
+      <View className="flex-1 flex-row justify-center items-center dark:bg-gray-800 px-5">
         <Text className="font-montserrat dark:text-white">Failed to load favorites: {error?.message}</Text>
       </View>
     )

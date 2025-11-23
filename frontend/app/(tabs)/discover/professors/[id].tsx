@@ -10,9 +10,9 @@ import {
     SafeAreaView
 } from 'react-native-safe-area-context';
 
-import { useQuery, useMutation } from '@tanstack/react-query'
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import { useQuery } from '@tanstack/react-query'
+import api from '@/services/api';
+import axios from 'axios';
 
 type ProfessorParams = {
     id: string,
@@ -41,18 +41,16 @@ const Professor = () => {
     const { isLoading:loading, isSuccess:success, error, data } = useQuery({
         queryKey: ["specific-professor", professorId, courseId, getAll === true ? "all" : "course"],
         queryFn: async () => {
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}${endpoint}`, {
-                method: "GET",
-                credentials: "include"
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.get(endpoint)
+                return response.data
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
-            const json = await response.json()
-            return json
         },
         refetchOnWindowFocus: true
     })

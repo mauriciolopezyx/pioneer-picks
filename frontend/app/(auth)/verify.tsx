@@ -10,10 +10,9 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as SecureStore from "expo-secure-store";
+import api from "@/services/api";
+import axios from "axios";
 import MasterToast from "@/components/ToastWrapper"
-
-import { LOCALHOST } from "@/services/api";
 import { useAuth } from "@/components/AuthProvider";
 
 export default function Verify() {
@@ -46,8 +45,8 @@ export default function Verify() {
     const forgotPassword = forgot === "true"
     const { refetch } = useAuth()
 
-    const verifyEndpoint = forgotPassword ? `${LOCALHOST}/auth/forgot-password/code` : `${LOCALHOST}/auth/verify`
-    const resendEndpoint = forgotPassword ? `${LOCALHOST}/auth/forgot-password/code/resend` : `${LOCALHOST}/auth/resend`
+    const verifyEndpoint = forgotPassword ? `/auth/forgot-password/code` : `/auth/verify`
+    const resendEndpoint = forgotPassword ? `/auth/forgot-password/code/resend` : `/auth/resend`
     const redirectUrl = forgotPassword ? "/(auth)/reset-password" : "/"
 
     const {isPending:loading, isError, error, mutate:confirmMutate} = useMutation({
@@ -59,33 +58,16 @@ export default function Verify() {
                 throw new Error("Failed to send code: no email detected")
             }
             console.log("submitting verify attempt")
-            const response = await fetch(verifyEndpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: email,
-                    verificationCode: code
-                })
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.post(verifyEndpoint, {email: email, verificationCode: code})
+                return response.data
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
-            
-            const contentType = response.headers.get("content-type")
-            if (contentType && contentType.includes('application/json')) {
-                const json = await response.json()
-
-                // if (json.sessionId) {
-                //     console.log("Saving session:", json.sessionId)
-                //     await SecureStore.setItemAsync("session", json.sessionId)
-                // }
-
-                return json
-            }
-            return {}
         },
         onSuccess: async (json) => {
             await refetch()
@@ -95,7 +77,7 @@ export default function Verify() {
             //console.error(e?.message ?? "Failed to verify")
             MasterToast.show({
                 text1: "Error verifying code",
-                text2: JSON.parse(e.message)?.message ?? "Failed to verify"
+                text2: e?.message ?? "Failed to verify"
             })
         }
     })
@@ -103,20 +85,17 @@ export default function Verify() {
     const {mutate:resendCode, isError:isResendError, error:resendError} = useMutation({
         mutationFn: async () => {
             console.log("submitting resend code")
-            const response = await fetch(resendEndpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: email
-                })
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.post(resendEndpoint, {email: email})
+                setResendCooldown(30)
+                return true
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
-            setResendCooldown(30)
         },
         onSuccess: () => {
             console.log("successfully resent code!")
@@ -125,7 +104,7 @@ export default function Verify() {
             //console.error(e?.message ?? "Failed to resend code")
             MasterToast.show({
                 text1: "Error resending code",
-                text2: JSON.parse(e.message)?.message ?? "Failed to resend"
+                text2: e?.message ?? "Failed to resend"
             })
         }
     })

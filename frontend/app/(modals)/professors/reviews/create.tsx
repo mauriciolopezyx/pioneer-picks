@@ -7,8 +7,8 @@ import Slider from '@react-native-community/slider';
 import { reviewOptions } from "@/services/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useLocalSearchParams } from "expo-router"
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from "@/services/api";
+import axios from "axios";
 
 import { ToastInstance } from "@/components/ToastWrapper";
 import MasterToast from "@/components/ToastWrapper"
@@ -65,25 +65,21 @@ export default function SectionScreen() {
                 const extra2 = form.negative.trim() === "" ? "What to look out for?" : ""
                 throw new Error(`The following fields are required: ${extra1} ${extra2}`)
             }
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}/reviews/${courseId}/${professorId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-                body: JSON.stringify({
-                   ...form,
-                   ["season"]: undefined,
-                   ["year"]: undefined,
-                   ["semester"]: form.season + " " + form.year,
-                   ["textbook"]: form.textbook.trim() != "" ? form.textbook : null
+            try {
+                const response = await api.post(`/reviews/${courseId}/${professorId}`, {
+                    ...form,
+                    ["season"]: undefined,
+                    ["year"]: undefined,
+                    ["semester"]: form.season + " " + form.year,
+                    ["textbook"]: form.textbook.trim() != "" ? form.textbook : null
                 })
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+                return true
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
         },
         onSuccess: () => {
@@ -98,7 +94,7 @@ export default function SectionScreen() {
             //console.error(e?.message ?? "Failed to verify")
             MasterToast.show({
                 text1: "Error posting review",
-                text2: JSON.parse(e.message)?.message ?? "Failed to post"
+                text2: e?.message ?? "Failed to post"
             })
         }
     })
@@ -232,7 +228,7 @@ export default function SectionScreen() {
             {readyToPost ? <View className="absolute w-[250px] bottom-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                 <GestureWrapper className="flex flex-row gap-x-2 items-center justify-center bg-blue-600 w-full py-2 rounded-full" backgroundColor="#155dfc" onPress={onReview}>
                     <Text className="text-white text-xl font-montserrat-semibold">Post</Text>
-                    <Ionicons name="send-outline" size={12} color="white" />
+                    <Ionicons name="send" size={12} color="white" />
                 </GestureWrapper>
             </View> : null}
 

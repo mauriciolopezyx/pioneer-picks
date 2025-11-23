@@ -6,13 +6,12 @@ import { useNavigation } from "@react-navigation/native";
 import SearchBar from '../SearchBar';
 
 import { useMutation } from '@tanstack/react-query'
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
-
+import api from '@/services/api';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MasterToast from "@/components/ToastWrapper"
 import { GestureWrapper, FavoriteCourseCard } from '@/app/(tabs)/home';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
 type DataProps = {
     courses: ProfessorCourse[],
@@ -43,18 +42,28 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
     const {isPending:favoriteLoading, isError, error:favoriteError, mutate:toggleFavorite} = useMutation({
         mutationFn: async () => {
             console.log("attempting to toggle favorite professor when favorited status is:", favorited)
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}/favorites/professor/${params.professorId}`, {
-                method: favorited ? "DELETE" : "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include"
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {})
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            if (favorited) {
+                try {
+                    const response = await api.delete(`/favorites/professor/${params.professorId}`)
+                    return true
+                } catch (error) {
+                    if (axios.isAxiosError(error) && error.response) {
+                        const customMessage = error.response.data.message
+                        throw new Error(customMessage || 'An error occurred')
+                    }
+                    throw error
+                }
+            }
+
+            try {
+                const response = await api.post(`/favorites/professor/${params.professorId}`)
+                return true
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
         },
         onMutate: () => {
@@ -71,7 +80,7 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
             setFavorited(prev => !prev) // reverts immediate change if failed
             MasterToast.show({
                 text1: "Error favoriting",
-                text2: JSON.parse(e.message)?.message ?? "Failed to favorite"
+                text2: e?.message ?? "Failed to favorite"
             })
         }
     })

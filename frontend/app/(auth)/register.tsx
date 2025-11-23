@@ -16,11 +16,11 @@ import MasterToast from "@/components/ToastWrapper"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import { Link, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-
-import { LOCALHOST } from "@/services/api";
+import api from "@/services/api";
 
 const formSchema = z.object({
     email: z.string().min(22, {
@@ -60,22 +60,16 @@ export default function Register() {
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting with:")
             console.log(data)
-            const response = await fetch(`${LOCALHOST}/auth/register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username: data.username,
-                    email: data.email,
-                    password: data.password
-                })
-            })
-            if (!response.ok) {
-                const payload = await response.json()
-                throw payload
+            try {
+                const response = await api.post(`/auth/register`, {username: data.username, email: data.email, password: data.password})
+                return response.data.email
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
-            return data.email
         },
         onSuccess: (email: string) => {
             router.replace({pathname: "/verify", params: {email: email, forgot: "false"}})
@@ -85,7 +79,7 @@ export default function Register() {
             //console.error(e?.error ?? "Failed to register")
             MasterToast.show({
                 text1: "Error registering",
-                text2: JSON.parse(e.message)?.message ?? "Failed to register"
+                text2: e?.message ?? "Failed to register"
             })
         }
     })

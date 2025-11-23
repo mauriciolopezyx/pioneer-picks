@@ -5,8 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
 import { useQuery } from '@tanstack/react-query'
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from '@/services/api';
+import axios from 'axios';
 
 import { revolvingColorPalette, subjectColorMappings, subjectIconMappings } from "@/services/utils";
 
@@ -44,18 +44,16 @@ const Home = () => {
   const { isLoading:loading, isSuccess:success, error, data:favorites, refetch } = useQuery({
     queryKey: ["favorite-course-professors"],
     queryFn: async () => {
-        //const sessionId = await SecureStore.getItemAsync("session");
-        const response = await fetch(`${LOCALHOST}/favorites`, {
-          method: "GET",
-          credentials: "include"
-          //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-        })
-        if (!response.ok) {
-          const payload = await response.text()
-          throw new Error(payload)
+      try {
+        const response = await api.get('/favorites')
+        return response.data
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          const customMessage = error.response.data.message
+          throw new Error(customMessage || 'An error occurred')
         }
-        const json = await response.json()
-        return json
+        throw error
+      }
     },
     gcTime: 1000 * 60 * 5,
     refetchOnWindowFocus: true

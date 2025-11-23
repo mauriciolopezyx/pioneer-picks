@@ -3,7 +3,7 @@ import { useFonts } from '@expo-google-fonts/montserrat';
 import { Montserrat_400Regular, Montserrat_500Medium, Montserrat_700Bold, Montserrat_800ExtraBold, Montserrat_900Black, Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { useQuery } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from "@/services/api";
 import * as SplashScreen from "expo-splash-screen";
 
 SplashScreen.preventAutoHideAsync()
@@ -36,23 +36,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { isLoading:loading, data:user, refetch } = useQuery({
         queryKey: ["authenticated-heartbeat"],
         queryFn: async () => {
-            //const sessionId = await SecureStore.getItemAsync("session");
-            //console.log("Session id is:", sessionId)
-            const response = await fetch(`${LOCALHOST}/user`, {
-                method: "GET",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                //...(sessionId ? { "Cookie": `SESSION=${sessionId}` } : {})
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
-            }
-            const json = await response.json()
-            console.log("rec authenticated json:", json)
-            return json
+            const response = await api.get('/user')
+            console.log("rec authenticated json:", response.data)
+            return response.data
         },
         refetchOnWindowFocus: true,
     })

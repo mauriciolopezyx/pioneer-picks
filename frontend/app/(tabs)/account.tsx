@@ -6,7 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import MasterToast from "@/components/ToastWrapper"
 import { useQueryClient, useQuery, useMutation, queryOptions } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from '@/services/api';
+import axios from 'axios';
 
 import {
     SafeAreaView
@@ -22,21 +23,20 @@ const Account = () => {
   const {mutate:logout} = useMutation({
     mutationFn: async () => {
       console.log("Attempting to log out")
-      //const sessionId = await SecureStore.getItemAsync("session");
-      const response = await fetch(`${LOCALHOST}/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include"
-      })
-      if (!response.ok) {
-        const payload = await response.text()
-        throw new Error(payload)
+      try {
+        const response = await api.post(`/logout`)
+        return true
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          const customMessage = error.response.data.message
+          throw new Error(customMessage || 'An error occurred')
+        }
+        throw error
       }
     },
     onSuccess: async () => {
-      await SecureStore.deleteItemAsync("session")
+      await SecureStore.deleteItemAsync("sessionId")
+      delete api.defaults.headers.common['Cookie']
       queryClient.invalidateQueries({queryKey: ["authenticated-heartbeat"]})
       MasterToast.show({
         text1: "Successfully logged out!"
@@ -47,7 +47,7 @@ const Account = () => {
       //console.error(e?.message ?? "failed to log out")
       MasterToast.show({
         text1: "Error logging out",
-        text2: JSON.parse(e.message)?.message ?? "Failed to log out"
+        text2: e?.message ?? "Failed to log out"
       })
     }
   })

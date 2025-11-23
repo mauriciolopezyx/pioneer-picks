@@ -3,8 +3,8 @@ import { useLocalSearchParams } from "expo-router"
 import React from 'react'
 
 import { useQuery } from '@tanstack/react-query'
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from '@/services/api'
+import axios from 'axios'
 
 import { FavoriteCourseCard as CourseCard } from '@/app/(tabs)/home';
 import { FavoriteSection as CourseSection } from '@/app/(tabs)/home/[category]';
@@ -21,21 +21,16 @@ const CoursesByArea = () => {
   const { isLoading:loading, error, data:courses } = useQuery({
       queryKey: ["specific-courses-by-area", area],
       queryFn: async () => {
-        //const sessionId = await SecureStore.getItemAsync("session");
-        const response = await fetch(`${LOCALHOST}/courses?q=${area}`, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-        })
-        if (!response.ok) {
-          const payload = await response.text()
-          throw new Error(payload)
+        try {
+          const response = await api.get(`/courses?q=${area}`)
+          return response.data
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response) {
+            const customMessage = error.response.data.message
+            throw new Error(customMessage || 'An error occurred')
+          }
+          throw error
         }
-        const json = await response.json()
-        return json
       },
       gcTime: 1000 * 60 * 5
     }

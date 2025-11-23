@@ -8,8 +8,8 @@ import { reviewOptions } from "@/services/utils";
 import { GestureWrapper } from "@/app/(tabs)/home";
 
 import { useQuery } from '@tanstack/react-query'
-import * as SecureStore from "expo-secure-store";
-import { LOCALHOST } from "@/services/api";
+import api from "@/services/api";
+import axios from "axios";
 
 type Review = {
   name: string,
@@ -39,18 +39,16 @@ export default function SectionScreen() {
     const { isLoading:loading, isSuccess:success, error, data:reviews } = useQuery({
         queryKey: ["specific-course-professor-reviews", professorId, courseId],
         queryFn: async () => {
-            //const sessionId = await SecureStore.getItemAsync("session");
-            const response = await fetch(`${LOCALHOST}/reviews/${courseId}/${professorId}`, {
-                method: "GET",
-                credentials: "include"
-                //...(sessionId ? { Cookie: `SESSION=${sessionId}` } : {}),
-            })
-            if (!response.ok) {
-                const payload = await response.text()
-                throw new Error(payload)
+            try {
+                const response = await api.get(`/reviews/${courseId}/${professorId}`)
+                return response.data
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
             }
-            const json = await response.json()
-            return json
         },
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60,
