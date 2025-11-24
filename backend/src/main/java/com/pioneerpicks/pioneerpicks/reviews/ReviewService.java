@@ -44,7 +44,7 @@ class ReviewService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        Optional<Review> reviewThatShouldNotExist = reviewRepository.findByUserId(user.getId());
+        Optional<Review> reviewThatShouldNotExist = reviewRepository.findByAllIds(user.getId(), professorId, courseId);
         if (reviewThatShouldNotExist.isPresent()) {
             throw new ForbiddenException("You have already posted a review");
         }

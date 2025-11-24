@@ -8,8 +8,8 @@ import { z } from "zod";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MasterToast from "@/components/ToastWrapper"
 
-import { View, Text, KeyboardAvoidingView, Platform, Pressable, TextInput, TouchableOpacity, useColorScheme } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, KeyboardAvoidingView, Platform, TextInput, TouchableOpacity, useColorScheme } from 'react-native'
+import React from 'react'
 
 const formSchema = z.object({
     email: z.string().min(22, {
@@ -36,7 +36,7 @@ const ForgotPassword = () => {
         mode: "onChange"
     })
 
-    const {isPending:loading, isError, error, mutate} = useMutation({
+    const {isPending:loading, mutate} = useMutation({
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting forgot password email")
             try {

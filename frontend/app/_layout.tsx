@@ -1,6 +1,6 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryProvider } from "@/components/QueryProvider";
-import { AuthProvider, useAuth } from '@/components/AuthProvider';
+import { AuthProvider } from '@/components/AuthProvider';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { Stack } from "expo-router";
 import { ToastInstance } from '@/components/ToastWrapper';

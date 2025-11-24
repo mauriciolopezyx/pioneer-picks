@@ -1,4 +1,3 @@
-
 import { Tabs } from 'expo-router'
 import React from 'react'
 import { Text, View, useColorScheme } from 'react-native'

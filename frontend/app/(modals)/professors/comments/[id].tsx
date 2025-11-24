@@ -32,7 +32,7 @@ export default function SectionScreen() {
         setCommentBody(text)
     }, [])
 
-    const {isPending:commentPending, isError, error:commentError, mutate:onComment} = useMutation({
+    const {mutate:onComment} = useMutation({
         mutationFn: async () => {
             console.log("attempting to post comment with body:", commentBody)
             if (commentBody.trim() === "") {
@@ -66,7 +66,7 @@ export default function SectionScreen() {
         }
     })
 
-    const { isLoading:loading, isSuccess:success, error, data:comments, refetch:refetchComments } = useQuery({
+    const { isLoading:loading, error, data:comments, refetch:refetchComments } = useQuery({
         queryKey: ["specific-course-professor-comments", professorId, courseId],
         queryFn: async () => {
             try {

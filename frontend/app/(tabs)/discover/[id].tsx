@@ -1,6 +1,6 @@
 import { StyleSheet, Text, ScrollView, View, ActivityIndicator, Linking, TouchableOpacity, Animated, useColorScheme } from 'react-native'
 import { FlashList } from "@shopify/flash-list";
-import { useLocalSearchParams, usePathname } from 'expo-router'
+import { useLocalSearchParams } from 'expo-router'
 import React, { useLayoutEffect, useMemo, useState, useCallback } from 'react'
 import CourseCard from '@/components/CourseCard'
 import SearchBar from '@/components/SearchBar';
@@ -21,7 +21,6 @@ import {
 const Courses = () => {
 
   const router = useRouter()
-  const colorScheme = useColorScheme()
   const {id} = useLocalSearchParams()
 
   const [query, setQuery] = useState("")

@@ -1,9 +1,7 @@
-import { Text, View, ScrollView, useColorScheme, ActivityIndicator, Pressable } from 'react-native'
+import { Text, View, ScrollView, ActivityIndicator, Pressable } from 'react-native'
 import { FlashList } from "@shopify/flash-list";
 import DiscoverCard from '@/components/DiscoverCard'
 import SearchBar from '@/components/SearchBar';
-import { Ionicons } from "@expo/vector-icons";
-import { useActionSheet } from '@expo/react-native-action-sheet';
 import { useState, useCallback, useMemo } from "react"
 import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api';
@@ -20,14 +18,13 @@ const filterOptions = ["Alphabetical", "Reset"]
 const discover = () => {
 
   const router = useRouter()
-  const colorScheme = useColorScheme()
   const [query, setQuery] = useState("")
   //const [filter, setFilter] = useState(filterOptions.length - 1)
   const onChangeQuery = useCallback((text: string) => {
     setQuery(text)
   }, [])
 
-  const { isLoading:loading, isSuccess:success, error, data } = useQuery({
+  const { isLoading:loading, error, data } = useQuery({
     queryKey: ["all-subjects"],
     queryFn: async () => {
       try {

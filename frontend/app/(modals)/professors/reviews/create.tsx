@@ -35,7 +35,6 @@ type Form = {
 export default function SectionScreen() {
 
     const { professorId, courseId }: {professorId: string, courseId: string} = useLocalSearchParams()
-    const { user } = useAuth()
     const router = useRouter()
 
     const [form, setForm] = useState<Form>({
@@ -57,7 +56,7 @@ export default function SectionScreen() {
         setForm((prev) => ({...prev, [key]: value}))
     }
 
-    const {isPending:commentPending, isError, error:commentError, mutate:onReview} = useMutation({
+    const {mutate:onReview} = useMutation({
         mutationFn: async () => {
             console.log("attempting to post review with:", form)
             if (form.positive.trim() === "" || form.negative.trim() === "") {

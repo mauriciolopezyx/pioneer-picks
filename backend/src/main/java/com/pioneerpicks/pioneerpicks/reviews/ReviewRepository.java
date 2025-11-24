@@ -37,8 +37,10 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     SELECT DISTINCT r
     FROM Review r
     WHERE r.user.id = :userId
+    AND r.professor.id = :professorId
+    AND r.course.id = :courseId
     """)
-    Optional<Review> findByUserId(@Param("userId") Long userId);
+    Optional<Review> findByAllIds(@Param("userId") Long userId, @Param("professorId") UUID professorId, @Param("courseId") UUID courseId);
 
     @Query("SELECT COUNT(r) FROM Review r WHERE r.professor.id = :professorId AND r.course.id = :courseId")
     long countByProfessorAndCourse(@Param("professorId") UUID professorId, @Param("courseId") UUID courseId);

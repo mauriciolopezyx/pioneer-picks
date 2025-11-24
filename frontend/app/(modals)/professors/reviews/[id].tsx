@@ -36,7 +36,7 @@ export default function SectionScreen() {
     const { user } = useAuth()
     const colorScheme = useColorScheme()
 
-    const { isLoading:loading, isSuccess:success, error, data:reviews } = useQuery({
+    const { isLoading:loading, error, data:reviews } = useQuery({
         queryKey: ["specific-course-professor-reviews", professorId, courseId],
         queryFn: async () => {
             try {

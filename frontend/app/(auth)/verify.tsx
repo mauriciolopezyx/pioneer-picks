@@ -49,7 +49,7 @@ export default function Verify() {
     const resendEndpoint = forgotPassword ? `/auth/forgot-password/code/resend` : `/auth/resend`
     const redirectUrl = forgotPassword ? "/(auth)/reset-password" : "/"
 
-    const {isPending:loading, isError, error, mutate:confirmMutate} = useMutation({
+    const {isPending:loading, isError, mutate:confirmMutate} = useMutation({
         mutationFn: async () => {
             if (code.length !== 6) {
                 throw new Error("Failed to send code: Please enter a 6-digit code")
@@ -82,7 +82,7 @@ export default function Verify() {
         }
     })
 
-    const {mutate:resendCode, isError:isResendError, error:resendError} = useMutation({
+    const {mutate:resendCode} = useMutation({
         mutationFn: async () => {
             console.log("submitting resend code")
             try {

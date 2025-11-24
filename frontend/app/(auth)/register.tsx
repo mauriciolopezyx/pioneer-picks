@@ -36,7 +36,6 @@ export default function Register() {
   
     const router = useRouter()
     const [showPassword, setShowPassword] = useState(false);
-    const [focused, setFocused] = useState({email: false, username: false, password: false})
 
     const colorScheme = useColorScheme();
     const isDark = colorScheme === "dark";
@@ -56,7 +55,7 @@ export default function Register() {
         mode: "onChange"
     })
 
-    const {isPending:loading, isError, error, mutate:register} = useMutation({
+    const {isPending:loading, mutate:register} = useMutation({
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting with:")
             console.log(data)
@@ -124,10 +123,8 @@ export default function Register() {
                         `}
                         placeholder=""
                         placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                        onFocus={() => setFocused(prev => ({ ...prev, email: true }))}
                         onBlur={() => {
-                            setFocused(prev => ({ ...prev, email: false }));
-                            onBlur();
+                            onBlur()
                         }}
                         onChangeText={onChange}
                         value={value}
@@ -162,10 +159,8 @@ export default function Register() {
                         `}
                         placeholder=""
                         placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                        onFocus={() => setFocused(prev => ({ ...prev, username: true }))}
                         onBlur={() => {
-                            setFocused(prev => ({ ...prev, username: false }));
-                            onBlur();
+                            onBlur()
                         }}
                         onChangeText={onChange}
                         value={value}
@@ -200,10 +195,8 @@ export default function Register() {
                             `}
                             placeholder=""
                             placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                            onFocus={() => setFocused(prev => ({ ...prev, password: true }))}
                             onBlur={() => {
-                                setFocused(prev => ({ ...prev, password: false }));
-                                onBlur();
+                                onBlur()
                             }}
                             onChangeText={onChange}
                             value={value}

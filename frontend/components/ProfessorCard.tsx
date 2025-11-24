@@ -5,38 +5,6 @@ import { Text, View, useColorScheme } from "react-native";
 import { revolvingColorPalette, subjectColorMappings } from "@/services/utils";
 import { GestureWrapper } from "@/app/(tabs)/home";
 
-// type Section = {
-//     sectionId: string,
-//     professor: string,
-//     schedule: string,
-//     location: string
-// }
-
-type Review = {
-  name: string
-  date: string,
-  semester: string,
-  location: number,
-  id: number,
-  workload: number,
-  leniency: number,
-  assignments: number,
-  communication: number,
-  curve: boolean,
-  attendance: boolean,
-  late: boolean,
-  textbook?: string,
-  positive: string,
-  negative: string
-}
-type Comment = {
-  name: string,
-  date: string,
-  semester: string,
-  body: string,
-  id: number
-}
-
 type SubjectCourseProps = {
   name: string,
   abbreviation: string

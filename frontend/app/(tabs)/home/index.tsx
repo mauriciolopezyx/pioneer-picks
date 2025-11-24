@@ -41,7 +41,7 @@ const Home = () => {
   const router = useRouter()
   const [refreshing, setRefreshing] = useState<boolean>(false)
 
-  const { isLoading:loading, isSuccess:success, error, data:favorites, refetch } = useQuery({
+  const { isLoading:loading, error, data:favorites, refetch } = useQuery({
     queryKey: ["favorite-course-professors"],
     queryFn: async () => {
       try {
@@ -66,8 +66,8 @@ const Home = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refetch}
-            tintColor="#fff" // makes the spinner white
-            colors={['#fff']} // for Android
+            tintColor="#fff"
+            colors={['#fff']}
           />
         }
       >

@@ -1,7 +1,6 @@
 import { Text, ActivityIndicator } from 'react-native'
 import { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { revolvingColorPalette, subjectColorMappings } from "@/services/utils"
 import SpecificProfessorCourse from '@/components/professors/SpecificCourse';
 import AllProfessorCourses from '@/components/professors/AllCourses';
 import { useParsedLocalSearchParams } from '@/services/utils';

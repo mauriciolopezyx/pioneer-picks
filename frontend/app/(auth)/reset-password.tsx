@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter } from "expo-router";
 import axios from "axios";
 import api from "@/services/api";
 import { Controller, useForm } from "react-hook-form";
@@ -25,8 +25,6 @@ type ResetPasswordParams = {
     token?: string,
     email?: string
 }
-
-// since we're not doing OAuth, if token/email both aren't in params then its coming from a user already signed in (and they have to have a password...)
 
 const ResetPassword = () => {
 
@@ -63,7 +61,7 @@ const ResetPassword = () => {
         mode: "onChange"
     })
 
-    const {isPending:loading, isError, error, mutate:resetPassword} = useMutation({
+    const {isPending:loading, mutate:resetPassword} = useMutation({
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting reset password *Attempt*")
             try {

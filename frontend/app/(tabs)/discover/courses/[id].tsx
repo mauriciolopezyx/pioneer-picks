@@ -19,8 +19,6 @@ import {
     SafeAreaView
 } from 'react-native-safe-area-context';
 
-//public record FullCourseDto(UUID id, String name, String abbreviation, Integer units, String areas, List<BasicProfessorDto> professors) {}
-
 const Course = () => {
 
     const router = useRouter()

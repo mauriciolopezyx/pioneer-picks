@@ -37,7 +37,6 @@ export default function Login() {
   const router = useRouter()
   const { refetch:refetchAuth } = useAuth()
   const [showPassword, setShowPassword] = useState(false);
-  const [focused, setFocused] = useState({email: false, password: false})
   
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -56,7 +55,7 @@ export default function Login() {
     mode: "onChange"
   })
 
-  const {isPending:loading, isError, error, mutate:login} = useMutation({
+  const {isPending:loading, mutate:login} = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
       console.log("submitting login attempt")
       try {
@@ -126,10 +125,8 @@ export default function Login() {
                     `}
                     placeholder=""
                     placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                    onFocus={() => setFocused(prev => ({ ...prev, email: true }))}
                     onBlur={() => {
-                      setFocused(prev => ({ ...prev, email: false }));
-                      onBlur();
+                      onBlur()
                     }}
                     onChangeText={onChange}
                     value={value}
@@ -165,10 +162,8 @@ export default function Login() {
                       `}
                       placeholder=""
                       placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                      onFocus={() => setFocused(prev => ({ ...prev, password: true }))}
                       onBlur={() => {
-                        setFocused(prev => ({ ...prev, password: false }));
-                        onBlur();
+                        onBlur()
                       }}
                       onChangeText={onChange}
                       value={value}

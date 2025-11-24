@@ -19,7 +19,7 @@ const Category = () => {
 
   const endpoint = category === "course" ? "/favorites/courses" : "/favorites/professors"
 
-  const { isLoading:loading, isSuccess:success, error, data:favorites } = useQuery({
+  const { isLoading:loading, error, data:favorites } = useQuery({
       queryKey: ["specific-favorite-course-professors", category],
       queryFn: async () => {
         try {

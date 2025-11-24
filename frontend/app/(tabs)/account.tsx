@@ -4,7 +4,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { GestureWrapper } from './home';
 import { Ionicons } from '@expo/vector-icons';
 import MasterToast from "@/components/ToastWrapper"
-import { useQueryClient, useQuery, useMutation, queryOptions } from '@tanstack/react-query'
+import { useQueryClient, useMutation } from '@tanstack/react-query'
 import * as SecureStore from "expo-secure-store";
 import api from '@/services/api';
 import axios from 'axios';

@@ -4,22 +4,6 @@ import { Text, View, useColorScheme } from "react-native";
 import { areas, revolvingColorPalette, subjectColorMappings, areaAbbreviations, findAreaParentKey, areaColorMappings } from "@/services/utils";
 import { GestureWrapper } from "@/app/(tabs)/home";
 
-type Section = {
-    sectionId: string,
-    professor: string,
-    schedule: string,
-    location: string
-}
-// type Course = {
-//     courseId: string,
-//     shortName: string,
-//     fullName: string,
-//     units: number,
-//     areas: string[],
-//     description: string,
-//     sections: Section[]
-// }
-
 type SubjectCourseProps = {
   name: string,
   abbreviation: string
@@ -75,7 +59,7 @@ const CourseCard = ({ course, subject }: { course: Course, subject: SubjectCours
   return (
     <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden" backgroundColor={bgColor} onPress={handleSubmit}>
       <View className="flex flex-col items-start justify-center gap-y-[2px]">
-        <Text numberOfLines={1} className={`text-xl font-bold ${textColor}`}>
+        <Text numberOfLines={1} className={`text-xl font-montserrat-bold ${textColor}`}>
           {`${subject.abbreviation} ${course.abbreviation}`}
         </Text>
         <Text className={`font-montserrat-semibold ${textColor} mb-[4px]`}>
