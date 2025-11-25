@@ -174,10 +174,18 @@ export const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
   const iconName = subjectIconMappings[data.subject] ?? "ellipse-outline";
 
   const onPress = () => {
-    router.navigate({
-      pathname: "/(tabs)/discover/courses/[id]",
-      params: { id: data.id, subjectName: data.subject, subjectAbbreviation: data.subjectAbbreviation },
-    })
+    // router.push({
+    //   pathname: "/(tabs)/discover/courses/[id]",
+    //   params: { id: data.id, subjectName: data.subject, subjectAbbreviation: data.subjectAbbreviation },
+    // })
+
+    router.push('/(tabs)/discover/all')
+    setTimeout(() => {
+      router.push({
+        pathname: "/(tabs)/discover/courses/[id]",
+        params: { id: data.id, subjectName: data.subject, subjectAbbreviation: data.subjectAbbreviation },
+      })
+    }, 100)
   }
 
   return (
@@ -210,10 +218,18 @@ export const FavoriteProfessorCard = ({data}: {data: FavoriteProfessor}) => {
   const router = useRouter()
 
   const onPress = () => {
-    router.navigate({
-      pathname: "/(tabs)/discover/professors/[id]",
-      params: { id: data.id, getAll: "true" },
-    })
+    // router.push({
+    //   pathname: "/(tabs)/discover/professors/[id]",
+    //   params: { id: data.id, getAll: "true" },
+    // })
+
+    router.push('/(tabs)/discover/all')
+    setTimeout(() => {
+      router.push({
+        pathname: "/(tabs)/discover/professors/[id]",
+        params: { id: data.id, getAll: "true" },
+      })
+    }, 100)
   }
 
   return (

@@ -67,8 +67,6 @@ const AllProfessorCourses = ({params}: {params: {professorId: string}}) => {
         refetchOnWindowFocus: false
     })
 
-    console.log(info, rawCourses)
-
     const courses = rawCourses?.pages.flatMap(page => page.content) ?? []
 
     const colorScheme = useColorScheme()

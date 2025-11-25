@@ -91,13 +91,18 @@ public class CourseService {
         User user = (User) authentication.getPrincipal();
 
         boolean favorited = userRepository.isCourseFavoritedByUser(user.getId(), id);
-
         FullCourseDto dto = new FullCourseDto(id, course.getName(), course.getAbbreviation(), course.getUnits(), course.getAreas(), favorited);
         return ResponseEntity.ok(dto);
     }
 
     public ResponseEntity<Void> requestNewCourse(@Valid NewCourseDto newCourseDto) {
-        Subject subject = subjectRepository.findByNameContainingIgnoreCase(newCourseDto.subject()).orElseThrow(() -> new NotFoundException("Subject not found"));
+        // v holds if new request (Computer Science)
+        UUID subjectId = UUID.fromString("75e92b02-c82d-44e0-869c-42718ce8911b");
+
+        if (!newCourseDto.subject().equalsIgnoreCase("new")) {
+            Subject subject = subjectRepository.findByName(newCourseDto.subject()).orElseThrow(() -> new NotFoundException("Subject not found"));
+            subjectId = subject.getId();
+        }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -105,7 +110,7 @@ public class CourseService {
         Map<String, Object> payload = Map.of(
                 "secret", discordSecret,
                 "subjectName", newCourseDto.subject(),
-                "subjectId", subject.getId(),
+                "subjectId", subjectId,
                 "name", newCourseDto.name(),
                 "userId", user.getId()
         );

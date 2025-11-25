@@ -62,7 +62,7 @@ const Category = () => {
       return lastPage.hasMore ? allPages.length : undefined
     },
     initialPageParam: 0,
-    gcTime: 1000 * 60 * 5
+    refetchOnWindowFocus: false
   })
 
   if (loading) {

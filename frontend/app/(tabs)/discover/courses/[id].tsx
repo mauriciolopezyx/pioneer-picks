@@ -34,8 +34,6 @@ const Course = () => {
         setQuery(text)
     }, [])
 
-    console.log(courseId, subjectName, subjectAbbreviation)
-
     useEffect(() => {
         if (subjectName) {
             navigation.setOptions({
@@ -98,26 +96,6 @@ const Course = () => {
             pathname: "/(modals)/areas"
         })
     }
-    
-    const scrollY = useMemo(() => new RNAnimated.Value(0), []);
-
-    useLayoutEffect(() => {
-        const listenerId = scrollY.addListener(({ value }) => {
-        const opacity = Math.min(value / 30, 1)
-        navigation.setOptions({
-                headerTintColor: `rgba(213, 0, 50, ${1 - opacity})`
-            })
-        })
-
-        return () => {
-            scrollY.removeListener(listenerId)
-        }
-    }, [])
-
-    const handleScroll = RNAnimated.event(
-        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-        { useNativeDriver: false }
-    )
 
     const seen = new Set()
     const areaDisplays = (course && course.areas) ? course.areas.split(",").map((area: string) => {
