@@ -11,6 +11,9 @@ import com.pioneerpicks.pioneerpicks.professors.ProfessorRepository;
 import com.pioneerpicks.pioneerpicks.reviews.dto.FullReviewDto;
 import com.pioneerpicks.pioneerpicks.reviews.dto.PostReviewDto;
 import com.pioneerpicks.pioneerpicks.user.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -95,17 +99,18 @@ class ReviewService {
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<List<FullReviewDto>> getCourseProfessorReviews(UUID courseId, UUID professorId) {
+    public ResponseEntity<Map<String, Object>> getCourseProfessorReviews(UUID courseId, UUID professorId, Integer pageNumber) {
         Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new NotFoundException("Professor not found"));
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new NotFoundException("Course not found"));
+        Pageable pageable = PageRequest.of(pageNumber, 5);
 
-        List<Review> reviews = reviewRepository.findReviewsWithUserAndCourse(professorId, courseId);
+        Page<Review> page = reviewRepository.findReviewsWithUserAndCourse(professorId, courseId, pageable);
 
-        List<FullReviewDto> dtos = reviews.stream()
+        List<FullReviewDto> reviews = page.getContent().stream()
                 .map(review -> new FullReviewDto(review.getId(), review.getUser().getUsername(), review.getDate(), review.getSemester(), review.getLocation(), review.getWorkload(), review.getLeniency(), review.getAssignments(), review.getCommunication(), review.getCurve(), review.getAttendance(), review.getLate(), Optional.ofNullable(review.getTextbook()), review.getPositive(), review.getNegative()))
                 .toList();
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(Map.of("content", reviews, "hasMore", page.hasNext(), "totalElements", page.getTotalElements(), "totalPages", page.getTotalPages(), "currentPage", page.getNumber()));
     }
 
 }

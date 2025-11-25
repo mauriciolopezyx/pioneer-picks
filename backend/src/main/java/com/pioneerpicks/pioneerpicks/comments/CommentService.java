@@ -8,6 +8,9 @@ import com.pioneerpicks.pioneerpicks.exception.NotFoundException;
 import com.pioneerpicks.pioneerpicks.professors.Professor;
 import com.pioneerpicks.pioneerpicks.professors.ProfessorRepository;
 import com.pioneerpicks.pioneerpicks.user.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -47,17 +51,18 @@ class CommentService {
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<List<FullCommentDto>> getComments(UUID courseId, UUID professorId) {
+    public ResponseEntity<Map<String, Object>> getComments(UUID courseId, UUID professorId, Integer pageNumber) {
         Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new NotFoundException("Professor not found"));
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new NotFoundException("Course not found"));
+        Pageable pageable = PageRequest.of(pageNumber, 20);
 
-        List<Comment> comments = commentRepository.findCommentsWithUserAndCourse(professorId, courseId);
+        Page<Comment> page = commentRepository.findCommentsWithUserAndCourse(professorId, courseId, pageable);
 
-        List<FullCommentDto> dtos = comments.stream()
+        List<FullCommentDto> comments = page.getContent().stream()
                 .map(comment -> new FullCommentDto(comment.getId(), comment.getUser().getUsername(), comment.getDate(), comment.getBody()))
                 .toList();
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(Map.of("content", comments, "hasMore", page.hasNext(), "totalElements", page.getTotalElements(), "totalPages", page.getTotalPages(), "currentPage", page.getNumber()));
     }
 
 }

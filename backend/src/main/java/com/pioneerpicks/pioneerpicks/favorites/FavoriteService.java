@@ -9,6 +9,9 @@ import com.pioneerpicks.pioneerpicks.professors.Professor;
 import com.pioneerpicks.pioneerpicks.professors.ProfessorRepository;
 import com.pioneerpicks.pioneerpicks.user.User;
 import com.pioneerpicks.pioneerpicks.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -90,30 +93,32 @@ class FavoriteService {
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<List<FavoriteCourseDto>> getCourseFavorites() {
+    public ResponseEntity<Map<String, Object>> getCourseFavorites(Integer pageNumber) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
+        Pageable pageable = PageRequest.of(pageNumber, 20);
 
-        User userWithFavorites = userRepository.findUserWithFavoriteCoursesAndSubjects(user.getId()).orElseThrow(); // should never throw
+        Page<Course> page = userRepository.findFavoriteCourses(user.getId(), pageable);
 
-        List<FavoriteCourseDto> courses = userWithFavorites.getFavoriteCourses().stream()
+        List<FavoriteCourseDto> courses = page.getContent().stream()
                 .map(course -> new FavoriteCourseDto(course.getId(), course.getName(), course.getSubject().getName(), course.getAbbreviation(), course.getSubject().getAbbreviation()))
                 .toList();
 
-        return ResponseEntity.ok(courses);
+        return ResponseEntity.ok(Map.of("content", courses, "hasMore", page.hasNext(), "totalElements", page.getTotalElements(), "totalPages", page.getTotalPages(), "currentPage", page.getNumber()));
     }
 
-    public ResponseEntity<List<FavoriteProfessorDto>> getProfessorFavorites() {
+    public ResponseEntity<Map<String, Object>> getProfessorFavorites(Integer pageNumber) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
+        Pageable pageable = PageRequest.of(pageNumber, 20);
 
-        User userWithFavorites = userRepository.findUserWithFavoriteProfessors(user.getId()).orElseThrow(); // should never throw
+        Page<Professor> page = userRepository.findFavoriteProfessors(user.getId(), pageable);
 
-        List<FavoriteProfessorDto> professors = userWithFavorites.getFavoriteProfessors().stream()
-                .map(professor -> new FavoriteProfessorDto(professor.getId(), professor.getName()))
+        List<FavoriteProfessorDto> professors = page.getContent().stream()
+                .map(prof -> new FavoriteProfessorDto(prof.getId(), prof.getName()))
                 .toList();
 
-        return ResponseEntity.ok(professors);
+        return ResponseEntity.ok(Map.of("content", professors, "hasMore", page.hasNext(), "totalElements", page.getTotalElements(), "totalPages", page.getTotalPages(), "currentPage", page.getNumber()));
     }
 
     public ResponseEntity<Map<Object, Object>> getFavorites() {
@@ -125,10 +130,12 @@ class FavoriteService {
 
         List<FavoriteCourseDto> courses = userWithFavorites1.getFavoriteCourses().stream()
                 .map(course -> new FavoriteCourseDto(course.getId(), course.getName(), course.getSubject().getName(), course.getAbbreviation(), course.getSubject().getAbbreviation()))
+                .limit(4)
                 .toList();
 
         List<FavoriteProfessorDto> professors = userWithFavorites2.getFavoriteProfessors().stream()
                 .map(professor -> new FavoriteProfessorDto(professor.getId(), professor.getName()))
+                .limit(4)
                 .toList();
 
         return ResponseEntity.ok(Map.of("professors", professors, "courses", courses));

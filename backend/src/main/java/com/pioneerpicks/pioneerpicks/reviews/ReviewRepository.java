@@ -3,6 +3,8 @@ package com.pioneerpicks.pioneerpicks.reviews;
 import com.pioneerpicks.pioneerpicks.courses.Course;
 import com.pioneerpicks.pioneerpicks.professors.Professor;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorReviewCountDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,7 +33,7 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     WHERE r.professor.id = :professorId
     AND r.course.id = :courseId
     """)
-    List<Review> findReviewsWithUserAndCourse(@Param("professorId") UUID professorId, @Param("courseId") UUID courseId);
+    Page<Review> findReviewsWithUserAndCourse(@Param("professorId") UUID professorId, @Param("courseId") UUID courseId, Pageable pageable);
 
     @Query("""
     SELECT DISTINCT r

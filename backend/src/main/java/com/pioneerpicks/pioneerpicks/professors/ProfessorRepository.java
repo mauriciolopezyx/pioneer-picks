@@ -1,6 +1,8 @@
 package com.pioneerpicks.pioneerpicks.professors;
 
 import com.pioneerpicks.pioneerpicks.courses.Course;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,6 +23,14 @@ public interface ProfessorRepository extends JpaRepository<Professor, UUID> {
     WHERE p.id = :professorId
     """)
     Optional<Professor> findProfessorWithCoursesAndSubjects(@Param("professorId") UUID professorId);
+
+    @Query("""
+    SELECT c
+    FROM Professor p
+    JOIN p.courses c
+    WHERE p.id = :professorId
+    """)
+    Page<Course> findCourses(@Param("professorId") UUID professorId, Pageable pageable);
 
     List<Professor> findByNameContainingIgnoreCase(String query);
 

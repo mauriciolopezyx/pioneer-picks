@@ -28,10 +28,11 @@ class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FavoriteCourseDto>> getCoursesByArea(
-            @RequestParam(required = true) String q
+    public ResponseEntity<Map<String, Object>> getCoursesByArea(
+            @RequestParam(required = true) String q,
+            @RequestParam(defaultValue = "0") int page
     ) {
-        return courseService.getCoursesByArea(q);
+        return courseService.getCoursesByArea(q, page);
     }
 
     @GetMapping("/{id}")
@@ -40,6 +41,14 @@ class CourseController {
     ) {
         System.out.println("rec course information attempt");
         return courseService.getCourseInformation(id);
+    }
+
+    @GetMapping("/{id}/professors")
+    public ResponseEntity<Map<String, Object>> getCourseProfessors(
+            @PathVariable UUID id,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        return courseService.getCourseProfessors(id, page);
     }
 
     @PostMapping

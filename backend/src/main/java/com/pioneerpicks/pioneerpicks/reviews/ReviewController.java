@@ -39,12 +39,13 @@ class ReviewController {
     }
 
     @GetMapping("/{courseId}/{professorId}")
-    public ResponseEntity<List<FullReviewDto>> getCourseProfessorReviews(
+    public ResponseEntity<Map<String, Object>> getCourseProfessorReviews(
             @PathVariable UUID courseId,
-            @PathVariable UUID professorId
+            @PathVariable UUID professorId,
+            @RequestParam(defaultValue = "0") int page
     ) {
         System.out.println("rec course professor reviews attempt");
-        return reviewService.getCourseProfessorReviews(courseId, professorId);
+        return reviewService.getCourseProfessorReviews(courseId, professorId, page);
     }
 
 

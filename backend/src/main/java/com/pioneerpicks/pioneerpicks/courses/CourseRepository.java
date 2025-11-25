@@ -1,8 +1,11 @@
 package com.pioneerpicks.pioneerpicks.courses;
 
 import com.pioneerpicks.pioneerpicks.comments.Comment;
+import com.pioneerpicks.pioneerpicks.professors.Professor;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorCommentCountDto;
 import com.pioneerpicks.pioneerpicks.professors.dto.ProfessorReviewCountDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,7 +22,15 @@ public interface CourseRepository extends JpaRepository<Course, UUID> {
     FROM Course c
     WHERE LOWER(c.areas) LIKE LOWER(CONCAT('%', :q, '%'))
     """)
-    List<Course> findCoursesByArea(@Param("q") String q);
+    Page<Course> findCoursesByArea(@Param("q") String q, Pageable pageable);
+
+    @Query("""
+    SELECT p
+    FROM Course c
+    JOIN c.professors p
+    WHERE c.id = :courseId
+    """)
+    Page<Professor> findProfessors(@Param("courseId") UUID courseId, Pageable pageable);
 
     @Query("""
     SELECT DISTINCT c

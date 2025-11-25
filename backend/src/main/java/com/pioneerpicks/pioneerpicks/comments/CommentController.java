@@ -40,12 +40,13 @@ class CommentController {
     }
 
     @GetMapping("/{courseId}/{professorId}")
-    public ResponseEntity<List<FullCommentDto>> getComments(
+    public ResponseEntity<Map<String, Object>> getComments(
             @PathVariable UUID courseId,
-            @PathVariable UUID professorId
+            @PathVariable UUID professorId,
+            @RequestParam(defaultValue = "0") int page
     ) {
         System.out.println("rec course professor comments attempt");
-        return commentService.getComments(courseId, professorId);
+        return commentService.getComments(courseId, professorId, page);
     }
 
 }

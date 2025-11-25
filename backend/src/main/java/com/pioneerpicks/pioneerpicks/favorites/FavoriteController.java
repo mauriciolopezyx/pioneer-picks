@@ -22,13 +22,13 @@ class FavoriteController {
     }
 
     @GetMapping("/courses")
-    public ResponseEntity<List<FavoriteCourseDto>> getCourseFavorites() {
-        return favoriteService.getCourseFavorites();
+    public ResponseEntity<Map<String, Object>> getCourseFavorites(@RequestParam(defaultValue = "0") int page) {
+        return favoriteService.getCourseFavorites(page);
     }
 
     @GetMapping("/professors")
-    public ResponseEntity<List<FavoriteProfessorDto>> getProfessorFavorites() {
-        return favoriteService.getProfessorFavorites();
+    public ResponseEntity<Map<String, Object>> getProfessorFavorites(@RequestParam(defaultValue = "0") int page) {
+        return favoriteService.getProfessorFavorites(page);
     }
 
     @GetMapping

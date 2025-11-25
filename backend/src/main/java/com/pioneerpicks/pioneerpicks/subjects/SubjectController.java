@@ -34,4 +34,12 @@ class SubjectController {
         return subjectService.getSubjectInformation(id);
     }
 
+    @GetMapping("/{id}/courses")
+    public ResponseEntity<Map<String, Object>> getSubjectCourses(
+            @PathVariable UUID id,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        return subjectService.getSubjectCourses(id, page);
+    }
+
 }
