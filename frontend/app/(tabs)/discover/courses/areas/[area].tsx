@@ -49,8 +49,10 @@ const CoursesByArea = () => {
     isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ["specific-courses-by-area", area],
+    enabled: !!area,
     queryFn: async ({ pageParam = 0 }) => {
       try {
+        console.log("new area att:", new Date(), "with page:", pageParam)
         const response = await api.get(`/courses?q=${area}&page=${pageParam}`)
         return response.data
       } catch (error) {
@@ -64,13 +66,17 @@ const CoursesByArea = () => {
       return lastPage.hasMore ? allPages.length : undefined
     },
     initialPageParam: 0,
-    gcTime: 1000 * 60 * 5
+    refetchOnWindowFocus: false,
+    // gcTime: 1000 * 60 * 12,
+    // staleTime: 1000 * 60 * 24
   })
 
   //////////////////////////////
 
   const areaDisplay = areaAbbreviations[area] ? areaAbbreviations[area] : area
   const fullDisplay = findAreaValueFromKey(areas, area) ? findAreaValueFromKey(areas, area) : null
+  
+  console.log("hasNextPage:", hasNextPage, "isFetchingNextPage:", isFetchingNextPage);
 
   if (loading) {
     return (
@@ -90,6 +96,7 @@ const CoursesByArea = () => {
   }
 
   const courses = data?.pages.flatMap(page => page.content) ?? []
+  console.log("Total courses loaded:", courses.length);
 
   if (!courses || (courses && courses.length == 0)) {
     return (
@@ -101,17 +108,9 @@ const CoursesByArea = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["left", "right"]}>
-      <ScrollView
-        className="flex-1 px-5"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-            minHeight: "100%", paddingBottom: 10
-        }}
-      >
-        <Text className="font-montserrat-medium my-5 text-xl dark:text-white">Courses with Area <Text className="font-montserrat-bold text-2xl">{areaDisplay}{fullDisplay ? ` (${fullDisplay})` : null}</Text></Text>
-        <CourseSection data={courses} ItemComponent={CourseCard} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} />
-      </ScrollView>
+    <SafeAreaView className="flex-1 px-5 dark:bg-gray-800" edges={["left", "right"]}>
+      <Text className="font-montserrat-medium my-5 text-xl dark:text-white">Courses with Area <Text className="font-montserrat-bold text-2xl">{areaDisplay}{fullDisplay ? ` (${fullDisplay})` : null}</Text></Text>
+      <CourseSection data={courses} ItemComponent={CourseCard} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} />
     </SafeAreaView>
   )
 }

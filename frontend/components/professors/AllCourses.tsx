@@ -64,14 +64,16 @@ const AllProfessorCourses = ({params}: {params: {professorId: string}}) => {
             return lastPage.hasMore ? allPages.length : undefined
         },
         initialPageParam: 0,
-        refetchOnWindowFocus: true
+        refetchOnWindowFocus: false
     })
+
+    console.log(info, rawCourses)
 
     const courses = rawCourses?.pages.flatMap(page => page.content) ?? []
 
     const colorScheme = useColorScheme()
     const navigation = useNavigation()
-    const [favorited, setFavorited] = useState<boolean>(info.favorited) // data.favorited is initial favorited status
+    const [favorited, setFavorited] = useState<boolean>(false)
 
     const [query, setQuery] = useState("")
     //const [filter, setFilter] = useState(filterOptions.length - 1)
@@ -212,7 +214,7 @@ export const CatalogSection = <T,>({data, ItemComponent, hasNextPage, isFetching
                     fetchNextPage()
                 }
             }}
-            onEndReachedThreshold={0.8} // triggered when XX% from end
+            onEndReachedThreshold={0.5} // triggered when XX% from end
             ListFooterComponent={() => {
                 if (isFetchingNextPage) {
                     return (

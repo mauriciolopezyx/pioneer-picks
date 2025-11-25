@@ -71,8 +71,8 @@ const Courses = () => {
     },
     initialPageParam: 0,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 60 * 24,
-    gcTime: 1000 * 60 * 60 * 48
+    // staleTime: 1000 * 60 * 60 * 24,
+    // gcTime: 1000 * 60 * 60 * 48
   })
 
   const courses = rawCourses?.pages.flatMap(page => page.content) ?? []
@@ -80,26 +80,6 @@ const Courses = () => {
   ////////////
 
   const colorScheme = useColorScheme()
-  const navigation = useNavigation()
-  const scrollY = useMemo(() => new Animated.Value(0), []);
-
-  useLayoutEffect(() => {
-    const listenerId = scrollY.addListener(({ value }) => {
-      const opacity = Math.min(value / 30, 1)
-      navigation.setOptions({
-        headerTintColor: `rgba(213, 0, 50, ${1 - opacity})`
-      })
-    })
-
-    return () => {
-      scrollY.removeListener(listenerId)
-    }
-  }, [])
-
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    { useNativeDriver: false }
-  )
 
   const filteredCourses = useMemo(() => {
     if (!courses) return []
@@ -135,63 +115,55 @@ const Courses = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']} >
-        <ScrollView
-        className="flex-1 px-5"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          minHeight: "100%", paddingBottom: 10
-        }}
-        onScroll={handleScroll}
-      >
-        <View className="h-[50px]"></View>
-        <Text className="font-montserrat-extrabold text-3xl mb-4 dark:text-white">{subject.name}</Text>
-        <TouchableOpacity className="mb-8" onPress={() => {openExternalLink(subject.description)}}>
-              <Text className="font-montserrat dark:text-white underline">{subject.description}</Text>
-        </TouchableOpacity>
+    <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={['left', 'right']} >
+      <View className="h-[50px]"></View>
+      <Text className="font-montserrat-extrabold text-3xl mb-4 dark:text-white">{subject.name}</Text>
+      <TouchableOpacity className="mb-8" onPress={() => {openExternalLink(subject.description)}}>
+            <Text className="font-montserrat dark:text-white underline">{subject.description}</Text>
+      </TouchableOpacity>
 
-        <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
-          <SearchBar
-            placeholder="Search"
-            onChangeText={onChangeQuery}
-            disabled={false}
-          />
-          <GestureWrapper className="rounded-full" onPress={() => { router.navigate({pathname: "/(modals)/courses/create"}) }} backgroundColor="#d50032">
-            <Ionicons name="add" size={30} color="white" />
-          </GestureWrapper>
-        </View>
+      <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
+        <SearchBar
+          placeholder="Search"
+          onChangeText={onChangeQuery}
+          disabled={false}
+        />
+        <GestureWrapper className="rounded-full" onPress={() => { router.navigate({pathname: "/(modals)/courses/create"}) }} backgroundColor="#d50032">
+          <Ionicons name="add" size={30} color="white" />
+        </GestureWrapper>
+      </View>
 
-        <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
-        {courses.length > 0 ?<FlashList
-            data={query != "" ? filteredCourses : courses}
-            renderItem={(item: any) => (
-                <CourseCard course={item.item} subject={{name: subject.name, abbreviation: subject.abbreviation}} />
-            )}
-            keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
-            numColumns={1}
-            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-            scrollEnabled={true}
+      <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
+      {courses.length > 0 ?<FlashList
+          data={query != "" ? filteredCourses : courses}
+          renderItem={(item: any) => (
+              <CourseCard course={item.item} subject={{name: subject.name, abbreviation: subject.abbreviation}} />
+          )}
+          keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
+          numColumns={1}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          scrollEnabled={true}
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1 }}
 
-            onEndReached={() => {
-              if (hasNextPage && !isFetchingNextPage) {
-                fetchNextPage()
-              }
-            }}
-            onEndReachedThreshold={0.8} // triggered when XX% from end
-            ListFooterComponent={() => {
-              if (isFetchingNextPage) {
-                return (
-                  <View style={{ padding: 20 }}>
-                    <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
-                  </View>
-                )
-              }
-              return null
-            }}
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) {
+              fetchNextPage()
+            }
+          }}
+          onEndReachedThreshold={0.5} // triggered when XX% from end
+          ListFooterComponent={() => {
+            if (isFetchingNextPage) {
+              return (
+                <View style={{ padding: 20 }}>
+                  <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+                </View>
+              )
+            }
+            return null
+          }}
 
-        /> : <Text className="font-montserrat dark:text-white">No courses found</Text> }
-        <View className="h-[50px]"></View>
-      </ScrollView>
+      /> : <Text className="font-montserrat dark:text-white">No courses found</Text> }
     </SafeAreaView>
   )
 }

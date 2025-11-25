@@ -32,10 +32,10 @@ class ProfessorController {
 
     @GetMapping("/{professorId}/courses")
     public ResponseEntity<Map<String, Object>> getProfessorCourses(
-            @PathVariable UUID id,
+            @PathVariable UUID professorId,
             @RequestParam(defaultValue = "0") int page
     ) {
-        return professorService.getProfessorCourses(id, page);
+        return professorService.getProfessorCourses(professorId, page);
     }
 
     @GetMapping("/{courseId}/{professorId}")

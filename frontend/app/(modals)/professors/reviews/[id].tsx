@@ -80,8 +80,8 @@ export default function SectionScreen() {
         },
         initialPageParam: 0,
         refetchOnWindowFocus: false,
-        staleTime: 1000 * 60,
-        gcTime: 1000 * 60 * 5
+        // staleTime: 1000 * 60 * 5,
+        // gcTime: 1000 * 60 * 5
     })
     
     if (loading) {
@@ -125,39 +125,38 @@ export default function SectionScreen() {
             <View className="flex-1 px-5 pt-5">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
-                <View className="flex-1">
-                    <FlashList
-                        data={reviews}
-                        renderItem={(item: any) => (
-                            <Review key={item.item.id} review={item.item} />
-                        )}
-                        keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
-                        numColumns={1}
-                        ItemSeparatorComponent={() => <View style={{ height: 30 }} />}
-                        contentContainerStyle={{ paddingBottom: 20 }}
-                        scrollEnabled={true}
-                        showsVerticalScrollIndicator={false}
-                        indicatorStyle="black"
+                <FlashList
+                    data={reviews}
+                    renderItem={(item: any) => (
+                        <Review key={item.item.id} review={item.item} />
+                    )}
+                    keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
+                    numColumns={1}
+                    ItemSeparatorComponent={() => <View style={{ height: 30 }} />}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    scrollEnabled={true}
+                    style={{ flex: 1 }}
+                    showsVerticalScrollIndicator={false}
+                    indicatorStyle="black"
 
-                        onEndReached={() => {
-                            if (hasNextPage && !isFetchingNextPage) {
-                                fetchNextPage()
-                            }
-                        }}
-                        onEndReachedThreshold={0.8} // triggered when XX% from end
-                        ListFooterComponent={() => {
-                            if (isFetchingNextPage) {
-                                return (
-                                <View style={{ padding: 20 }}>
-                                    <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
-                                </View>
-                                )
-                            }
-                            return null
-                        }}
+                    onEndReached={() => {
+                        if (hasNextPage && !isFetchingNextPage) {
+                            fetchNextPage()
+                        }
+                    }}
+                    onEndReachedThreshold={0.5} // triggered when XX% from end
+                    ListFooterComponent={() => {
+                        if (isFetchingNextPage) {
+                            return (
+                            <View style={{ padding: 20 }}>
+                                <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+                            </View>
+                            )
+                        }
+                        return null
+                    }}
 
-                    />
-                </View>
+                />
             </View>
             
             <View className="absolute bottom-[30px] right-[30px]">

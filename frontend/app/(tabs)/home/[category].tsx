@@ -92,18 +92,10 @@ const Category = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 dark:bg-gray-800" edges={["left", "right"]}>
-      <ScrollView
-        className="flex-1 px-5"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-            minHeight: "100%", paddingBottom: 10
-        }}
-      >
-        <Text className="font-montserrat-bold text-2xl dark:text-white my-5">Favorite {category === "course" ? "Courses" : "Professors"}</Text>
-        {category === "course" ? <FavoriteSection data={favorites} ItemComponent={FavoriteCourseCard} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} /> : null}
-        {category === "professor" ? <FavoriteSection data={favorites} ItemComponent={FavoriteProfessorCard} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} /> : null}
-      </ScrollView>
+    <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["left", "right"]}>
+      <Text className="font-montserrat-bold text-2xl dark:text-white my-5">Favorite {category === "course" ? "Courses" : "Professors"}</Text>
+      {category === "course" ? <FavoriteSection data={favorites} ItemComponent={FavoriteCourseCard} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} /> : null}
+      {category === "professor" ? <FavoriteSection data={favorites} ItemComponent={FavoriteProfessorCard} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} /> : null}
     </SafeAreaView>
   )
 }
@@ -128,6 +120,7 @@ export const FavoriteSection = <T,>({data, ItemComponent, hasNextPage, isFetchin
       keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
       showsVerticalScrollIndicator={false}
       ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+      style={{ flex: 1 }}
       scrollEnabled={true}
 
       onEndReached={() => {
@@ -135,7 +128,8 @@ export const FavoriteSection = <T,>({data, ItemComponent, hasNextPage, isFetchin
           fetchNextPage()
         }
       }}
-      onEndReachedThreshold={0.8} // triggered when XX% from end
+      onEndReachedThreshold={0.5} // triggered when XX% from end
+
       ListFooterComponent={() => {
         if (isFetchingNextPage) {
           return (

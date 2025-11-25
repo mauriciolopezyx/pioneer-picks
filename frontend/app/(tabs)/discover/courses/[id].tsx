@@ -84,7 +84,9 @@ const Course = () => {
             return lastPage.hasMore ? allPages.length : undefined
         },
         initialPageParam: 0,
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: false,
+        // staleTime: 1000 * 60 * 24,
+        // gcTime: 1000 * 60 * 48
     })
 
     const professors = rawProfessors?.pages.flatMap(page => page.content) ?? []
@@ -224,83 +226,75 @@ const Course = () => {
     }
 
     return (
-        <SafeAreaView className="flex-1 dark:bg-gray-800" edges={['left', 'right']}>
-            <ScrollView
-                className="flex-1 px-5"
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{
-                    minHeight: "100%", paddingBottom: 10
-                }}
-                onScroll={handleScroll}
-            >
-                <View className="h-[50px]"></View>
-                <Text className="font-montserrat-extrabold text-3xl mb-2 dark:text-white">{course.name}</Text>
+        <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={['left', 'right']}>
+            <View className="h-[50px]"></View>
+            <Text className="font-montserrat-extrabold text-3xl mb-2 dark:text-white">{course.name}</Text>
 
-                <Text className="font-montserrat mb-2 dark:text-white">Also known as <Text className="font-montserrat-semibold text-xl">{`${subjectAbbreviation} ${course.abbreviation}`}</Text></Text>
-                <Text className="font-montserrat mb-4 dark:text-white"><Text className="font-montserrat-semibold text-xl">{course.units ?? "Unknown"}</Text> units</Text>
+            <Text className="font-montserrat mb-2 dark:text-white">Also known as <Text className="font-montserrat-semibold text-xl">{`${subjectAbbreviation} ${course.abbreviation}`}</Text></Text>
+            <Text className="font-montserrat mb-4 dark:text-white"><Text className="font-montserrat-semibold text-xl">{course.units ?? "Unknown"}</Text> units</Text>
 
-                <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
-                    <Text className="font-montserrat-bold text-2xl dark:text-white">Areas</Text>
-                    <View className="flex flex-row justify-center items-center gap-x-4">
-                        <GestureWrapper className="flex items-center justify-center rounded-full" backgroundColor={colorScheme === "dark" ? "#767576" : "#000"} onPress={onAreaPress}>
-                            <Ionicons name="information-outline" size={25} color="white" />
-                        </GestureWrapper>
-                        {(favorited === null || favoriteLoading) ? <ActivityIndicator size="small" color="#fff" className="self-center" />
-                        : favoriteError ? <Ionicons name="alert-outline" size={25} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} /> :
-                        (
-                            <GestureWrapper className="flex flex-row justify-between items-center" onPress={toggleFavorite} >
-                                <Ionicons name={`bookmark${favorited ? "" : "-outline"}`} size={25} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
-                            </GestureWrapper>
-                        )}
-                    </View> 
-                </View>
-
-                <View className="flex flex-row flex-wrap gap-2 w-full mb-4">
-                    {areaDisplays}
-                </View>
-
-                <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
-                    <SearchBar
-                        placeholder="Search"
-                        onChangeText={onChangeQuery}
-                        disabled={false}
-                    />
-                    <GestureWrapper className="rounded-full" onPress={() => { router.navigate({pathname: "/(modals)/professors/create", params: {courseId: courseId, subjectAbbreviation: subjectAbbreviation, courseAbbreviation: course.abbreviation}}) }} backgroundColor="#d50032">
-                        <Ionicons name="add" size={30} color="white" />
+            <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
+                <Text className="font-montserrat-bold text-2xl dark:text-white">Areas</Text>
+                <View className="flex flex-row justify-center items-center gap-x-4">
+                    <GestureWrapper className="flex items-center justify-center rounded-full" backgroundColor={colorScheme === "dark" ? "#767576" : "#000"} onPress={onAreaPress}>
+                        <Ionicons name="information-outline" size={25} color="white" />
                     </GestureWrapper>
-                </View>
-
-                <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
-                { professors.length > 0 ? <FlashList
-                    data={query != "" ? filteredProfessors : professors}
-                    renderItem={(item: any) => (
-                        <ProfessorCard professor={item.item} course={{id: courseId, abbreviation: course.abbreviation}} subject={{name: subjectName, abbreviation: subjectAbbreviation}} />
+                    {(favorited === null || favoriteLoading) ? <ActivityIndicator size="small" color="#fff" className="self-center" />
+                    : favoriteError ? <Ionicons name="alert-outline" size={25} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} /> :
+                    (
+                        <GestureWrapper className="flex flex-row justify-between items-center" onPress={toggleFavorite} >
+                            <Ionicons name={`bookmark${favorited ? "" : "-outline"}`} size={25} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
+                        </GestureWrapper>
                     )}
-                    keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
-                    numColumns={1}
-                    ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-                    scrollEnabled={true}
+                </View> 
+            </View>
 
-                    onEndReached={() => {
-                        if (hasNextPage && !isFetchingNextPage) {
-                            fetchNextPage()
-                        }
-                    }}
-                    onEndReachedThreshold={0.8} // triggered when XX% from end
-                    ListFooterComponent={() => {
-                        if (isFetchingNextPage) {
-                        return (
-                            <View style={{ padding: 20 }}>
-                                <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
-                            </View>
-                        )
-                        }
-                        return null
-                    }}
+            <View className="flex flex-row flex-wrap gap-2 w-full mb-4">
+                {areaDisplays}
+            </View>
 
-                /> : <Text className="font-montserrat dark:text-white">No professors found</Text> }
-                <View className="h-[50px]"></View>
-            </ScrollView>
+            <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
+                <SearchBar
+                    placeholder="Search"
+                    onChangeText={onChangeQuery}
+                    disabled={false}
+                />
+                <GestureWrapper className="rounded-full" onPress={() => { router.navigate({pathname: "/(modals)/professors/create", params: {courseId: courseId, subjectAbbreviation: subjectAbbreviation, courseAbbreviation: course.abbreviation}}) }} backgroundColor="#d50032">
+                    <Ionicons name="add" size={30} color="white" />
+                </GestureWrapper>
+            </View>
+
+            <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
+            { professors.length > 0 ? <FlashList
+                data={query != "" ? filteredProfessors : professors}
+                renderItem={(item: any) => (
+                    <ProfessorCard professor={item.item} course={{id: courseId, abbreviation: course.abbreviation}} subject={{name: subjectName, abbreviation: subjectAbbreviation}} />
+                )}
+                keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
+                numColumns={1}
+                ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+                scrollEnabled={true}
+                style={{ flex: 1 }}
+                showsVerticalScrollIndicator={false}
+
+                onEndReached={() => {
+                    if (hasNextPage && !isFetchingNextPage) {
+                        fetchNextPage()
+                    }
+                }}
+                onEndReachedThreshold={0.5} // triggered when XX% from end
+                ListFooterComponent={() => {
+                    if (isFetchingNextPage) {
+                    return (
+                        <View style={{ padding: 20 }}>
+                            <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+                        </View>
+                    )
+                    }
+                    return null
+                }}
+
+            /> : <Text className="font-montserrat dark:text-white">No professors found</Text> }
         </SafeAreaView>
     )
 }

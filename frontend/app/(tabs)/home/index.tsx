@@ -108,7 +108,7 @@ type SectionProps<T> = {
 const FavoriteSection = <T,>({loading, error, data, ItemComponent, hasNextPage, isFetchingNextPage, fetchNextPage}: SectionProps<T>) => {
 
   const colorScheme = useColorScheme()
-  
+
   if (loading) {
     return (
       <View className="flex flex-row justify-center items-center">
@@ -149,7 +149,7 @@ const FavoriteSection = <T,>({loading, error, data, ItemComponent, hasNextPage, 
           fetchNextPage()
         }
       }}
-      onEndReachedThreshold={0.8} // triggered when XX% from end
+      onEndReachedThreshold={0.5} // triggered when XX% from end
       ListFooterComponent={() => {
         if (isFetchingNextPage) {
           return (
