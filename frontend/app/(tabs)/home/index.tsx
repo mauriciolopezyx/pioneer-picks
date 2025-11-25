@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, ScrollView, RefreshControl } from 'react-native'
+import { View, Text, ActivityIndicator, ScrollView, RefreshControl, useColorScheme } from 'react-native'
 import React, { useState } from 'react'
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
@@ -78,7 +78,7 @@ const Home = () => {
           </GestureWrapper> : null }
         </View>
         <View className="my-4">
-          <FavoriteSection loading={loading} error={error} data={favorites ? favorites.courses.slice(0, 3) : null} ItemComponent={FavoriteCourseCard} />
+          <FavoriteSection loading={loading} error={error} data={favorites ? favorites.courses.slice(0, 3) : null} ItemComponent={FavoriteCourseCard} hasNextPage={false} isFetchingNextPage={false} fetchNextPage={() => {}} />
         </View>
 
         <View className="flex flex-row justify-between items-center">
@@ -88,7 +88,7 @@ const Home = () => {
           </GestureWrapper> : null }
         </View>
         <View className="my-4">
-          <FavoriteSection loading={loading} error={error} data={favorites ? favorites.professors.slice(0, 3) : null} ItemComponent={FavoriteProfessorCard} />
+          <FavoriteSection loading={loading} error={error} data={favorites ? favorites.professors.slice(0, 3) : null} ItemComponent={FavoriteProfessorCard} hasNextPage={false} isFetchingNextPage={false} fetchNextPage={() => {}} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -99,11 +99,16 @@ type SectionProps<T> = {
   loading: boolean,
   error: Error | null | undefined,
   data: T[] | null,
-  ItemComponent: React.ComponentType<{ data: T }>
+  ItemComponent: React.ComponentType<{ data: T }>,
+  hasNextPage: boolean,
+  isFetchingNextPage: boolean,
+  fetchNextPage: (...args: any[]) => any
 }
 
-const FavoriteSection = <T,>({loading, error, data, ItemComponent}: SectionProps<T>) => {
+const FavoriteSection = <T,>({loading, error, data, ItemComponent, hasNextPage, isFetchingNextPage, fetchNextPage}: SectionProps<T>) => {
 
+  const colorScheme = useColorScheme()
+  
   if (loading) {
     return (
       <View className="flex flex-row justify-center items-center">
@@ -138,7 +143,25 @@ const FavoriteSection = <T,>({loading, error, data, ItemComponent}: SectionProps
       keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
       showsHorizontalScrollIndicator={false}
       ItemSeparatorComponent={() => <View style={{ width: 15 }} />}
+
+      onEndReached={() => {
+        if (hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      }}
+      onEndReachedThreshold={0.8} // triggered when XX% from end
+      ListFooterComponent={() => {
+        if (isFetchingNextPage) {
+          return (
+            <View style={{ padding: 20 }}>
+              <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+            </View>
+          )
+        }
+        return null
+      }}
     />
+    
   )
 }
 
@@ -167,7 +190,7 @@ export const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
           {data.name}
         </Text>
 
-        <Ionicons
+        {/* <Ionicons
           name={iconName}
           size={35}
           color="rgba(255,255,255,0.7)"
@@ -176,7 +199,7 @@ export const FavoriteCourseCard = ({data}: {data: FavoriteCourse}) => {
             bottom: -15,
             right: -15,
           }}
-        />
+        /> */}
       </View>
     </GestureWrapper>
   )

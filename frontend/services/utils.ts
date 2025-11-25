@@ -239,6 +239,19 @@ export function findAreaParentKey(
   return null
 }
 
+export function findAreaValueFromKey(data: any, targetKey: string): string | null {
+  for (const [_, value] of Object.entries(data)) {
+    if (typeof value === "object" && value !== null) {
+      if (targetKey in value) {
+        return value[targetKey as keyof object]
+      }
+      const found = findAreaValueFromKey(value, targetKey);
+      if (found) return found;
+    }
+  }
+  return null
+}
+
 export const subjectIconMappings: Record<string, keyof typeof Ionicons.glyphMap> = {
   All: "globe-outline",
   "Biological Sciences": "flask-outline",

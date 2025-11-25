@@ -9,7 +9,7 @@ import { areas, revolvingColorPalette, areaAbbreviations, findAreaParentKey, are
 import { GestureWrapper } from '../../home';
 import SearchBar from '@/components/SearchBar';
 
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useInfiniteQuery } from '@tanstack/react-query'
 import api from '@/services/api';
 import axios from 'axios';
 
@@ -61,6 +61,35 @@ const Course = () => {
         },
         refetchOnWindowFocus: true
     })
+
+    const {
+        data:rawProfessors,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteQuery({
+        queryKey: ["specific-course-professors", courseId],
+        queryFn: async ({ pageParam = 0 }) => {
+        try {
+            const response = await api.get(`/courses/${courseId}/professors?page=${pageParam}`)
+            return response.data
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                throw new Error(error.response.data.message || 'An error occurred')
+            }
+            throw error
+        }
+        },
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.hasMore ? allPages.length : undefined
+        },
+        initialPageParam: 0,
+        refetchOnWindowFocus: true,
+    })
+
+    const professors = rawProfessors?.pages.flatMap(page => page.content) ?? []
+
+    ////////////////////////
 
     const onAreaPress = () => {
         router.navigate({
@@ -162,9 +191,9 @@ const Course = () => {
     })
 
     const filteredProfessors = useMemo(() => {
-        if (!course?.professors) return []
+        if (!professors) return []
         const q = query.replace(/\s+/g, '').toLowerCase()
-        return [...course.professors]
+        return [...professors]
             .filter(item =>
                 item.name.replace(/\s+/g, '').toLowerCase().includes(q)
             )
@@ -242,8 +271,8 @@ const Course = () => {
                 </View>
 
                 <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>
-                { course.professors.length > 0 ? <FlashList
-                    data={query != "" ? filteredProfessors : course.professors}
+                { professors.length > 0 ? <FlashList
+                    data={query != "" ? filteredProfessors : professors}
                     renderItem={(item: any) => (
                         <ProfessorCard professor={item.item} course={{id: courseId, abbreviation: course.abbreviation}} subject={{name: subjectName, abbreviation: subjectAbbreviation}} />
                     )}
@@ -251,6 +280,24 @@ const Course = () => {
                     numColumns={1}
                     ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
                     scrollEnabled={true}
+
+                    onEndReached={() => {
+                        if (hasNextPage && !isFetchingNextPage) {
+                            fetchNextPage()
+                        }
+                    }}
+                    onEndReachedThreshold={0.8} // triggered when XX% from end
+                    ListFooterComponent={() => {
+                        if (isFetchingNextPage) {
+                        return (
+                            <View style={{ padding: 20 }}>
+                                <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+                            </View>
+                        )
+                        }
+                        return null
+                    }}
+
                 /> : <Text className="font-montserrat dark:text-white">No professors found</Text> }
                 <View className="h-[50px]"></View>
             </ScrollView>

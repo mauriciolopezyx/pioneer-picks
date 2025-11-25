@@ -8,7 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { ToastInstance } from "@/components/ToastWrapper";
 import MasterToast from "@/components/ToastWrapper"
 
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import api from "@/services/api";
 import axios from "axios";
 
@@ -66,20 +66,50 @@ export default function SectionScreen() {
         }
     })
 
-    const { isLoading:loading, error, data:comments, refetch:refetchComments } = useQuery({
+    // const { isLoading:loading, error, data:comments, refetch:refetchComments } = useQuery({
+    //     queryKey: ["specific-course-professor-comments", professorId, courseId],
+    //     queryFn: async () => {
+    //         try {
+    //             const response = await api.get(`/comments/${courseId}/${professorId}`)
+    //             return response.data
+    //         } catch (error) {
+    //             if (axios.isAxiosError(error) && error.response) {
+    //                 const customMessage = error.response.data.message
+    //                 throw new Error(customMessage || 'An error occurred')
+    //             }
+    //             throw error
+    //         }
+    //     },
+    //     refetchOnWindowFocus: false,
+    //     staleTime: 1000 * 60,
+    //     gcTime: 1000 * 60 * 5
+    // })
+
+    const {
+        data,
+        isLoading:loading,
+        error,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        refetch:refetchComments
+    } = useInfiniteQuery({
         queryKey: ["specific-course-professor-comments", professorId, courseId],
-        queryFn: async () => {
+        queryFn: async ({ pageParam = 0 }) => {
             try {
-                const response = await api.get(`/comments/${courseId}/${professorId}`)
+                const response = await api.get(`/comments/${courseId}/${professorId}?page=${pageParam}`)
                 return response.data
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
+                    throw new Error(error.response.data.message || 'An error occurred')
                 }
                 throw error
             }
         },
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.hasMore ? allPages.length : undefined
+        },
+        initialPageParam: 0,
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60,
         gcTime: 1000 * 60 * 5
@@ -105,7 +135,9 @@ export default function SectionScreen() {
         )
     }
 
-    if (!comments) {
+    const comments = data?.pages.flatMap(page => page.content) ?? []
+
+    if (!comments || (comments && comments.length == 0) ) {
         return (
             <View className="flex-1 dark:bg-gray-800">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
@@ -125,7 +157,7 @@ export default function SectionScreen() {
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <View className="flex-1">
-                    { comments.length > 0 ? <FlashList
+                    <FlashList
                         data={comments}
                         renderItem={(item: any) => (
                             <CommentItem comment={item.item} />
@@ -137,7 +169,24 @@ export default function SectionScreen() {
                         scrollEnabled={true}
                         showsVerticalScrollIndicator={false}
                         indicatorStyle="black"
-                    /> : <Text className="font-montserrat dark:text-white mx-auto">No comments found</Text> }
+
+                        onEndReached={() => {
+                            if (hasNextPage && !isFetchingNextPage) {
+                                fetchNextPage()
+                            }
+                        }}
+                        onEndReachedThreshold={0.8} // triggered when XX% from end
+                        ListFooterComponent={() => {
+                            if (isFetchingNextPage) {
+                                return (
+                                <View style={{ padding: 20 }}>
+                                    <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+                                </View>
+                                )
+                            }
+                            return null
+                        }}
+                    />
                 </View>
             </View>
             <View className="pb-[25px] pt-[10px] bg-black dark:bg-gray-800 flex items-center justify-center">

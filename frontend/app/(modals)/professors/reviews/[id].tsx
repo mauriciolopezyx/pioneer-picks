@@ -7,7 +7,7 @@ import Slider from '@react-native-community/slider';
 import { reviewOptions } from "@/services/utils";
 import { GestureWrapper } from "@/app/(tabs)/home";
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import api from "@/services/api";
 import axios from "axios";
 
@@ -36,20 +36,49 @@ export default function SectionScreen() {
     const { user } = useAuth()
     const colorScheme = useColorScheme()
 
-    const { isLoading:loading, error, data:reviews } = useQuery({
+    // const { isLoading:loading, error, data:reviews } = useQuery({
+    //     queryKey: ["specific-course-professor-reviews", professorId, courseId],
+    //     queryFn: async () => {
+    //         try {
+    //             const response = await api.get(`/reviews/${courseId}/${professorId}`)
+    //             return response.data
+    //         } catch (error) {
+    //             if (axios.isAxiosError(error) && error.response) {
+    //                 const customMessage = error.response.data.message
+    //                 throw new Error(customMessage || 'An error occurred')
+    //             }
+    //             throw error
+    //         }
+    //     },
+    //     refetchOnWindowFocus: false,
+    //     staleTime: 1000 * 60,
+    //     gcTime: 1000 * 60 * 5
+    // })
+
+    const {
+        data,
+        isLoading:loading,
+        error,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteQuery({
         queryKey: ["specific-course-professor-reviews", professorId, courseId],
-        queryFn: async () => {
+        queryFn: async ({ pageParam = 0 }) => {
             try {
-                const response = await api.get(`/reviews/${courseId}/${professorId}`)
+                const response = await api.get(`/reviews/${courseId}/${professorId}?page=${pageParam}`)
                 return response.data
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
+                    throw new Error(error.response.data.message || 'An error occurred')
                 }
                 throw error
             }
         },
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.hasMore ? allPages.length : undefined
+        },
+        initialPageParam: 0,
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60,
         gcTime: 1000 * 60 * 5
@@ -75,7 +104,9 @@ export default function SectionScreen() {
         )
     }
 
-    if (!reviews) {
+    const reviews = data?.pages.flatMap(page => page.content) ?? []
+
+    if (!reviews || (reviews && reviews.length == 0) ) {
         return (
             <View className="flex-1 dark:bg-gray-800">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
@@ -95,7 +126,7 @@ export default function SectionScreen() {
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <View className="flex-1">
-                    { reviews.length > 0 ? <FlashList
+                    <FlashList
                         data={reviews}
                         renderItem={(item: any) => (
                             <Review key={item.item.id} review={item.item} />
@@ -107,7 +138,25 @@ export default function SectionScreen() {
                         scrollEnabled={true}
                         showsVerticalScrollIndicator={false}
                         indicatorStyle="black"
-                    /> : <Text className="font-montserrat dark:text-white mx-auto">No reviews found</Text> }
+
+                        onEndReached={() => {
+                            if (hasNextPage && !isFetchingNextPage) {
+                                fetchNextPage()
+                            }
+                        }}
+                        onEndReachedThreshold={0.8} // triggered when XX% from end
+                        ListFooterComponent={() => {
+                            if (isFetchingNextPage) {
+                                return (
+                                <View style={{ padding: 20 }}>
+                                    <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+                                </View>
+                                )
+                            }
+                            return null
+                        }}
+
+                    />
                 </View>
             </View>
             

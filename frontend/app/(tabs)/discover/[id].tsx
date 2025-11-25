@@ -8,7 +8,7 @@ import { GestureWrapper } from '../home';
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import api from '@/services/api';
 import axios from 'axios';
 
@@ -48,8 +48,38 @@ const Courses = () => {
     gcTime: 1000 * 60 * 60 * 48
   })
 
+  const {
+    data:rawCourses,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
+    queryKey: ["specific-subject-courses", id],
+    queryFn: async ({ pageParam = 0 }) => {
+      try {
+        const response = await api.get(`/subjects/${id}/courses?page=${pageParam}`)
+        return response.data
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          throw new Error(error.response.data.message || 'An error occurred')
+        }
+        throw error
+      }
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.hasMore ? allPages.length : undefined
+    },
+    initialPageParam: 0,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 60 * 24,
+    gcTime: 1000 * 60 * 60 * 48
+  })
+
+  const courses = rawCourses?.pages.flatMap(page => page.content) ?? []
+
   ////////////
 
+  const colorScheme = useColorScheme()
   const navigation = useNavigation()
   const scrollY = useMemo(() => new Animated.Value(0), []);
 
@@ -72,9 +102,9 @@ const Courses = () => {
   )
 
   const filteredCourses = useMemo(() => {
-    if (!subject?.courses) return []
+    if (!courses) return []
     const q = query.replace(/\s+/g, '').toLowerCase()
-    return [...subject.courses]
+    return [...courses]
       .filter(item =>
         item.name.replace(/\s+/g, '').toLowerCase().includes(q)
       )
@@ -132,8 +162,8 @@ const Courses = () => {
         </View>
 
         <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Courses</Text>
-        {subject.courses.length > 0 ?<FlashList
-            data={query != "" ? filteredCourses : subject.courses}
+        {courses.length > 0 ?<FlashList
+            data={query != "" ? filteredCourses : courses}
             renderItem={(item: any) => (
                 <CourseCard course={item.item} subject={{name: subject.name, abbreviation: subject.abbreviation}} />
             )}
@@ -141,6 +171,24 @@ const Courses = () => {
             numColumns={1}
             ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
             scrollEnabled={true}
+
+            onEndReached={() => {
+              if (hasNextPage && !isFetchingNextPage) {
+                fetchNextPage()
+              }
+            }}
+            onEndReachedThreshold={0.8} // triggered when XX% from end
+            ListFooterComponent={() => {
+              if (isFetchingNextPage) {
+                return (
+                  <View style={{ padding: 20 }}>
+                    <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+                  </View>
+                )
+              }
+              return null
+            }}
+
         /> : <Text className="font-montserrat dark:text-white">No courses found</Text> }
         <View className="h-[50px]"></View>
       </ScrollView>

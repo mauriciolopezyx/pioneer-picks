@@ -1,7 +1,10 @@
-import { Text, View, useColorScheme } from 'react-native'
+import { Text, View, useColorScheme, ActivityIndicator } from 'react-native'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
 import { GestureWrapper } from '@/app/(tabs)/home';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import api from '@/services/api';
 
 import {
     SafeAreaView
@@ -12,12 +15,6 @@ import { subjectColorMappings, revolvingColorPalette } from '@/services/utils';
 // params should be { id:professorId, courseId, subjectName, subjectAbbreviation, courseAbbreviation }
 
 type SpecificProfessorCourseProps = {
-    professor: {
-        id: string,
-        name: string,
-        reviewCount: number,
-        commentCount: number
-    },
     params: {
         professorId: string,
         courseId: string,
@@ -26,10 +23,59 @@ type SpecificProfessorCourseProps = {
         courseAbbreviation: string
     }
 }
-const SpecificProfessorCourse = ({professor, params}: SpecificProfessorCourseProps) => {
+
+type ProfessorInfo = {
+    id: string,
+    name: string,
+    reviewCount: number,
+    commentCount: number
+}
+
+const SpecificProfessorCourse = ({params}: SpecificProfessorCourseProps) => {
+
+    const { isLoading:loading, error, data:professor } = useQuery({
+        queryKey: ["specific-professor-course-info", params.professorId, params.courseId],
+        queryFn: async () => {
+            try {
+                const response = await api.get(`/professors/${params.courseId}/${params.professorId}`)
+                return response.data
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
+            }
+        },
+        refetchOnWindowFocus: true
+    })
 
     const colorScheme = useColorScheme()
     const router = useRouter()
+
+    if (loading) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800">
+                <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+            </SafeAreaView>
+        )
+    }
+
+    if (error) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800 flex flex-col justify-center items-center px-5">
+                <Text className="font-montserrat dark:text-white">Failed to load professor: {error?.message}</Text>
+            </SafeAreaView>
+        )
+    }
+
+    if (!professor) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800 flex flex-col justify-center items-center px-5">
+                <Text className="font-montserrat dark:text-white">Failed to load professor information (no data found)</Text>
+            </SafeAreaView>
+        )
+    }
 
     const paletteKey = subjectColorMappings[params.subjectName.toLowerCase()] ?? 0
     const bgColor = revolvingColorPalette[paletteKey]?.primary ?? "#000";

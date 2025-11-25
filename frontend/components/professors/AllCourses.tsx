@@ -5,7 +5,7 @@ import { FlashList } from '@shopify/flash-list'
 import { useNavigation } from "@react-navigation/native";
 import SearchBar from '../SearchBar';
 
-import { useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useInfiniteQuery } from '@tanstack/react-query'
 import api from '@/services/api';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MasterToast from "@/components/ToastWrapper"
@@ -21,11 +21,57 @@ type DataProps = {
     }
 }
 
-const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professorId: string}}) => {
+const AllProfessorCourses = ({params}: {params: {professorId: string}}) => {
+
+    const { data:info } = useQuery({
+        queryKey: ["specific-professor-info", params.professorId],
+        queryFn: async () => {
+            try {
+                const response = await api.get(`/professors/${params.professorId}`)
+                return response.data
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    const customMessage = error.response.data.message
+                    throw new Error(customMessage || 'An error occurred')
+                }
+                throw error
+            }
+        },
+        refetchOnWindowFocus: true
+    })
+
+    const {
+        data:rawCourses,
+        isLoading:loading,
+        error,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useInfiniteQuery({
+        queryKey: ["specific-professor-courses", params.professorId],
+        queryFn: async ({ pageParam = 0 }) => {
+            try {
+                const response = await api.get(`/professors/${params.professorId}/courses?page=${pageParam}`)
+                return response.data
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    throw new Error(error.response.data.message || 'An error occurred')
+                }
+                throw error
+            }
+        },
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.hasMore ? allPages.length : undefined
+        },
+        initialPageParam: 0,
+        refetchOnWindowFocus: true
+    })
+
+    const courses = rawCourses?.pages.flatMap(page => page.content) ?? []
 
     const colorScheme = useColorScheme()
     const navigation = useNavigation()
-    const [favorited, setFavorited] = useState(data.favorited) // data.favorited is initial favorited status
+    const [favorited, setFavorited] = useState<boolean>(info.favorited) // data.favorited is initial favorited status
 
     const [query, setQuery] = useState("")
     //const [filter, setFilter] = useState(filterOptions.length - 1)
@@ -39,7 +85,7 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
         })
     }, [])
 
-    const {isPending:favoriteLoading, isError, error:favoriteError, mutate:toggleFavorite} = useMutation({
+    const {isPending:favoriteLoading, error:favoriteError, mutate:toggleFavorite} = useMutation({
         mutationFn: async () => {
             console.log("attempting to toggle favorite professor when favorited status is:", favorited)
             if (favorited) {
@@ -86,17 +132,34 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
     })
 
     const filteredCourses = useMemo(() => {
-        if (!data?.courses) return []
+        if (!courses) return []
         const q = query.replace(/\s+/g, '').toLowerCase()
-        return [...data.courses]
+        return [...courses]
             .filter(item =>
                 item.name.replace(/\s+/g, '').toLowerCase().includes(q)
             )
-    }, [query, data])
+    }, [query, courses])
+
+
+    if (loading) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800">
+                <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+            </SafeAreaView>
+        )
+    }
+
+    if (error) {
+        return (
+            <SafeAreaView className="flex-1 dark:bg-gray-800 flex flex-col justify-center items-center px-5">
+                <Text className="font-montserrat dark:text-white">Failed to load professor: {error?.message}</Text>
+            </SafeAreaView>
+        )
+    }
 
     return (
         <SafeAreaView className="flex-1 dark:bg-gray-800 px-5" edges={["top"]}>
-            <Text className="font-montserrat-bold text-4xl dark:text-white mb-4">{data.info.name}'s Courses</Text>
+            <Text className="font-montserrat-bold text-4xl dark:text-white mb-4">{info.info.name}'s Courses</Text>
 
             <View className="flex flex-row justify-start items-center gap-x-[10px] mb-4">
                 <SearchBar
@@ -113,30 +176,55 @@ const AllProfessorCourses = ({data, params}: {data: DataProps, params: {professo
                 </GestureWrapper>
             )}
 
-            <CatalogSection data={query != "" ? filteredCourses : data.courses} ItemComponent={FavoriteCourseCard} />
+            {courses.length > 0 ? (
+                <CatalogSection data={query != "" ? filteredCourses : courses} ItemComponent={FavoriteCourseCard} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} />
+            ) : <Text className="font-montserrat dark:text-white">No courses found</Text>}
 
         </SafeAreaView>
     )
 }
 
 export type CatalogSectionProps<T> = {
-  data: T[] | null,
-  ItemComponent: React.ComponentType<{ data: T }>
+    data: T[] | null,
+    ItemComponent: React.ComponentType<{ data: T }>,
+    hasNextPage: boolean,
+    isFetchingNextPage: boolean,
+    fetchNextPage: (...args: any[]) => any
 }
 
-export const CatalogSection = <T,>({data, ItemComponent}: CatalogSectionProps<T>) => {
-  return (
-    <FlashList
-      data={data}
-      renderItem={(item: any) => (
-          <ItemComponent data={item.item} />
-      )}
-      numColumns={2}
-      keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
-      showsVerticalScrollIndicator={false}
-      ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-    />
-  )
+export const CatalogSection = <T,>({data, ItemComponent, hasNextPage, isFetchingNextPage, fetchNextPage}: CatalogSectionProps<T>) => {
+    
+    const colorScheme = useColorScheme()
+
+    return (
+        <FlashList
+            data={data}
+            renderItem={(item: any) => (
+                <ItemComponent data={item.item} />
+            )}
+            numColumns={2}
+            keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+
+            onEndReached={() => {
+                if (hasNextPage && !isFetchingNextPage) {
+                    fetchNextPage()
+                }
+            }}
+            onEndReachedThreshold={0.8} // triggered when XX% from end
+            ListFooterComponent={() => {
+                if (isFetchingNextPage) {
+                    return (
+                        <View style={{ padding: 20 }}>
+                        <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+                        </View>
+                    )
+                }
+                return null
+            }}
+        />
+    )
 }
 
 export default AllProfessorCourses
