@@ -109,121 +109,124 @@ const ResetPassword = () => {
         <SafeAreaView className="flex-1 dark:bg-gray-800">
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                className="flex-1 justify-center px-6 py-12"
+                className="flex-1"
             >
-                <View className="mb-6">
-                    <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-6">
-                        Reset Password
-                    </Text>
-                    <Text className="font-montserrat text-md mx-auto text-gray-900 dark:text-white mb-2">
-                        {conditionalTitle}
-                    </Text>
-                </View>
+                <View className="flex-1 justify-center items-center px-6">
+                    <View className="w-full max-w-[500px]">
+                        <View className="mb-6">
+                            <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-6">
+                                Reset Password
+                            </Text>
+                            <Text className="font-montserrat text-md mx-auto text-gray-900 dark:text-white mb-2">
+                                {conditionalTitle}
+                            </Text>
+                        </View>
 
-                { (!token && !email) ? <View className="mb-6">
-                    <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Current Password
-                    </Text>
-                    <View className="relative">
-                        <Controller
-                        control={control}
-                        name="old"
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <TextInput
+                        { (!token && !email) ? <View className="mb-6">
+                            <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Current Password
+                            </Text>
+                            <View className="relative">
+                                <Controller
+                                control={control}
+                                name="old"
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                    <TextInput
+                                    className={`
+                                        font-montserrat
+                                        bg-gray-50 dark:bg-gray-700 
+                                        rounded-full px-4 py-3 pr-12
+                                        text-gray-900 dark:text-white
+                                    `}
+                                    placeholder=""
+                                    placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                                    onChangeText={onChange}
+                                    value={value}
+                                    secureTextEntry={!passwordShowStatuses.old}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    />
+                                )}
+                                />
+                                <Pressable
+                                    onPress={() => onToggleUpdate("old", !passwordShowStatuses.old)}
+                                    className="absolute right-5 top-1/2 transform -translate-y-1/2"
+                                >
+                                {passwordShowStatuses.old ? (
+                                    <Ionicons name="eye-off-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
+                                ) : (
+                                    <Ionicons name="eye-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
+                                )}
+                                </Pressable>
+                            </View>
+                            {errors.old ? (
+                                <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
+                                    {errors.old.message}
+                                </Text>
+                            ) : null}
+                        </View> : null }
+
+                        <View className="mb-6">
+                            <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                New Password
+                            </Text>
+                            <View className="relative">
+                                <Controller
+                                control={control}
+                                name="new"
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                    <TextInput
+                                    className={`
+                                        font-montserrat
+                                        bg-gray-50 dark:bg-gray-700 
+                                        rounded-full px-4 py-3 pr-12
+                                        text-gray-900 dark:text-white
+                                    `}
+                                    placeholder=""
+                                    placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                                    onChangeText={onChange}
+                                    value={value}
+                                    secureTextEntry={!passwordShowStatuses.new}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    />
+                                )}
+                                />
+                                <Pressable
+                                    onPress={() => onToggleUpdate("new", !passwordShowStatuses.new)}
+                                    className="absolute right-5 top-1/2 transform -translate-y-1/2"
+                                >
+                                {passwordShowStatuses.new ? (
+                                    <Ionicons name="eye-off-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
+                                ) : (
+                                    <Ionicons name="eye-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
+                                )}
+                                </Pressable>
+                            </View>
+                            {errors.new ? (
+                                <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
+                                    {errors.new.message}
+                                </Text>
+                            ) : null}
+                        </View>
+
+                        <TouchableOpacity
+                            onPress={handleSubmit(onSubmit)}
+                            disabled={loading}
                             className={`
-                                font-montserrat
-                                bg-gray-50 dark:bg-gray-700 
-                                rounded-full px-4 py-3 pr-12
-                                text-gray-900 dark:text-white
+                                rounded-lg py-3.5 mb-4
+                                ${loading 
+                                ? "bg-gray-400 dark:bg-gray-600" 
+                                : "bg-primary dark:bg-primary"
+                                }
                             `}
-                            placeholder=""
-                            placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                            onChangeText={onChange}
-                            value={value}
-                            secureTextEntry={!passwordShowStatuses.old}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            />
-                        )}
-                        />
-                        <Pressable
-                            onPress={() => onToggleUpdate("old", !passwordShowStatuses.old)}
-                            className="absolute right-5 top-1/2 transform -translate-y-1/2"
                         >
-                        {passwordShowStatuses.old ? (
-                            <Ionicons name="eye-off-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
-                        ) : (
-                            <Ionicons name="eye-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
-                        )}
-                        </Pressable>
+                            <Text className="font-montserrat-semibold text-white text-center text-lg">
+                                {loading ? "Confirming..." : "Confirm"}
+                            </Text>
+                        </TouchableOpacity>
                     </View>
-                    {errors.old ? (
-                        <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                            {errors.old.message}
-                        </Text>
-                    ) : null}
-                </View> : null }
-
-                <View className="mb-6">
-                    <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        New Password
-                    </Text>
-                    <View className="relative">
-                        <Controller
-                        control={control}
-                        name="new"
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <TextInput
-                            className={`
-                                font-montserrat
-                                bg-gray-50 dark:bg-gray-700 
-                                rounded-full px-4 py-3 pr-12
-                                text-gray-900 dark:text-white
-                            `}
-                            placeholder=""
-                            placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                            onChangeText={onChange}
-                            value={value}
-                            secureTextEntry={!passwordShowStatuses.new}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            />
-                        )}
-                        />
-                        <Pressable
-                            onPress={() => onToggleUpdate("new", !passwordShowStatuses.new)}
-                            className="absolute right-5 top-1/2 transform -translate-y-1/2"
-                        >
-                        {passwordShowStatuses.new ? (
-                            <Ionicons name="eye-off-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
-                        ) : (
-                            <Ionicons name="eye-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
-                        )}
-                        </Pressable>
-                    </View>
-                    {errors.new ? (
-                        <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                            {errors.new.message}
-                        </Text>
-                    ) : null}
                 </View>
-
-                <TouchableOpacity
-                    onPress={handleSubmit(onSubmit)}
-                    disabled={loading}
-                    className={`
-                        rounded-lg py-3.5 mb-4
-                        ${loading 
-                        ? "bg-gray-400 dark:bg-gray-600" 
-                        : "bg-primary dark:bg-primary"
-                        }
-                    `}
-                >
-                    <Text className="font-montserrat-semibold text-white text-center text-lg">
-                        {loading ? "Confirming..." : "Confirm"}
-                    </Text>
-                </TouchableOpacity>
-
             </KeyboardAvoidingView>
         </SafeAreaView>
     )

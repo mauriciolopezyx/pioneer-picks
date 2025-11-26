@@ -121,52 +121,54 @@ export default function Verify() {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="flex-1"
             >
-                <View className="flex-1 justify-center px-6 pt-8">
-                    <View className="items-center mb-8">
-                        <Text className="font-montserrat-bold text-3xl font-bold text-gray-900 dark:text-white mb-6">
-                            Verify
-                        </Text>
-                        <Text className="font-montserrat text-gray-600 dark:text-gray-300 text-center">
-                            Enter the code sent to <Text className="font-montserrat-semibold">{email ? maskEmail(email) : maskEmail("placeholder@gmail.com")}</Text>
-                        </Text>
-                    </View>
+                <View className="flex-1 justify-center items-center px-6">
+                    <View className="w-full max-w-[500px]">
+                        <View className="items-center mb-8">
+                            <Text className="font-montserrat-bold text-3xl font-bold text-gray-900 dark:text-white mb-6">
+                                Verify
+                            </Text>
+                            <Text className="font-montserrat text-gray-600 dark:text-gray-300 text-center">
+                                Enter the code sent to <Text className="font-montserrat-semibold">{email ? maskEmail(email) : maskEmail("placeholder@gmail.com")}</Text>
+                            </Text>
+                        </View>
 
-                    <TextInput
-                        className={`font-montserrat-bold w-full h-14 text-xl text-center font-semibold rounded-full dark:bg-gray-700 dark:text-white ${isError ? "mb-4" : "mb-8"}`}
-                        keyboardType="numeric"
-                        onChangeText={onChangeQuery}
-                        maxLength={6}
-                        selectTextOnFocus
-                        textContentType="oneTimeCode"
-                    />
+                        <TextInput
+                            className={`font-montserrat-bold w-full h-14 text-xl text-center font-semibold rounded-full dark:bg-gray-700 dark:text-white ${isError ? "mb-4" : "mb-8"}`}
+                            keyboardType="numeric"
+                            onChangeText={onChangeQuery}
+                            maxLength={6}
+                            selectTextOnFocus
+                            textContentType="oneTimeCode"
+                        />
 
-                    <TouchableOpacity
-                        className={`w-full py-4 rounded-lg mb-4 ${
-                            loading || code.length !== 6
-                            ? 'bg-gray-300 dark:bg-gray-700'
-                            : 'bg-primary dark:bg-primary'
-                        }`}
-                        onPress={() => {confirmMutate()}}
-                        disabled={loading || code.length !== 6}
-                    >
-                        <Text className={`font-montserrat-semibold text-center font-semibold text-lg ${
-                            loading || code.length !== 6
-                            ? 'text-gray-500 dark:text-gray-400'
-                            : 'text-white'
-                        }`}>
-                            {loading ? 'Verifying...' : 'Confirm'}
-                        </Text>
-                    </TouchableOpacity>
-
-                    <View className="items-center">
-                        <Text className="font-montserrat text-gray-600 dark:text-gray-300 text-sm mb-2">
-                            Didn't receive a code?
-                        </Text>
-                        <TouchableOpacity onPress={() => {resendCode()}} disabled={loading || resendCooldown > 0}>
-                            <Text className="font-montserrat-semibold text-md text-blue-600 dark:text-light-100 font-semibold">
-                            {resendCooldown > 0 ? `Resent Code! (${resendCooldown})` : "Resend Code"}
+                        <TouchableOpacity
+                            className={`w-full py-4 rounded-lg mb-4 ${
+                                loading || code.length !== 6
+                                ? 'bg-gray-300 dark:bg-gray-700'
+                                : 'bg-primary dark:bg-primary'
+                            }`}
+                            onPress={() => {confirmMutate()}}
+                            disabled={loading || code.length !== 6}
+                        >
+                            <Text className={`font-montserrat-semibold text-center font-semibold text-lg ${
+                                loading || code.length !== 6
+                                ? 'text-gray-500 dark:text-gray-400'
+                                : 'text-white'
+                            }`}>
+                                {loading ? 'Verifying...' : 'Confirm'}
                             </Text>
                         </TouchableOpacity>
+
+                        <View className="items-center">
+                            <Text className="font-montserrat text-gray-600 dark:text-gray-300 text-sm mb-2">
+                                Didn't receive a code?
+                            </Text>
+                            <TouchableOpacity onPress={() => {resendCode()}} disabled={loading || resendCooldown > 0}>
+                                <Text className="font-montserrat-semibold text-md text-blue-600 dark:text-light-100 font-semibold">
+                                {resendCooldown > 0 ? `Resent Code! (${resendCooldown})` : "Resend Code"}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </KeyboardAvoidingView>

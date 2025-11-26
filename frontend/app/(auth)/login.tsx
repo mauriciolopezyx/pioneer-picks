@@ -95,70 +95,28 @@ export default function Login() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <View className="flex-1 justify-center px-6 py-12">
-
-            <View className="mb-12">
-              <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-2">
-                Login
-              </Text>
-            </View>
-
-            <View className="mb-4">
-              <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email
-              </Text>
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    className={`
-                        font-montserrat
-                        bg-gray-50 dark:bg-gray-700 
-                        rounded-full px-4 py-3 
-                        text-gray-900 dark:text-white
-                    `}
-                    placeholder=""
-                    placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                    onBlur={() => {
-                      onBlur()
-                    }}
-                    onChangeText={onChange}
-                    value={value}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    testID="email-input"
-                  />
-                )}
-              />
-              {errors.email ? (
-                <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                  {errors.email.message}
+          <View className="flex-1 justify-center items-center px-6">
+            <View className="w-full max-w-[500px]">
+              <View className="mb-12">
+                <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-2">
+                  Login
                 </Text>
-              ) : null}
-            </View>
+              </View>
 
-            <View className="mb-6">
-              <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
-              </Text>
-              <View className="relative">
+              <View className="mb-4">
+                <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email
+                </Text>
                 <Controller
                   control={control}
-                  name="password"
+                  name="email"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
                       className={`
-                        font-montserrat
-                        bg-gray-50 dark:bg-gray-700 
-                        rounded-full px-4 py-3 pr-12
-                        text-gray-900 dark:text-white
+                          font-montserrat
+                          bg-gray-50 dark:bg-gray-700 
+                          rounded-full px-4 py-3 
+                          text-gray-900 dark:text-white
                       `}
                       placeholder=""
                       placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
@@ -167,63 +125,100 @@ export default function Login() {
                       }}
                       onChangeText={onChange}
                       value={value}
-                      secureTextEntry={!showPassword}
+                      keyboardType="email-address"
                       autoCapitalize="none"
                       autoCorrect={false}
-                      testID="password-input"
+                      testID="email-input"
                     />
                   )}
                 />
-                <Pressable
-                  onPress={() => setShowPassword(!showPassword)}
-                  className="absolute right-5 top-1/2 transform -translate-y-1/2"
-                  testID="password-toggle"
-                >
-                  {showPassword ? (
-                    <Ionicons name="eye-off-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
-                  ) : (
-                    <Ionicons name="eye-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
-                  )}
-                </Pressable>
+                {errors.email ? (
+                  <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
+                    {errors.email.message}
+                  </Text>
+                ) : null}
               </View>
-              {errors.password ? (
-                <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                  {errors.password.message}
+
+              <View className="mb-6">
+                <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Password
                 </Text>
-              ) : null}
-            </View>
+                <View className="relative">
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        className={`
+                          font-montserrat
+                          bg-gray-50 dark:bg-gray-700 
+                          rounded-full px-4 py-3 pr-12
+                          text-gray-900 dark:text-white
+                        `}
+                        placeholder=""
+                        placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                        onBlur={() => {
+                          onBlur()
+                        }}
+                        onChangeText={onChange}
+                        value={value}
+                        secureTextEntry={!showPassword}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        testID="password-input"
+                      />
+                    )}
+                  />
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    className="absolute right-5 top-1/2 transform -translate-y-1/2"
+                    testID="password-toggle"
+                  >
+                    {showPassword ? (
+                      <Ionicons name="eye-off-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
+                    ) : (
+                      <Ionicons name="eye-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
+                    )}
+                  </Pressable>
+                </View>
+                {errors.password ? (
+                  <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
+                    {errors.password.message}
+                  </Text>
+                ) : null}
+              </View>
 
-            <TouchableOpacity className="mb-6" onPress={() => { router.navigate({pathname: "/(auth)/forgot-password"}) }} >
-              <Text className="font-montserrat-semibold text-md text-blue-600 dark:text-light-100 text-right">
-                Forgot password?
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleSubmit(onSubmit)}
-              disabled={loading}
-              className={`
-                rounded-lg py-3.5 mb-4
-                ${loading 
-                  ? "bg-gray-400 dark:bg-gray-600" 
-                  : "bg-primary dark:bg-primary"
-                }
-              `}
-              testID="login-button"
-            >
-              <Text className="font-montserrat-semibold text-white text-center text-lg">
-                {loading ? "Logging in..." : "Login"}
-              </Text>
-            </TouchableOpacity>
-
-            <View className="flex-row justify-center items-center">
-                <Text className="font-montserrat text-gray-600 dark:text-gray-400 text-sm">
-                Don&apos;t have an account?{" "}
+              <TouchableOpacity className="mb-6" onPress={() => { router.navigate({pathname: "/(auth)/forgot-password"}) }} >
+                <Text className="font-montserrat-semibold text-md text-blue-600 dark:text-light-100 text-right">
+                  Forgot password?
                 </Text>
-                <Link replace href="/register" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Register</Link>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleSubmit(onSubmit)}
+                disabled={loading}
+                className={`
+                  rounded-lg py-3.5 mb-4
+                  ${loading 
+                    ? "bg-gray-400 dark:bg-gray-600" 
+                    : "bg-primary dark:bg-primary"
+                  }
+                `}
+                testID="login-button"
+              >
+                <Text className="font-montserrat-semibold text-white text-center text-lg">
+                  {loading ? "Logging in..." : "Login"}
+                </Text>
+              </TouchableOpacity>
+
+              <View className="flex-row justify-center items-center">
+                  <Text className="font-montserrat text-gray-600 dark:text-gray-400 text-sm">
+                  Don&apos;t have an account?{" "}
+                  </Text>
+                  <Link replace href="/register" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Register</Link>
+              </View>
             </View>
           </View>
-        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )

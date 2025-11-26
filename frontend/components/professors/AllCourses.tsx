@@ -4,6 +4,7 @@ import { FavoriteCourse as ProfessorCourse } from '@/app/(tabs)/home'
 import { FlashList } from '@shopify/flash-list'
 import { useNavigation } from "@react-navigation/native";
 import SearchBar from '../SearchBar';
+import * as Device from 'expo-device';
 
 import { useQuery, useMutation, useInfiniteQuery } from '@tanstack/react-query'
 import api from '@/services/api';
@@ -72,6 +73,12 @@ const AllProfessorCourses = ({params}: {params: {professorId: string}}) => {
     const colorScheme = useColorScheme()
     const navigation = useNavigation()
     const [favorited, setFavorited] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (info) {
+            setFavorited(info.favorited)
+        }
+    }, [info])
 
     const [query, setQuery] = useState("")
     //const [filter, setFilter] = useState(filterOptions.length - 1)
@@ -202,7 +209,7 @@ export const CatalogSection = <T,>({data, ItemComponent, hasNextPage, isFetching
             renderItem={(item: any) => (
                 <ItemComponent data={item.item} />
             )}
-            numColumns={2}
+            numColumns={Device.deviceType != 2 ? 2 : 4}
             keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
             showsVerticalScrollIndicator={false}
             ItemSeparatorComponent={() => <View style={{ height: 10 }} />}

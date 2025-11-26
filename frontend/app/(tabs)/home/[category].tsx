@@ -2,6 +2,7 @@ import { View, Text, ActivityIndicator, ScrollView, useColorScheme } from 'react
 import { useLocalSearchParams } from "expo-router"
 import React from 'react'
 import { FlashList } from '@shopify/flash-list';
+import * as Device from 'expo-device';
 
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import api from '@/services/api';
@@ -116,7 +117,7 @@ export const FavoriteSection = <T,>({data, ItemComponent, hasNextPage, isFetchin
       renderItem={(item: any) => (
           <ItemComponent data={item.item} />
       )}
-      numColumns={2}
+      numColumns={Device.deviceType != 2 ? 2 : 4}
       keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
       showsVerticalScrollIndicator={false}
       ItemSeparatorComponent={() => <View style={{ height: 10 }} />}

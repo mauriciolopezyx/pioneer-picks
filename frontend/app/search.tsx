@@ -167,10 +167,17 @@ const SearchResult = ({data, colorScheme}: {data: SubjectResult | CourseResult |
                 category: category,
                 abbreviation: result.abbreviation
             })
-            router.navigate({
-                pathname: "/(tabs)/discover/[id]",
-                params: { id: result.id },
-            })
+            // router.navigate({
+            //     pathname: "/(tabs)/discover/[id]",
+            //     params: { id: result.id },
+            // })
+            router.push('/(tabs)/discover/all')
+            setTimeout(() => {
+                router.push({
+                    pathname: "/(tabs)/discover/[id]",
+                    params: { id: result.id },
+                })
+            }, 100)
         } else if (category === 2) {
             await addRecentSearch({
                 id: result.id,
@@ -180,20 +187,34 @@ const SearchResult = ({data, colorScheme}: {data: SubjectResult | CourseResult |
                 abbreviation: result.abbreviation,
                 subjectAbbreviation: result.subjectAbbreviation
             })
-            router.navigate({
-                pathname: "/(tabs)/discover/courses/[id]",
-                params: { id: result.id, subjectName: result.subject, subjectAbbreviation: result.subjectAbbreviation },
-            })
+            // router.navigate({
+            //     pathname: "/(tabs)/discover/courses/[id]",
+            //     params: { id: result.id, subjectName: result.subject, subjectAbbreviation: result.subjectAbbreviation },
+            // })
+            router.push('/(tabs)/discover/all')
+            setTimeout(() => {
+                router.push({
+                    pathname: "/(tabs)/discover/courses/[id]",
+                    params: { id: result.id, subjectName: result.subject, subjectAbbreviation: result.subjectAbbreviation },
+                })
+            }, 100)
         } else {
             await addRecentSearch({
                 id: result.id,
                 name: result.name,
                 category: category
             })
-            router.navigate({
-                pathname: "/(tabs)/discover/professors/[id]",
-                params: { id: result.id, getAll: "true" },
-            })
+            // router.navigate({
+            //     pathname: "/(tabs)/discover/professors/[id]",
+            //     params: { id: result.id, getAll: "true" },
+            // })
+            router.push('/(tabs)/discover/all')
+            setTimeout(() => {
+                router.push({
+                    pathname: "/(tabs)/discover/professors/[id]",
+                    params: { id: result.id, getAll: "true" },
+                })
+            }, 100)
         }
     }
 
@@ -225,20 +246,41 @@ const RecentSearchResult = ({data, colorScheme}: {data: RecentSearch, colorSchem
 
     const handleSubmit = async () => {
         if (data.category === 1) {
-            router.navigate({
-                pathname: "/(tabs)/discover/[id]",
-                params: { id: data.id },
-            })
+            // router.navigate({
+            //     pathname: "/(tabs)/discover/[id]",
+            //     params: { id: data.id },
+            // })
+            router.push('/(tabs)/discover/all')
+            setTimeout(() => {
+                router.push({
+                    pathname: "/(tabs)/discover/[id]",
+                    params: { id: data.id },
+                })
+            }, 100)
         } else if (data.category === 2) {
-            router.navigate({
-                pathname: "/(tabs)/discover/courses/[id]",
-                params: { id: data.id, subjectName: data.subject, subjectAbbreviation: data.subjectAbbreviation },
-            })
+            // router.navigate({
+            //     pathname: "/(tabs)/discover/courses/[id]",
+            //     params: { id: data.id, subjectName: data.subject, subjectAbbreviation: data.subjectAbbreviation },
+            // })
+            router.push('/(tabs)/discover/all')
+            setTimeout(() => {
+                router.push({
+                    pathname: "/(tabs)/discover/courses/[id]",
+                    params: { id: data.id, subjectName: data.subject, subjectAbbreviation: data.subjectAbbreviation },
+                })
+            }, 100)
         } else {
-            router.navigate({
-                pathname: "/(tabs)/discover/professors/[id]",
-                params: { id: data.id, getAll: "true" },
-            })
+            // router.navigate({
+            //     pathname: "/(tabs)/discover/professors/[id]",
+            //     params: { id: data.id, getAll: "true" },
+            // })
+            router.push('/(tabs)/discover/all')
+            setTimeout(() => {
+                router.push({
+                    pathname: "/(tabs)/discover/professors/[id]",
+                    params: { id: data.id, getAll: "true" },
+                })
+            }, 100)
         }
     }
 

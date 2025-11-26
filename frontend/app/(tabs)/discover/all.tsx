@@ -4,6 +4,7 @@ import DiscoverCard from '@/components/DiscoverCard'
 import SearchBar from '@/components/SearchBar';
 import { useState, useCallback, useMemo } from "react"
 import { useQuery } from '@tanstack/react-query'
+import * as Device from 'expo-device';
 import api from '@/services/api';
 import axios from 'axios';
 
@@ -116,7 +117,7 @@ const discover = () => {
           <Pressable className="flex-1" onPress={() => { router.navigate({ pathname: "/search" })}}>
             <View className="pointer-events-none flex-1">
               <SearchBar
-                placeholder="Search"
+                placeholder="Searchs"
                 onChangeText={onChangeQuery}
                 disabled={true}
               />
@@ -141,7 +142,7 @@ const discover = () => {
             <DiscoverCard {...item} />
           )}
           keyExtractor={(item: any) => item.id.toString() ?? crypto.randomUUID()}
-          numColumns={2}
+          numColumns={Device.deviceType != 2 ? 2 : 4}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           scrollEnabled={false}
         />

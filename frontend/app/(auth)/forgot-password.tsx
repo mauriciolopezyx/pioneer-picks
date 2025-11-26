@@ -75,65 +75,68 @@ const ForgotPassword = () => {
         <SafeAreaView className="flex-1 dark:bg-gray-800">
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                className="flex-1 justify-center px-6 py-12"
+                className="flex-1"
             >
-                <View className="mb-6">
-                    <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-6">
-                        Forgot Password
-                    </Text>
-                    <Text className="font-montserrat text-md mx-auto text-gray-900 dark:text-white mb-2" style={{textAlign: "center"}}>
-                        Enter your email to receive a verification code:
-                    </Text>
-                </View>
+                <View className="flex-1 justify-center items-center px-6">
+                    <View className="w-full max-w-[500px]">
+                        <View className="mb-6">
+                            <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-6">
+                                Forgot Password
+                            </Text>
+                            <Text className="font-montserrat text-md mx-auto text-gray-900 dark:text-white mb-2" style={{textAlign: "center"}}>
+                                Enter your email to receive a verification code:
+                            </Text>
+                        </View>
 
-                <View className="mb-6">
-                    <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Email
-                    </Text>
-                    <Controller
-                        control={control}
-                        name="email"
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <TextInput
-                            className={`
-                                font-montserrat
-                                bg-gray-50 dark:bg-gray-700 
-                                rounded-full px-4 py-3 pr-12
-                                text-gray-900 dark:text-white
-                            `}
-                            placeholder=""
-                            placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                            onChangeText={onChange}
-                            value={value}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            autoCorrect={false}
+                        <View className="mb-6">
+                            <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Email
+                            </Text>
+                            <Controller
+                                control={control}
+                                name="email"
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                    <TextInput
+                                    className={`
+                                        font-montserrat
+                                        bg-gray-50 dark:bg-gray-700 
+                                        rounded-full px-4 py-3 pr-12
+                                        text-gray-900 dark:text-white
+                                    `}
+                                    placeholder=""
+                                    placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                                    onChangeText={onChange}
+                                    value={value}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    />
+                                )}
                             />
-                        )}
-                    />
-                    {errors.email ? (
-                        <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                            {errors.email.message}
-                        </Text>
-                    ) : null}
+                            {errors.email ? (
+                                <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
+                                    {errors.email.message}
+                                </Text>
+                            ) : null}
+                        </View>
+
+                        <TouchableOpacity
+                            onPress={handleSubmit(onSubmit)}
+                            disabled={loading}
+                            className={`
+                                rounded-lg py-3.5 mb-4
+                                ${loading 
+                                ? "bg-gray-400 dark:bg-gray-600" 
+                                : "bg-primary dark:bg-primary"
+                                }
+                            `}
+                        >
+                            <Text className="font-montserrat-semibold text-white text-center text-lg">
+                                {loading ? "Confirming..." : "Confirm"}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-
-                <TouchableOpacity
-                    onPress={handleSubmit(onSubmit)}
-                    disabled={loading}
-                    className={`
-                        rounded-lg py-3.5 mb-4
-                        ${loading 
-                        ? "bg-gray-400 dark:bg-gray-600" 
-                        : "bg-primary dark:bg-primary"
-                        }
-                    `}
-                >
-                    <Text className="font-montserrat-semibold text-white text-center text-lg">
-                        {loading ? "Confirming..." : "Confirm"}
-                    </Text>
-                </TouchableOpacity>
-
             </KeyboardAvoidingView>
         </SafeAreaView>
     )

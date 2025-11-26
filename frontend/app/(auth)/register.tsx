@@ -93,164 +93,159 @@ export default function Register() {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="flex-1"
             >
-                <ScrollView
-                contentContainerStyle={{ flexGrow: 1 }}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
-                >
-                <View className="flex-1 justify-center px-6 py-12">
+                <View className="flex-1 justify-center items-center px-6">
+                    <View className="w-full max-w-[500px]">
+                        <View className="mb-12">
+                            <Text className="font-montserrat-bold text-4xl mx-auto font-bold text-gray-900 dark:text-white mb-2">
+                            Register
+                            </Text>
+                        </View>
 
-                <View className="mb-12">
-                    <Text className="font-montserrat-bold text-4xl mx-auto font-bold text-gray-900 dark:text-white mb-2">
-                    Register
-                    </Text>
-                </View>
+                        <View className="mb-4">
+                            <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Email
+                            </Text>
+                            <Controller
+                            control={control}
+                            name="email"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <TextInput
+                                className={`
+                                    font-montserrat
+                                    bg-gray-50 dark:bg-gray-700 
+                                    rounded-full px-4 py-3 
+                                    text-gray-900 dark:text-white
+                                `}
+                                placeholder=""
+                                placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                                onBlur={() => {
+                                    onBlur()
+                                }}
+                                onChangeText={onChange}
+                                value={value}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                testID="email-input"
+                                />
+                            )}
+                            />
+                            {errors.email ? (
+                            <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
+                                {errors.email.message}
+                            </Text>
+                            ) : null}
+                        </View>
 
-                <View className="mb-4">
-                    <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email
-                    </Text>
-                    <Controller
-                    control={control}
-                    name="email"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                        className={`
-                            font-montserrat
-                            bg-gray-50 dark:bg-gray-700 
-                            rounded-full px-4 py-3 
-                            text-gray-900 dark:text-white
-                        `}
-                        placeholder=""
-                        placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                        onBlur={() => {
-                            onBlur()
-                        }}
-                        onChangeText={onChange}
-                        value={value}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        testID="email-input"
-                        />
-                    )}
-                    />
-                    {errors.email ? (
-                    <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                        {errors.email.message}
-                    </Text>
-                    ) : null}
-                </View>
+                        <View className="mb-4">
+                            <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            First and Last Name
+                            </Text>
+                            <Controller
+                            control={control}
+                            name="username"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <TextInput
+                                className={`
+                                    font-montserrat
+                                    bg-gray-50 dark:bg-gray-700 
+                                    rounded-full px-4 py-3 
+                                    text-gray-900 dark:text-white
+                                `}
+                                placeholder=""
+                                placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                                onBlur={() => {
+                                    onBlur()
+                                }}
+                                onChangeText={onChange}
+                                value={value}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                testID="username-input"
+                                />
+                            )}
+                            />
+                            {errors.username ? (
+                            <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
+                                {errors.username.message}
+                            </Text>
+                            ) : null}
+                        </View>
 
-                <View className="mb-4">
-                    <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    First and Last Name
-                    </Text>
-                    <Controller
-                    control={control}
-                    name="username"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                        className={`
-                            font-montserrat
-                            bg-gray-50 dark:bg-gray-700 
-                            rounded-full px-4 py-3 
-                            text-gray-900 dark:text-white
-                        `}
-                        placeholder=""
-                        placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                        onBlur={() => {
-                            onBlur()
-                        }}
-                        onChangeText={onChange}
-                        value={value}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        testID="username-input"
-                        />
-                    )}
-                    />
-                    {errors.username ? (
-                    <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                        {errors.username.message}
-                    </Text>
-                    ) : null}
-                </View>
+                        <View className="mb-6">
+                            <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Password
+                            </Text>
+                            <View className="relative">
+                            <Controller
+                                control={control}
+                                name="password"
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                <TextInput
+                                    className={`
+                                    font-montserrat
+                                    bg-gray-50 dark:bg-gray-700 
+                                    rounded-full px-4 py-3 pr-12
+                                    text-gray-900 dark:text-white
+                                    `}
+                                    placeholder=""
+                                    placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                                    onBlur={() => {
+                                        onBlur()
+                                    }}
+                                    onChangeText={onChange}
+                                    value={value}
+                                    secureTextEntry={!showPassword}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    testID="password-input"
+                                />
+                                )}
+                            />
+                            <Pressable
+                                onPress={() => setShowPassword(!showPassword)}
+                                className="absolute right-5 top-1/2 transform -translate-y-1/2"
+                                testID="password-toggle"
+                            >
+                                {showPassword ? (
+                                    <Ionicons name="eye-off-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
+                                ) : (
+                                    <Ionicons name="eye-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
+                                )}
+                            </Pressable>
+                            </View>
+                            {errors.password ? (
+                            <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
+                                {errors.password.message}
+                            </Text>
+                            ) : null}
+                        </View>
 
-                <View className="mb-6">
-                    <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Password
-                    </Text>
-                    <View className="relative">
-                    <Controller
-                        control={control}
-                        name="password"
-                        render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
+                        <TouchableOpacity
+                            onPress={handleSubmit(onSubmit)}
+                            disabled={loading}
                             className={`
-                            font-montserrat
-                            bg-gray-50 dark:bg-gray-700 
-                            rounded-full px-4 py-3 pr-12
-                            text-gray-900 dark:text-white
+                            rounded-lg py-3.5 mb-4
+                            ${loading 
+                                ? "bg-gray-400 dark:bg-gray-600" 
+                                : "bg-primary dark:bg-primary"
+                            }
                             `}
-                            placeholder=""
-                            placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                            onBlur={() => {
-                                onBlur()
-                            }}
-                            onChangeText={onChange}
-                            value={value}
-                            secureTextEntry={!showPassword}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            testID="password-input"
-                        />
-                        )}
-                    />
-                    <Pressable
-                        onPress={() => setShowPassword(!showPassword)}
-                        className="absolute right-5 top-1/2 transform -translate-y-1/2"
-                        testID="password-toggle"
-                    >
-                        {showPassword ? (
-                            <Ionicons name="eye-off-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
-                        ) : (
-                            <Ionicons name="eye-outline" size={20} color={isDark ? "#9CA3AF" : "#6B7280"}/>
-                        )}
-                    </Pressable>
+                            testID="register-button"
+                        >
+                            <Text className="font-montserrat-semibold text-white text-center font-semibold text-base">
+                            {loading ? "Signing up..." : "Register"}
+                            </Text>
+                        </TouchableOpacity>
+
+                        <View className="flex-row justify-center items-center">
+                            <Text className="font-montserrat text-gray-600 dark:text-gray-400 text-sm">
+                            Already have an account?{" "}
+                            </Text>
+                            <Link replace href="/login" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Login</Link>
+                        </View>
                     </View>
-                    {errors.password ? (
-                    <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                        {errors.password.message}
-                    </Text>
-                    ) : null}
                 </View>
-
-                <TouchableOpacity
-                    onPress={handleSubmit(onSubmit)}
-                    disabled={loading}
-                    className={`
-                    rounded-lg py-3.5 mb-4
-                    ${loading 
-                        ? "bg-gray-400 dark:bg-gray-600" 
-                        : "bg-primary dark:bg-primary"
-                    }
-                    `}
-                    testID="register-button"
-                >
-                    <Text className="font-montserrat-semibold text-white text-center font-semibold text-base">
-                    {loading ? "Signing up..." : "Register"}
-                    </Text>
-                </TouchableOpacity>
-
-                <View className="flex-row justify-center items-center">
-                    <Text className="font-montserrat text-gray-600 dark:text-gray-400 text-sm">
-                    Already have an account?{" "}
-                    </Text>
-                    <Link replace href="/login" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Login</Link>
-                </View>
-                </View>
-                </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     )

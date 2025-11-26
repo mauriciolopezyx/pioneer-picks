@@ -6,6 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import Slider from '@react-native-community/slider';
 import { reviewOptions } from "@/services/utils";
 import { GestureWrapper } from "@/app/(tabs)/home";
+import * as Device from 'expo-device';
 
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import api from "@/services/api";
@@ -213,7 +214,8 @@ const Review = ({ review }: ReviewItemProps) => {
             <View className="relative">
                 <Slider
                     value={review.workload}
-                    style={{width: 340, height: 15}}
+                    className="min-w-[350px] h-[15px]"
+                    //style={{width: 340, height: 15}}
                     minimumValue={0}
                     maximumValue={3}
                     minimumTrackTintColor="#d50032"
@@ -222,7 +224,7 @@ const Review = ({ review }: ReviewItemProps) => {
                     step={1}
                     disabled={true}
                 />
-                <Text className="absolute bg-black text-white rounded-full px-2 py-1 text-xs font-montserrat-bold -bottom-10 left-1/2 transform -translate-x-1/2 -translate-y-1/2">{reviewOptions.workload[review.workload]} hours</Text>
+                <Text className="absolute bg-black text-white rounded-full px-2 py-1 text-xs font-montserrat-bold -bottom-10 left-1/2 transform -translate-x-1/2 -translate-y-1/2">{reviewOptions.workload[review.workload]} hours per week</Text>
             </View>
 
             <Text className="font-montserrat-semibold text-md dark:text-white">Textbook</Text>
