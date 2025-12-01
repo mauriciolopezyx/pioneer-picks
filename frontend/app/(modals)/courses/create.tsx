@@ -50,16 +50,8 @@ const Create = () => {
                 const extra2 = form.name.trim() === "" ? "Course Name" : ""
                 throw new Error(`The following fields are required: ${extra1} ${extra2}`)
             }
-            try {
-                const response = await api.post(`/courses`, form)
-                return true
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(`/courses`, form)
+            return true
         },
         onSuccess: () => {
             MasterToast.show({

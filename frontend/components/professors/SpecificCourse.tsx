@@ -36,16 +36,8 @@ const SpecificProfessorCourse = ({params}: SpecificProfessorCourseProps) => {
     const { isLoading:loading, error, data:professor } = useQuery({
         queryKey: ["specific-professor-course-info", params.professorId, params.courseId],
         queryFn: async () => {
-            try {
-                const response = await api.get(`/professors/${params.courseId}/${params.professorId}`)
-                return response.data
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.get(`/professors/${params.courseId}/${params.professorId}`)
+            return response.data
         },
         refetchOnWindowFocus: true
     })

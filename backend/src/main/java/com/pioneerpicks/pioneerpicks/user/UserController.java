@@ -1,5 +1,6 @@
 package com.pioneerpicks.pioneerpicks.user;
 
+import com.pioneerpicks.pioneerpicks.user.dto.DeleteAccountDto;
 import com.pioneerpicks.pioneerpicks.user.dto.FullUserDto;
 import com.pioneerpicks.pioneerpicks.user.dto.ResetPasswordDto;
 import com.pioneerpicks.pioneerpicks.exception.BadRequestException;
@@ -33,6 +34,18 @@ class UserController {
         }
 
         return userService.resetPassword(resetPasswordDto);
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteAccount(
+            @RequestBody @Valid DeleteAccountDto deleteAccountDto,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("Delete account validation failed");
+        }
+
+        return userService.deleteAccount(deleteAccountDto);
     }
 
 }

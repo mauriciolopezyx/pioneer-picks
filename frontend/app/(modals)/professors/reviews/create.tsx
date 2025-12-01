@@ -64,22 +64,14 @@ export default function SectionScreen() {
                 const extra2 = form.negative.trim() === "" ? "What to look out for?" : ""
                 throw new Error(`The following fields are required: ${extra1} ${extra2}`)
             }
-            try {
-                const response = await api.post(`/reviews/${courseId}/${professorId}`, {
-                    ...form,
-                    ["season"]: undefined,
-                    ["year"]: undefined,
-                    ["semester"]: form.season + " " + form.year,
-                    ["textbook"]: form.textbook.trim() != "" ? form.textbook : null
-                })
-                return true
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(`/reviews/${courseId}/${professorId}`, {
+                ...form,
+                ["season"]: undefined,
+                ["year"]: undefined,
+                ["semester"]: form.season + " " + form.year,
+                ["textbook"]: form.textbook.trim() != "" ? form.textbook : null
+            })
+            return true
         },
         onSuccess: () => {
             console.log("successfully posted review!")

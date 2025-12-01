@@ -59,16 +59,8 @@ export default function Register() {
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting with:")
             console.log(data)
-            try {
-                const response = await api.post(`/auth/register`, {username: data.username, email: data.email, password: data.password})
-                return response.data.email
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(`/auth/register`, {username: data.username, email: data.email, password: data.password})
+            return response.data.email
         },
         onSuccess: (email: string) => {
             router.replace({pathname: "/verify", params: {email: email, forgot: "false"}})

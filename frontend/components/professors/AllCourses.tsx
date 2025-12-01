@@ -24,19 +24,11 @@ type DataProps = {
 
 const AllProfessorCourses = ({params}: {params: {professorId: string}}) => {
 
-    const { data:info } = useQuery({
+    const { isLoading:infoLoading, data:info } = useQuery({
         queryKey: ["specific-professor-info", params.professorId],
         queryFn: async () => {
-            try {
-                const response = await api.get(`/professors/${params.professorId}`)
-                return response.data
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.get(`/professors/${params.professorId}`)
+            return response.data
         },
         refetchOnWindowFocus: true
     })
@@ -51,15 +43,8 @@ const AllProfessorCourses = ({params}: {params: {professorId: string}}) => {
     } = useInfiniteQuery({
         queryKey: ["specific-professor-courses", params.professorId],
         queryFn: async ({ pageParam = 0 }) => {
-            try {
-                const response = await api.get(`/professors/${params.professorId}/courses?page=${pageParam}`)
-                return response.data
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    throw new Error(error.response.data.message || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.get(`/professors/${params.professorId}/courses?page=${pageParam}`)
+            return response.data
         },
         getNextPageParam: (lastPage, allPages) => {
             return lastPage.hasMore ? allPages.length : undefined
@@ -96,28 +81,12 @@ const AllProfessorCourses = ({params}: {params: {professorId: string}}) => {
         mutationFn: async () => {
             console.log("attempting to toggle favorite professor when favorited status is:", favorited)
             if (favorited) {
-                try {
-                    const response = await api.delete(`/favorites/professor/${params.professorId}`)
-                    return true
-                } catch (error) {
-                    if (axios.isAxiosError(error) && error.response) {
-                        const customMessage = error.response.data.message
-                        throw new Error(customMessage || 'An error occurred')
-                    }
-                    throw error
-                }
+                const response = await api.delete(`/favorites/professor/${params.professorId}`)
+                return true
             }
 
-            try {
-                const response = await api.post(`/favorites/professor/${params.professorId}`)
-                return true
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(`/favorites/professor/${params.professorId}`)
+            return true
         },
         onMutate: () => {
             setFavorited(prev => !prev)
@@ -148,7 +117,7 @@ const AllProfessorCourses = ({params}: {params: {professorId: string}}) => {
     }, [query, courses])
 
 
-    if (loading) {
+    if (infoLoading || loading) {
         return (
             <SafeAreaView className="flex-1 dark:bg-gray-800">
                 <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />

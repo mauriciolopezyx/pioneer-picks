@@ -49,15 +49,8 @@ const Category = () => {
   } = useInfiniteQuery({
     queryKey: ["specific-favorite-course-professors", category],
     queryFn: async ({ pageParam = 0 }) => {
-      try {
-        const response = await api.get(`${endpoint}?page=${pageParam}`)
-        return response.data
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-          throw new Error(error.response.data.message || 'An error occurred')
-        }
-        throw error
-      }
+      const response = await api.get(`${endpoint}?page=${pageParam}`)
+      return response.data
     },
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.hasMore ? allPages.length : undefined

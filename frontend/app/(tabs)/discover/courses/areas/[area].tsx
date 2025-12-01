@@ -51,16 +51,9 @@ const CoursesByArea = () => {
     queryKey: ["specific-courses-by-area", area],
     enabled: !!area,
     queryFn: async ({ pageParam = 0 }) => {
-      try {
-        console.log("new area att:", new Date(), "with page:", pageParam)
-        const response = await api.get(`/courses?q=${area}&page=${pageParam}`)
-        return response.data
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-          throw new Error(error.response.data.message || 'An error occurred')
-        }
-        throw error
-      }
+      console.log("new area att:", new Date(), "with page:", pageParam)
+      const response = await api.get(`/courses?q=${area}&page=${pageParam}`)
+      return response.data
     },
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.hasMore ? allPages.length : undefined

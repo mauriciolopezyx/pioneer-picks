@@ -58,16 +58,8 @@ export default function Verify() {
                 throw new Error("Failed to send code: no email detected")
             }
             console.log("submitting verify attempt")
-            try {
-                const response = await api.post(verifyEndpoint, {email: email, verificationCode: code})
-                return response.data
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(verifyEndpoint, {email: email, verificationCode: code})
+            return response.data
         },
         onSuccess: async (json) => {
             await refetch()
@@ -85,17 +77,9 @@ export default function Verify() {
     const {mutate:resendCode} = useMutation({
         mutationFn: async () => {
             console.log("submitting resend code")
-            try {
-                const response = await api.post(resendEndpoint, {email: email})
-                setResendCooldown(30)
-                return true
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(resendEndpoint, {email: email})
+            setResendCooldown(30)
+            return true
         },
         onSuccess: () => {
             console.log("successfully resent code!")

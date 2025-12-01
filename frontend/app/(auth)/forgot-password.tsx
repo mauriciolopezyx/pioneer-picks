@@ -39,16 +39,8 @@ const ForgotPassword = () => {
     const {isPending:loading, mutate} = useMutation({
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting forgot password email")
-            try {
-                const response = await api.post(`/auth/forgot-password`, {email: data.email})
-                return response.data.email
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(`/auth/forgot-password`, {email: data.email})
+            return response.data.email
         },
         onSuccess: (email: string) => {
             console.log("sent forgot password code to email successfully!")

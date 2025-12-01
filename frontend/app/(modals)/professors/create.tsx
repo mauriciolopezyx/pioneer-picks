@@ -30,16 +30,8 @@ const Create = () => {
             if (form.name.trim() === "") {
                 throw new Error(`The following fields are required: Professor Name`)
             }
-            try {
-                const response = await api.post(`/professors`, form)
-                return true
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(`/professors`, form)
+            return true
         },
         onSuccess: () => {
             MasterToast.show({

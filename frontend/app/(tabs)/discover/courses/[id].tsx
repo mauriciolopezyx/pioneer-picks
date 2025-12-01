@@ -45,17 +45,9 @@ const Course = () => {
     const { isLoading:loading, isSuccess:success, error, data:course } = useQuery({
         queryKey: ["specific-course", courseId],
         queryFn: async () => {
-            try {
-                const response = await api.get(`/courses/${courseId}`)
-                setFavorited(response.data.favorited)
-                return response.data
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                const customMessage = error.response.data.message
-                throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.get(`/courses/${courseId}`)
+            setFavorited(response.data.favorited)
+            return response.data
         },
         refetchOnWindowFocus: true
     })
@@ -68,15 +60,8 @@ const Course = () => {
     } = useInfiniteQuery({
         queryKey: ["specific-course-professors", courseId],
         queryFn: async ({ pageParam = 0 }) => {
-        try {
             const response = await api.get(`/courses/${courseId}/professors?page=${pageParam}`)
             return response.data
-        } catch (error) {
-            if (axios.isAxiosError(error) && error.response) {
-                throw new Error(error.response.data.message || 'An error occurred')
-            }
-            throw error
-        }
         },
         getNextPageParam: (lastPage, allPages) => {
             return lastPage.hasMore ? allPages.length : undefined
@@ -128,28 +113,12 @@ const Course = () => {
         mutationFn: async () => {
             console.log("attempting to toggle favorite course when favorited status is:", favorited)
             if (favorited) {
-                try {
-                    const response = await api.delete(`/favorites/course/${courseId}`)
-                    return true
-                } catch (error) {
-                    if (axios.isAxiosError(error) && error.response) {
-                        const customMessage = error.response.data.message
-                        throw new Error(customMessage || 'An error occurred')
-                    }
-                    throw error
-                }
+                const response = await api.delete(`/favorites/course/${courseId}`)
+                return true
             }
 
-            try {
-                const response = await api.post(`/favorites/course/${courseId}`)
-                return true
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(`/favorites/course/${courseId}`)
+            return true
         },
         onMutate: () => {
             setFavorited(prev => !prev)

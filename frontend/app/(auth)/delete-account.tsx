@@ -15,28 +15,27 @@ import { Ionicons } from "@expo/vector-icons";
 
 import api from "@/services/api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Link, useRouter } from "expo-router";
 import axios from "axios";
 import { Controller, useForm } from "react-hook-form";
+import * as SecureStore from "expo-secure-store";
 import { z } from "zod";
 import { useAuth } from "@/components/AuthProvider";
 import MasterToast from "@/components/ToastWrapper"
 
 const formSchema = z.object({
-    email: z.string().min(22, {
-        message: "Email is required"
-    }),
     password: z.string().min(5, {
         message: "Password must be at least 5 characters"
-    }),
+    })
 })
 
-export default function Login() {
+export default function DeleteAccount() {
   
   const router = useRouter()
   const { refetch:refetchAuth } = useAuth()
   const [showPassword, setShowPassword] = useState(false);
+  const queryClient = useQueryClient()
   
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -49,35 +48,37 @@ export default function Login() {
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
       password: ""
     },
     mode: "onChange"
   })
 
-  const {isPending:loading, mutate:login} = useMutation({
+  const {isPending:loading, mutate} = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      console.log("submitting login attempt")
-      const response = await api.post('/auth/login', data)
-      return response.data
+      console.log("submitting delete account attempt")
+      const response = await api.delete('/user/me', {data: data})
+      return true
     },
     onSuccess: async () => {
-      console.log("on Login success")
-      await refetchAuth()
-      router.replace({pathname: "/"})
-      reset()
+      console.log("on delete account success")
+      await SecureStore.deleteItemAsync("sessionId")
+      delete api.defaults.headers.common['Cookie']
+      queryClient.invalidateQueries({queryKey: ["authenticated-heartbeat"]})
+      MasterToast.show({
+        text1: "Successfully deleted account, thank you for using Pioneer Picks"
+      })
+      router.dismissTo({pathname: "/login"})
     },
     onError: (e: any) => {
-      //console.error("Login error:", e.message)
       MasterToast.show({
-        text1: "Error logging in",
-        text2: e?.message ?? "Failed to login"
+        text1: "Error deleting account",
+        text2: e?.message ?? "Failed to delete account"
       })
     }
   })
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-      login(values)
+    mutate(values)
   }
 
   return (
@@ -88,46 +89,13 @@ export default function Login() {
       >
           <View className="flex-1 justify-center items-center px-6">
             <View className="w-full max-w-[500px]">
-              <View className="mb-12">
+              <View className="mb-6">
                 <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-2">
-                  Login
+                  Delete Account
                 </Text>
-              </View>
-
-              <View className="mb-4">
-                <Text className="ml-4 font-montserrat-semibold font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email
+                <Text className="font-montserrat text-md mx-auto text-gray-900 dark:text-white mb-2" style={{textAlign: "center"}}>
+                    WARNING: By entering your password and pressing "Delete", you are deleting your account. This is irreversible!
                 </Text>
-                <Controller
-                  control={control}
-                  name="email"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      className={`
-                          font-montserrat
-                          bg-gray-50 dark:bg-gray-700 
-                          rounded-full px-4 py-3 
-                          text-gray-900 dark:text-white
-                      `}
-                      placeholder=""
-                      placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-                      onBlur={() => {
-                        onBlur()
-                      }}
-                      onChangeText={onChange}
-                      value={value}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      testID="email-input"
-                    />
-                  )}
-                />
-                {errors.email ? (
-                  <Text className="font-montserrat text-red-500 dark:text-red-400 text-sm mt-2">
-                    {errors.email.message}
-                  </Text>
-                ) : null}
               </View>
 
               <View className="mb-6">
@@ -179,12 +147,6 @@ export default function Login() {
                 ) : null}
               </View>
 
-              <TouchableOpacity className="mb-6" onPress={() => { router.navigate({pathname: "/(auth)/forgot-password"}) }} >
-                <Text className="font-montserrat-semibold text-md text-blue-600 dark:text-light-100 text-right">
-                  Forgot password?
-                </Text>
-              </TouchableOpacity>
-
               <TouchableOpacity
                 onPress={handleSubmit(onSubmit)}
                 disabled={loading}
@@ -195,19 +157,12 @@ export default function Login() {
                     : "bg-primary dark:bg-primary"
                   }
                 `}
-                testID="login-button"
+                testID="delete-account-button"
               >
                 <Text className="font-montserrat-semibold text-white text-center text-lg">
-                  {loading ? "Logging in..." : "Login"}
+                  {loading ? "Deleting..." : "Delete"}
                 </Text>
               </TouchableOpacity>
-
-              <View className="flex-row justify-center items-center">
-                  <Text className="font-montserrat text-gray-600 dark:text-gray-400 text-sm">
-                  Don&apos;t have an account?{" "}
-                  </Text>
-                  <Link replace href="/register" className="font-montserrat-semibold text-blue-600 dark:text-light-100 text-md">Register</Link>
-              </View>
             </View>
           </View>
       </KeyboardAvoidingView>

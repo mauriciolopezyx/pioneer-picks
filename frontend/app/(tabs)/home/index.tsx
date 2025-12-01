@@ -44,16 +44,8 @@ const Home = () => {
   const { isLoading:loading, error, data:favorites, refetch } = useQuery({
     queryKey: ["favorite-course-professors"],
     queryFn: async () => {
-      try {
-        const response = await api.get('/favorites')
-        return response.data
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-          const customMessage = error.response.data.message
-          throw new Error(customMessage || 'An error occurred')
-        }
-        throw error
-      }
+      const response = await api.get('/favorites')
+      return response.data
     },
     gcTime: 1000 * 60 * 5,
     refetchOnWindowFocus: true

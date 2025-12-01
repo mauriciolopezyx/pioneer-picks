@@ -7,7 +7,6 @@ const api = axios.create({
   withCredentials: false,
 });
 
-// Request interceptor - add session cookie
 api.interceptors.request.use(async (config) => {
   delete config.headers.Cookie;
 
@@ -18,7 +17,6 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// Response interceptor - save session ID
 api.interceptors.response.use(
   async (response) => {
 
@@ -42,7 +40,22 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    return Promise.reject(error);
+    if (axios.isAxiosError(error)) {
+      const message = error.response?.data?.message || error.message || 'An error occurred';
+      const status = error.response?.status;
+      
+      // Create a simple error object
+      const cleanError = new Error(message);
+      // Only attach simple, serializable properties
+      if (status) {
+        (cleanError as any).status = status;
+      }
+      
+      return Promise.reject(cleanError);
+    }
+    
+    // For non-axios errors, ensure it's a proper Error object
+    return Promise.reject(error instanceof Error ? error : new Error(String(error)));
   }
 );
 

@@ -80,22 +80,14 @@ const search = () => {
             if (query.trim() === "") {
                 throw new Error("Query cannot be empty")
             }
-            try {
-                const response = await api.get(`/search?q=${query}`)
-                return (
-                    [
-                        ...response.data.subjects.map((s: any) => ({ category: 1, data: s })),
-                        ...response.data.courses.map((c: any) => ({ category: 2, data: c })),
-                        ...response.data.professors.map((p: any) => ({ category: 3, data: p }))
-                    ]
-                )
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.get(`/search?q=${query}`)
+            return (
+                [
+                    ...response.data.subjects.map((s: any) => ({ category: 1, data: s })),
+                    ...response.data.courses.map((c: any) => ({ category: 2, data: c })),
+                    ...response.data.professors.map((p: any) => ({ category: 3, data: p }))
+                ]
+            )
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "Failed to verify")

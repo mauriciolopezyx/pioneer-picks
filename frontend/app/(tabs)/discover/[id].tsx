@@ -32,16 +32,8 @@ const Courses = () => {
   const { isLoading:loading, isSuccess:success, error, data:subject } = useQuery({
     queryKey: ["specific-subject", id],
     queryFn: async () => {
-      try {
-        const response = await api.get(`/subjects/${id}`)
-        return response.data
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-          const customMessage = error.response.data.message
-          throw new Error(customMessage || 'An error occurred')
-        }
-        throw error
-      }
+      const response = await api.get(`/subjects/${id}`)
+      return response.data
     },
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 60 * 24,
@@ -56,15 +48,8 @@ const Courses = () => {
   } = useInfiniteQuery({
     queryKey: ["specific-subject-courses", id],
     queryFn: async ({ pageParam = 0 }) => {
-      try {
-        const response = await api.get(`/subjects/${id}/courses?page=${pageParam}`)
-        return response.data
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-          throw new Error(error.response.data.message || 'An error occurred')
-        }
-        throw error
-      }
+      const response = await api.get(`/subjects/${id}/courses?page=${pageParam}`)
+      return response.data
     },
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.hasMore ? allPages.length : undefined

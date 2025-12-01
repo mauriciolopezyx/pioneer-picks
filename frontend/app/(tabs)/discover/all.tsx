@@ -28,16 +28,8 @@ const discover = () => {
   const { isLoading:loading, error, data } = useQuery({
     queryKey: ["all-subjects"],
     queryFn: async () => {
-      try {
-        const response = await api.get(`/subjects`)
-        return response.data
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-          const customMessage = error.response.data.message
-          throw new Error(customMessage || 'An error occurred')
-        }
-        throw error
-      }
+      const response = await api.get(`/subjects`)
+      return response.data
     },
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 60 * 24,

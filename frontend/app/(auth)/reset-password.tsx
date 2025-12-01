@@ -64,21 +64,13 @@ const ResetPassword = () => {
     const {isPending:loading, mutate:resetPassword} = useMutation({
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting reset password *Attempt*")
-            try {
-                const response = await api.post(endpoint, {
-                    ...( (!token && !email) && {oldPassword: data.old}),
-                    ...(token && {forgotToken: token}),
-                    ...(email && {email: email}),
-                    newPassword: data.new
-                })
-                return true
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(endpoint, {
+                ...( (!token && !email) && {oldPassword: data.old}),
+                ...(token && {forgotToken: token}),
+                ...(email && {email: email}),
+                newPassword: data.new
+            })
+            return true
         },
         onSuccess: async () => {
             console.log("reset password successfully!")

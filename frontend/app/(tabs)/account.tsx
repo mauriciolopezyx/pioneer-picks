@@ -23,16 +23,8 @@ const Account = () => {
   const {mutate:logout} = useMutation({
     mutationFn: async () => {
       console.log("Attempting to log out")
-      try {
-        const response = await api.post(`/logout`)
-        return true
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-          const customMessage = error.response.data.message
-          throw new Error(customMessage || 'An error occurred')
-        }
-        throw error
-      }
+      const response = await api.post(`/logout`)
+      return true
     },
     onSuccess: async () => {
       await SecureStore.deleteItemAsync("sessionId")
@@ -74,7 +66,7 @@ const Account = () => {
       </View> 
         
       <View>
-        <Text className="font-montserrat dark:text-light-100 italic" style={{textAlign: "right"}}>Version 1.0</Text>
+        <Text className="font-montserrat dark:text-light-100 italic" style={{textAlign: "right"}}>Version 1.0.0</Text>
         {/* <Text className="font-montserrat text-xs dark:text-light-200 italic" style={{textAlign: "right"}}>Made by CSUEB students</Text> */}
       </View>
 

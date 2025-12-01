@@ -38,16 +38,8 @@ export default function SectionScreen() {
             if (commentBody.trim() === "") {
                 throw new Error("Cannot have empty comment body!")
             }
-            try {
-                const response = await api.post(`/comments/${courseId}/${professorId}`, {body: commentBody})
-                return true
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    const customMessage = error.response.data.message
-                    throw new Error(customMessage || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.post(`/comments/${courseId}/${professorId}`, {body: commentBody})
+            return true
         },
         onSuccess: () => {
             console.log("successfully posted comment")
@@ -96,15 +88,8 @@ export default function SectionScreen() {
     } = useInfiniteQuery({
         queryKey: ["specific-course-professor-comments", professorId, courseId],
         queryFn: async ({ pageParam = 0 }) => {
-            try {
-                const response = await api.get(`/comments/${courseId}/${professorId}?page=${pageParam}`)
-                return response.data
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    throw new Error(error.response.data.message || 'An error occurred')
-                }
-                throw error
-            }
+            const response = await api.get(`/comments/${courseId}/${professorId}?page=${pageParam}`)
+            return response.data
         },
         getNextPageParam: (lastPage, allPages) => {
             return lastPage.hasMore ? allPages.length : undefined
