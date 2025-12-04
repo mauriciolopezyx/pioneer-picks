@@ -59,6 +59,11 @@ const Account = () => {
           <Ionicons name="chevron-forward-outline" size={30} color={(colorScheme && colorScheme === "dark") ? "white" : "black"} />
         </GestureWrapper>
 
+        <GestureWrapper className="flex flex-row justify-between items-center py-4" onPress={ () => { router.navigate({pathname: "/(auth)/delete-account"}) }} >
+          <Text className="font-montserrat-semibold text-xl text-random">Delete Account</Text>
+          <Ionicons name="chevron-forward-outline" size={30} color="#00d0ff" />
+        </GestureWrapper>
+
         <GestureWrapper className="flex flex-row justify-between items-center py-4" onPress={ () => { logout() }} >
           <Text className="font-montserrat-semibold text-xl text-primary">Log Out</Text>
           <Ionicons name="chevron-forward-outline" size={30} color="#d50032" />

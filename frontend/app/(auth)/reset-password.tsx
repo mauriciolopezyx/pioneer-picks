@@ -77,11 +77,13 @@ const ResetPassword = () => {
             MasterToast.show({
                 text1: "Successfully reset password!"
             })
-            reset()
+            // reset()
             if (token) {
-                await refetchAuth()
+                // await refetchAuth()
+                router.dismissTo({pathname: "/login"})
+            } else {
+                router.dismissTo({pathname: "/"})
             }
-            router.replace({pathname: "/"})
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "failed to reset password")

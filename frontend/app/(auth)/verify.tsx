@@ -47,7 +47,7 @@ export default function Verify() {
 
     const verifyEndpoint = forgotPassword ? `/auth/forgot-password/code` : `/auth/verify`
     const resendEndpoint = forgotPassword ? `/auth/forgot-password/code/resend` : `/auth/resend`
-    const redirectUrl = forgotPassword ? "/(auth)/reset-password" : "/"
+    const redirectUrl = forgotPassword ? "/(auth)/reset-password" : "/login"
 
     const {isPending:loading, isError, mutate:confirmMutate} = useMutation({
         mutationFn: async () => {
@@ -62,8 +62,8 @@ export default function Verify() {
             return response.data
         },
         onSuccess: async (json) => {
-            await refetch()
-            router.replace({pathname: redirectUrl, params: {token: (json?.token && forgotPassword) ? json.token : undefined, email: (json?.token && forgotPassword) ? email : undefined}})
+            // await refetch()
+            router.dismissTo({pathname: redirectUrl, params: {token: (json?.token && forgotPassword) ? json.token : undefined, email: (json?.token && forgotPassword) ? email : undefined}})
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "Failed to verify")
@@ -112,7 +112,7 @@ export default function Verify() {
                                 Verify
                             </Text>
                             <Text className="font-montserrat text-gray-600 dark:text-gray-300 text-center">
-                                Enter the code sent to <Text className="font-montserrat-semibold">{email ? maskEmail(email) : maskEmail("placeholder@gmail.com")}</Text>
+                                Enter the code sent to <Text className="font-montserrat-semibold">{email ? maskEmail(email) : ""}</Text>
                             </Text>
                         </View>
 

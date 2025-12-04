@@ -18,7 +18,8 @@ module.exports = {
           200: "#0f0d23"
         },
         tab: "#aaa",
-        accent: "#AB8BFF"
+        accent: "#AB8BFF",
+        random: "#00d0ff"
       },
 
       fontFamily: {

@@ -89,12 +89,12 @@ export default function DeleteAccount() {
       >
           <View className="flex-1 justify-center items-center px-6">
             <View className="w-full max-w-[500px]">
-              <View className="mb-6">
-                <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-2">
+              <View className="mb-6`">
+                <Text className="font-montserrat-bold text-4xl mx-auto text-gray-900 dark:text-white mb-4">
                   Delete Account
                 </Text>
-                <Text className="font-montserrat text-md mx-auto text-gray-900 dark:text-white mb-2" style={{textAlign: "center"}}>
-                    WARNING: By entering your password and pressing "Delete", you are deleting your account. This is irreversible!
+                <Text className="font-montserrat text-md mx-auto text-gray-900 dark:text-white mb-4" style={{textAlign: "center"}}>
+                    <Text className="font-montserrat-bold">WARNING:</Text> By entering your password and pressing "Delete", you are deleting your account. This is irreversible!
                 </Text>
               </View>
 

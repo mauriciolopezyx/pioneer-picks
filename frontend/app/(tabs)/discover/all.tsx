@@ -109,7 +109,7 @@ const discover = () => {
           <Pressable className="flex-1" onPress={() => { router.navigate({ pathname: "/search" })}}>
             <View className="pointer-events-none flex-1">
               <SearchBar
-                placeholder="Searchs"
+                placeholder="Search"
                 onChangeText={onChangeQuery}
                 disabled={true}
               />

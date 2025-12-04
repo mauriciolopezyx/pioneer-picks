@@ -102,7 +102,7 @@ export default function SectionScreen() {
 
     if (loading) {
         return (
-            <View className="flex-1 dark:bg-gray-800">
+            <View className="flex-1 dark:bg-gray-800 p-5">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
@@ -112,10 +112,15 @@ export default function SectionScreen() {
 
     if (error) {
         return (
-            <View className="flex-1 dark:bg-gray-800">
+            <View className="flex-1 dark:bg-gray-800 p-5">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
-                <Text className="font-montserrat dark:text-white">Failed to load comments: {error?.message}</Text>
+                <Text className="font-montserrat dark:text-white" style={{textAlign: "center"}}>Failed to load comments: {error?.message}</Text>
+                <View className="pb-[25px] pt-[10px] bg-black dark:bg-gray-800 flex items-center justify-center">
+                    <View className="w-[90%]">
+                        <CommentInput onChangeText={onChangeBody} commentBody={commentBody} onComment={onComment} user={user} colorScheme={colorScheme} />
+                    </View>
+                </View>
             </View>
         )
     }
@@ -124,11 +129,22 @@ export default function SectionScreen() {
 
     if (!comments || (comments && comments.length == 0) ) {
         return (
-            <View className="flex-1 dark:bg-gray-800">
-                <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
-                <View className="border-t-[1px] dark:border-white mb-8"></View>
-                <Text className="font-montserrat dark:text-white">Failed to load comments (no data found)</Text>
-            </View>
+            <KeyboardAvoidingView
+                className="flex-1 dark:bg-gray-800"
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={55}
+            >
+                <View className="flex-1 p-5">
+                    <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
+                    <View className="border-t-[1px] dark:border-white mb-8"></View>
+                    <Text className="font-montserrat dark:text-white" style={{textAlign: "center"}}>No comments found</Text>
+                </View>
+                <View className="pb-[25px] pt-[10px] bg-black dark:bg-gray-800 flex items-center justify-center">
+                    <View className="w-[90%]">
+                        <CommentInput onChangeText={onChangeBody} commentBody={commentBody} onComment={onComment} user={user} colorScheme={colorScheme} />
+                    </View>
+                </View>
+            </KeyboardAvoidingView>
         )
     }
 
@@ -138,7 +154,7 @@ export default function SectionScreen() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={55}
         >
-            <View className="flex-1 px-5 pt-5">
+            <View className="flex-1 p-5">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Comments</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <FlashList

@@ -40,7 +40,7 @@ const ForgotPassword = () => {
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log("submitting forgot password email")
             const response = await api.post(`/auth/forgot-password`, {email: data.email})
-            return response.data.email
+            return data.email
         },
         onSuccess: (email: string) => {
             console.log("sent forgot password code to email successfully!")
@@ -48,7 +48,7 @@ const ForgotPassword = () => {
                 text1: "Successfully sent email code!"
             })
             reset()
-            router.replace({pathname: "/verify", params: {email: email, forgot: "true"}})
+            router.dismissTo({pathname: "/verify", params: {email: email, forgot: "true"}})
         },
         onError: (e: any) => {
             //console.error(e?.message ?? "failed to reset password")

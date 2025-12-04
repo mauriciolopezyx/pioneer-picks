@@ -80,20 +80,38 @@ export default function SectionScreen() {
     
     if (loading) {
         return (
-            <View className="flex-1 dark:bg-gray-800">
+            <View className="flex-1 dark:bg-gray-800 relative p-5">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <ActivityIndicator size="large" color="#fff" className="mt-10 self-center" />
+                <View className="absolute bottom-[30px] right-[30px]">
+                    <GestureWrapper
+                        className="w-[75px] h-[75px] px-1 flex items-center justify-center rounded-full"
+                        backgroundColor="#d50032"
+                        onPress={() => { router.navigate({pathname: "/(modals)/professors/reviews/create", params: {professorId: professorId, courseId: courseId}}) }}
+                    >
+                        <Ionicons name={user ? "add-outline" : "close-outline"} size={35} color="white" />
+                    </GestureWrapper>
+                </View>
             </View>
         )
     }
 
     if (error) {
         return (
-            <View className="flex-1 dark:bg-gray-800">
+            <View className="flex-1 dark:bg-gray-800 relative p-5">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
-                <Text className="font-montserrat dark:text-white">Failed to load reviews: {error?.message}</Text>
+                <Text className="font-montserrat dark:text-white" style={{textAlign: "center"}}>Failed to load reviews: {error?.message}</Text>
+                <View className="absolute bottom-[30px] right-[30px]">
+                    <GestureWrapper
+                        className="w-[75px] h-[75px] px-1 flex items-center justify-center rounded-full"
+                        backgroundColor="#d50032"
+                        onPress={() => { router.navigate({pathname: "/(modals)/professors/reviews/create", params: {professorId: professorId, courseId: courseId}}) }}
+                    >
+                        <Ionicons name={user ? "add-outline" : "close-outline"} size={35} color="white" />
+                    </GestureWrapper>
+                </View>
             </View>
         )
     }
@@ -102,10 +120,19 @@ export default function SectionScreen() {
 
     if (!reviews || (reviews && reviews.length == 0) ) {
         return (
-            <View className="flex-1 dark:bg-gray-800">
+            <View className="flex-1 dark:bg-gray-800 relative p-5">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
-                <Text className="font-montserrat dark:text-white">Failed to load reviews (no data found)</Text>
+                <Text className="font-montserrat dark:text-white" style={{textAlign: "center"}}>No reviews found</Text>
+                <View className="absolute bottom-[30px] right-[30px]">
+                    <GestureWrapper
+                        className="w-[75px] h-[75px] px-1 flex items-center justify-center rounded-full"
+                        backgroundColor="#d50032"
+                        onPress={() => { router.navigate({pathname: "/(modals)/professors/reviews/create", params: {professorId: professorId, courseId: courseId}}) }}
+                    >
+                        <Ionicons name={user ? "add-outline" : "close-outline"} size={35} color="white" />
+                    </GestureWrapper>
+                </View>
             </View>
         )
     }
@@ -116,7 +143,7 @@ export default function SectionScreen() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={55}
         >
-            <View className="flex-1 px-5 pt-5">
+            <View className="flex-1 p-5">
                 <Text className="font-montserrat-bold font-bold text-2xl mb-4 mx-auto dark:text-white">Reviews</Text>
                 <View className="border-t-[1px] dark:border-white mb-8"></View>
                 <FlashList

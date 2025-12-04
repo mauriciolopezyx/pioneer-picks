@@ -64,7 +64,7 @@ export default function Login() {
     onSuccess: async () => {
       console.log("on Login success")
       await refetchAuth()
-      router.replace({pathname: "/"})
+      router.dismissTo({pathname: "/"})
       reset()
     },
     onError: (e: any) => {
@@ -179,7 +179,7 @@ export default function Login() {
                 ) : null}
               </View>
 
-              <TouchableOpacity className="mb-6" onPress={() => { router.navigate({pathname: "/(auth)/forgot-password"}) }} >
+              <TouchableOpacity className="mb-6" onPress={() => { router.push({pathname: "/(auth)/forgot-password"}) }} >
                 <Text className="font-montserrat-semibold text-md text-blue-600 dark:text-light-100 text-right">
                   Forgot password?
                 </Text>

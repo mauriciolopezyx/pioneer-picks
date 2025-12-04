@@ -177,7 +177,7 @@ const Course = () => {
             <View className="h-[50px]"></View>
             <Text className="font-montserrat-extrabold text-3xl mb-2 dark:text-white">{course.name}</Text>
 
-            <Text className="font-montserrat mb-2 dark:text-white">Also known as <Text className="font-montserrat-semibold text-xl">{`${subjectAbbreviation} ${course.abbreviation}`}</Text></Text>
+            {course.abbreviation ? <Text className="font-montserrat mb-2 dark:text-white">Also known as <Text className="font-montserrat-semibold text-xl">{`${subjectAbbreviation} ${course.abbreviation}`}</Text></Text> : null}
             <Text className="font-montserrat mb-4 dark:text-white"><Text className="font-montserrat-semibold text-xl">{course.units ?? "Unknown"}</Text> units</Text>
 
             <View className="flex flex-row justify-between items-center gap-x-2 mb-2">
@@ -206,9 +206,9 @@ const Course = () => {
                     onChangeText={onChangeQuery}
                     disabled={false}
                 />
-                <GestureWrapper className="rounded-full" onPress={() => { router.navigate({pathname: "/(modals)/professors/create", params: {courseId: courseId, subjectAbbreviation: subjectAbbreviation, courseAbbreviation: course.abbreviation}}) }} backgroundColor="#d50032">
+                {course.abbreviation ? <GestureWrapper className="rounded-full" onPress={() => { router.navigate({pathname: "/(modals)/professors/create", params: {courseId: courseId, subjectAbbreviation: subjectAbbreviation, courseAbbreviation: course.abbreviation}}) }} backgroundColor="#d50032">
                     <Ionicons name="add" size={30} color="white" />
-                </GestureWrapper>
+                </GestureWrapper> : null}
             </View>
 
             <Text className="font-montserrat-bold text-2xl mb-2 dark:text-white">Professors</Text>

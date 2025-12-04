@@ -32,7 +32,7 @@ const CourseCard = ({ course, subject }: { course: Course, subject: SubjectCours
   };
 
   const seen = new Set()
-  const areaDisplays = course.areas.split(",").map((area) => {
+  const areaDisplays = (course && course.areas) ? course.areas.split(",").map((area) => {
     if (seen.has(area)) return null
     if (areaAbbreviations[area] && seen.has(areaAbbreviations[area])) return null
 
@@ -54,13 +54,13 @@ const CourseCard = ({ course, subject }: { course: Course, subject: SubjectCours
         <Text className={`font-montserrat-medium text-sm ${textAreaColor}`}>{area}</Text>
       </View>
     )
-  })
+  }) : []
 
   return (
     <GestureWrapper className="flex flex-row justify-between items-center flex-1 rounded-lg p-3 overflow-hidden" backgroundColor={bgColor} onPress={handleSubmit}>
       <View className="flex flex-col items-start justify-center gap-y-[2px]">
         <Text numberOfLines={1} className={`text-xl font-montserrat-bold ${textColor}`}>
-          {`${subject.abbreviation} ${course.abbreviation}`}
+          {course.abbreviation ? `${subject.abbreviation} ${course.abbreviation}` : `Incomplete Course`}
         </Text>
         <Text className={`font-montserrat-semibold ${textColor} mb-[4px]`}>
           {course.name}

@@ -60,10 +60,10 @@ export default function Register() {
             console.log("submitting with:")
             console.log(data)
             const response = await api.post(`/auth/register`, {username: data.username, email: data.email, password: data.password})
-            return response.data.email
+            return data.email
         },
         onSuccess: (email: string) => {
-            router.replace({pathname: "/verify", params: {email: email, forgot: "false"}})
+            router.dismissTo({pathname: "/verify", params: {email: email, forgot: "false"}})
             reset()
         },
         onError: (e: any) => {
