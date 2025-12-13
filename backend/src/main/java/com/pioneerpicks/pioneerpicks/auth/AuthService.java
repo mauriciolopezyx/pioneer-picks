@@ -163,16 +163,17 @@ class AuthService {
     }
 
     public void sendVerificationEmail(User user) {
-        String subject = "Account Verification";
         String verificationCode = user.getVerificationCode();
+        String subject = verificationCode + " is your verification code";
         String htmlMessage = "<html>"
-                + "<body style=\"font-family: Arial, sans-serif;\">"
-                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
-                + "<h2 style=\"color: #333;\">Welcome to Pioneer Picks!</h2>"
-                + "<p style=\"font-size: 16px;\">Please enter the following verification code in the website to continue!</p>"
-                + "<div style=\"background-color: #fff; padding: 10px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
-                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + verificationCode + "</p>"
-                + "</div>"
+                + "<head>"
+                + "<link href=\"https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap\" rel=\"stylesheet\">"
+                + "</head>"
+                + "<body style=\"font-family: 'Montserrat', Arial, sans-serif; margin: 0; padding: 0;\">"
+                + "<div style=\"padding: 20px;\">"
+                + "<h2 style=\"font-family: 'Montserrat', sans-serif; color: #000; font-weight: 700;\">Pioneer Picks</h2>"
+                + "<p style=\"font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 400;\">Please enter the following verification code when prompted:</p>"
+                + "<p style=\"font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 700; color: #d50032;\">" + verificationCode + "</p>"
                 + "</div>"
                 + "</body>"
                 + "</html>";
